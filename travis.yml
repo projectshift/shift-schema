@@ -1,0 +1,13 @@
+language: python
+
+# use pythons
+python:
+  - "3.3"
+  - "3.4"
+
+# install dependencies
+install:
+  - pip install -r requirements/travis.txt
+
+# run tests
+script: nosetests -c nose.cfg

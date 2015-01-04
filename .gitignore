@@ -7,3 +7,6 @@ __pycache__
 # virtualenv ignores
 /env
 
+# project ignores
+/data/*
+
