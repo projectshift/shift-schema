@@ -1,0 +1,9 @@
+# IDE and OS ignores
+.idea
+.DS_Store
+__pycache__
+*.pyc
+
+# virtualenv ignores
+/env
+
