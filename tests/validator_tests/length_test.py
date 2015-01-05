@@ -16,27 +16,28 @@ class LengthTest(TestCase):
         """ Testing if length is too short """
         input = 'Short'
         validator = Length(min=10)
-        result = validator.validate(input)
-        self.assertFalse(result is True)
-        self.assertTrue(type(result) is str)
+        valid = validator.validate(input)
+
+        self.assertFalse(valid)
+        self.assertIsNotNone(valid.error)
 
 
     def test_too_long(self):
         """ Testing  if length is too long"""
         input = 'Very long string'
         validator = Length(max=3)
-        result = validator.validate(input)
-        self.assertFalse(result is True)
-        self.assertTrue(type(result) is str)
+        valid = validator.validate(input)
+        self.assertFalse(valid is True)
+        self.assertIsNotNone(valid.error)
 
 
     def test_length_range(self):
         """ Testing length is within range """
         value = 'Me is a very-very long string that is not in range'
         validator = Length(min=3, max=10)
-        result = validator.validate(value)
-        self.assertFalse(result is True)
-        self.assertTrue(type(result) is str)
+        valid = validator.validate(value)
+        self.assertFalse(valid is True)
+        self.assertIsNotNone(valid.error)
 
 
     def test_return_custom_error(self):
@@ -44,12 +45,13 @@ class LengthTest(TestCase):
         input = 'Short'
         error = 'Me is custom error'
         validator = Length(min=10, message=error)
-        self.assertEqual(error, validator.validate(input))
+        valid = validator.validate(input)
+        self.assertEqual(error, valid.error)
 
 
     def test_can_pass_validation(self):
         """ Test that correct length can pass validation """
         value = 'Me is ok'
         validator = Length(min=3, max=8)
-        result = validator.validate(value)
-        self.assertTrue(result is True)
+        valid = validator.validate(value)
+        self.assertTrue(valid)
