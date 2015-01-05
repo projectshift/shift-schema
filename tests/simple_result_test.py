@@ -2,7 +2,7 @@ from unittest import TestCase, mock
 from nose.plugins.attrib import attr
 from shiftvalidate.results import SimpleResult
 
-class ExampleTest(TestCase):
+class SimpleResultTests(TestCase):
     """
     Example test
     This is an example to demonstrate unittests are working
