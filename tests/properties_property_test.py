@@ -48,7 +48,6 @@ class PropertyTests(TestCase):
     def test_raise_on_adding_bad_validator(self):
         """ Raise if adding validator of bad type """
         property = Property()
-
         with self.assertRaises(InvalidValidator):
             property.add_validator(mock.Mock())
 
@@ -69,6 +68,8 @@ class PropertyTests(TestCase):
         property3 = Property()
         self.assertTrue(len(property3.filters) == 0)
         self.assertTrue(len(property3.validators) == 0)
+
+
 
 
 

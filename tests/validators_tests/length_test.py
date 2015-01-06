@@ -3,6 +3,7 @@ from nose.plugins.attrib import attr
 from shiftvalidate.validators import Length
 
 
+@attr('validator', 'length')
 class LengthTest(TestCase):
     """ String length validator test"""
 

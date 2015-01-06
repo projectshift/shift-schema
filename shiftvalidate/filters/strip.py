@@ -1,7 +1,13 @@
-from shiftvalidate.filters.abstract_filter import AbstractFilter
+from shiftvalidate.filters import AbstractFilter
+from shiftvalidate.exceptions import UnsupportedValueType, InvalidOption
 
 
 class Strip(AbstractFilter):
+    """
+    Strip filter
+    Removes spaces and newlines or specified characters from string.
+    Either from the front, back or from both sides.
+    """
 
     def __init__(self, mode='both', chars=None):
         """
@@ -16,7 +22,7 @@ class Strip(AbstractFilter):
         """
         modes = ['left', 'right', 'both']
         if not mode in modes:
-            raise ValueError('Allowed strip modes are left, right or both')
+            raise InvalidOption('Allowed strip modes are left, right or both')
 
         self.mode = mode
         self.chars = None
@@ -34,7 +40,7 @@ class Strip(AbstractFilter):
         :return:                filtered value
         """
         if not type(value) is str:
-            raise TypeError('Invalid type of value str expected')
+            raise UnsupportedValueType('Invalid type of value str expected')
 
         if self.mode == 'left':
             return value.lstrip(self.chars)
