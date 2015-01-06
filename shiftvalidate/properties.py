@@ -8,12 +8,16 @@ class Property:
     Represents a simple single-value property on the processor and
     holds a number of filters and validators for property value
     """
+    def __init__(self):
+        """
+        Initialize
+        Defines instance-level container for filters and validators
 
-    # property filters
-    filters = []
+        :return:                    None
+        """
+        self.filters = []
+        self.validators = []
 
-    # property validators
-    validators = []
 
 
     def add_filter(self, filter):
@@ -46,9 +50,9 @@ class Property:
         """
         if not isinstance(validator, AbstractValidator):
             err = 'Validator must be of type {}'.format(AbstractValidator)
-            raise InvalidFilter(err)
+            raise InvalidValidator(err)
 
-        self.validators.append(filter)
+        self.validators.append(validator)
         return self
 
 
