@@ -31,13 +31,14 @@ class Strip(AbstractFilter):
 
 
 
-    def filter(self, value):
+    def filter(self, value, context=None):
         """
         Filter
         Performs value filtering and returns filtered result.
 
-        :param value:           input value
-        :return:                filtered value
+        :param value:               input value
+        :param context:             object, filtering context
+        :return:                    filtered value
         """
         if not type(value) is str:
             raise UnsupportedValueType('Invalid type of value str expected')

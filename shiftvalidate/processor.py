@@ -39,9 +39,6 @@ class Processor:
             return
 
 
-
-
-
     def has_property(self, name):
         """
         Has property?

@@ -57,8 +57,21 @@ class Property:
 
 
 
-    def filter_value(self, value):
-        pass
+    def filter_value(self, value, context=None):
+        """
+        Filter value
+        Sequentially applies every attached filter to value.
+
+        :param value:               str, value to filter
+        :param context:             object, context (usually an entity)
+        :return:                    str, filtered result
+        """
+        for filter in self.filters:
+            value = filter.filter(value, context=context)
+
+        return value
+
+
 
     def validate_value(self, value):
         pass

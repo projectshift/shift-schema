@@ -3,7 +3,7 @@ from nose.plugins.attrib import attr
 
 from shiftvalidate.properties import Property
 from shiftvalidate.exceptions import InvalidFilter, InvalidValidator
-from shiftvalidate.filters import Strip
+from shiftvalidate.filters import Strip, Digits
 from shiftvalidate.validators import Length
 
 @attr('property')
@@ -70,7 +70,14 @@ class PropertyTests(TestCase):
         self.assertTrue(len(property3.validators) == 0)
 
 
+    def test_can_filter_value(self):
+        """ Filtering property value with attach filters """
+        property = Property()
+        property.add_filter(Strip(mode='both'))
+        property.add_filter(Digits())
 
+        value = '  Good luck in 2015 to you!'
+        self.assertEqual('2015', property.filter_value(value))
 
 
 
