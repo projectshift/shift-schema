@@ -3,8 +3,8 @@ from nose.plugins.attrib import attr
 
 from shiftvalidate.properties import Property
 from shiftvalidate.exceptions import InvalidFilter, InvalidValidator
-from shiftvalidate.filters.strip import Strip
-from shiftvalidate.validators.length import Length
+from shiftvalidate.filters import Strip
+from shiftvalidate.validators import Length
 
 @attr('property')
 class PropertyTests(TestCase):

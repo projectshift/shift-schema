@@ -1,6 +1,6 @@
 from unittest import TestCase, mock
 from nose.plugins.attrib import attr
-from shiftvalidate.filters.strip import Strip
+from shiftvalidate.filters import Strip
 
 @attr('filters', 'strip')
 class StripTest(TestCase):

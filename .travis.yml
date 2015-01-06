@@ -11,3 +11,7 @@ install:
 
 # run tests
 script: nosetests -c nose.cfg
+
+notifications:
+  email:
+    - dmitrybelyakov@gmail.com

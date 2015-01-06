@@ -1,6 +1,6 @@
 from shiftvalidate.exceptions import InvalidFilter, InvalidValidator
-from shiftvalidate.filters.abstract_filter import AbstractFilter
-from shiftvalidate.validators.abstract_validator import AbstractValidator
+from shiftvalidate.filters import AbstractFilter
+from shiftvalidate.validators import AbstractValidator
 
 class Property:
     """
