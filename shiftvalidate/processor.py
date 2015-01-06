@@ -41,6 +41,7 @@ class Processor:
 
 
 
+
     def has_property(self, name):
         """
         Has property?

@@ -1,6 +1,11 @@
 from abc import ABCMeta, abstractmethod
 
 class AbstractValidator(metaclass=ABCMeta):
+    """
+    Abstract validator
+    Provides a base for concrete validators and your custom validators. All
+    of those can be added to simple properties on the processor.
+    """
 
     @abstractmethod
     def validate(self, value, context=None):

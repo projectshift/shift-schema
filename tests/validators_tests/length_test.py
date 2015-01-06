@@ -1,6 +1,6 @@
 from unittest import TestCase, mock
 from nose.plugins.attrib import attr
-from shiftvalidate.validator.length import Length
+from shiftvalidate.validators.length import Length
 
 
 class LengthTest(TestCase):
@@ -55,3 +55,4 @@ class LengthTest(TestCase):
         validator = Length(min=3, max=8)
         valid = validator.validate(value)
         self.assertTrue(valid)
+

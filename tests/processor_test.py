@@ -22,37 +22,38 @@ class PersonProcessor(Processor):
     Holds a collection of filters and validators for processing person
     entity
     """
-    spec = {
-        'state': [
-            StateValidator1(),
-            StateValidator2(),
-        ],
-        'collections': {
-            'friends': [
-                CollectionProcessor1(),
-                CollectionProcessor2(),
-            ],
-            'enemies': [
-                CollectionProcessor1(),
-                CollectionProcessor2(),
-            ],
-        },
-
-        'entities': {
-            'spouse': [
-                EntityProcessor1(),
-                EntityProcessor2()
-            ],
-            'child': [
-                EntityProcessor1(),
-                EntityProcessor2()
-            ]
-        },
-
-        'id': [
-            Integer(),
-        ]
-    }
+    spec = {}
+    # spec = {
+    #     'state': [
+    #         StateValidator1(),
+    #         StateValidator2(),
+    #     ],
+    #     'collections': {
+    #         'friends': [
+    #             CollectionProcessor1(),
+    #             CollectionProcessor2(),
+    #         ],
+    #         'enemies': [
+    #             CollectionProcessor1(),
+    #             CollectionProcessor2(),
+    #         ],
+    #     },
+    #
+    #     'entities': {
+    #         'spouse': [
+    #             EntityProcessor1(),
+    #             EntityProcessor2()
+    #         ],
+    #         'child': [
+    #             EntityProcessor1(),
+    #             EntityProcessor2()
+    #         ]
+    #     },
+    #
+    #     'id': [
+    #         Integer(),
+    #     ]
+    # }
 
 
 class ProcessorTests(TestCase):

@@ -1,4 +1,4 @@
-from shiftvalidate.validator.abstract_validator import AbstractValidator
+from shiftvalidate.validators.abstract_validator import AbstractValidator
 from shiftvalidate.results import SimpleResult as Result
 
 class Length(AbstractValidator):
