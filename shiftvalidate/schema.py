@@ -3,27 +3,14 @@ from shiftvalidate.properties import Property, Entity, Collection
 from shiftvalidate.exceptions import PropertyExists
 
 
-class Processor:
+class Schema:
     """
-    Entity processor
+    Entity schema
     Performs filtering and validation of entity property values according
     to specified rules to return a validation result object containing
     error messages (if any). Extend from this class and define your
     own filtering and validation rules for your entities.
     """
-
-    # state validators
-    state_processors = {}
-
-    # property objects (each having filters and validator)
-    property_processors = {}
-
-    # linked entity processors
-    entity_processors = {}
-
-    # collection objects
-    collection_processors = {}
-
 
     def __init__(self, spec=None):
         """
@@ -35,8 +22,23 @@ class Processor:
         :param spec:            dict or None, processor specification
         :return:                None
         """
+
+        # state validators
+        self.state = {}
+
+        # property objects (each having filters and validator)
+        self.properties = {}
+
+        # linked entities
+        self.entities = {}
+
+        # linked collections
+        self.collections = {}
+
         if spec is None:
             return
+
+
 
 
     def has_property(self, name):
@@ -48,11 +50,11 @@ class Processor:
         :param name:            string, property name to check
         :return:                bool
         """
-        if property in self.property_processors:
+        if name in self.properties:
             return True
-        if property in self.collection_processors:
+        if name in self.collections:
             return True
-        if property in self.entity_processors:
+        if name in self.entities:
             return True
 
         # otherwise no property
@@ -71,7 +73,7 @@ class Processor:
         if self.has_property(name):
             err = 'Property "{}" already exists'
             raise PropertyExists(err.format(name))
-        self.property_processors[name] = Property()
+        self.properties[name] = Property()
 
 
     def add_collection(self, name):
@@ -86,7 +88,7 @@ class Processor:
         if self.has_property(name):
             err = 'Property "{}" already exists'
             raise PropertyExists(err.format(name))
-        self.property_processors[name] = Collection()
+        self.collections[name] = Collection()
 
 
     def add_entity(self, name):
@@ -101,19 +103,42 @@ class Processor:
         if self.has_property(name):
             err = 'Property "{}" already exists'
             raise PropertyExists(err.format(name))
-        self.entity_processors[name] = Entity()
+        self.entities[name] = Entity()
 
 
-    def validate(self, model):
+    def __getattr__(self, property):
         """
-        Validate
-        Perform model validation by going through all attached filters
-        and validators and collect results into a result object.
+        Get attribute
+        Searches for an attribute in properties, linked entities and collections
+        and returns the first result found.
 
-        :param model:           object, an entity fo filter and validate
+        :param property:        a property to get
+        :return:                Property, Entity or Collection
+        """
+
+        if property in self.properties.keys():
+            return self.properties[property]
+        if property in self.entities.keys():
+            return self.entities[property]
+        if property in self.collections:
+            return self.collections[property]
+
+        return object.__getattribute__(self, property)
+
+
+
+    def process(self, model):
+        """
+        Process
+        Accepts an entity than applies its filters and performs validation
+        afterwards to return validation result object
+
+        :param model:           object, an object to process
         :return:                shiftvalidate.results.ModelResult
         """
-        pass
+        self.filter(model)
+        validation_result = self.validate(model)
+        return validation_result
 
 
     def filter(self, model):
@@ -126,18 +151,31 @@ class Processor:
         :param model:           object, an entity to filter
         :return:                object
         """
+
+        # go through each configured properties and filter onthe model
+
         pass
 
 
-    def process(self, model):
+    def validate(self, model):
         """
-        Process
-        Accepts an entity than applies its filters and performs validation
-        afterwards to return validation result object
+        Validate
+        Perform model validation by going through all attached filters
+        and validators and collect results into a result object.
 
-        :param model:           object, an object to process
+        :param model:           object, an entity fo filter and validate
         :return:                shiftvalidate.results.ModelResult
         """
+
+        # go through each configured property and validate, collecting and
+        # merging results
+
         pass
+
+
+
+
+
+
 
 
