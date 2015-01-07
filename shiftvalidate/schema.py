@@ -255,6 +255,12 @@ class Schema:
 
         result = ValidationResult()
 
+        # validate state
+        for state_validator in self.state:
+            ok = state_validator.validate(value=model, context=model)
+            if not ok:
+                result.add_errors(property=None, errors=ok.errors)
+
         # validate properties
         for property in self.properties:
 
@@ -274,7 +280,7 @@ class Schema:
             )
 
             if not ok:
-                result.add_errors(property, ok)
+                result.add_errors(property, ok.errors)
 
         # done
         return result

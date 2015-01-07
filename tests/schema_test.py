@@ -30,7 +30,7 @@ person_spec = {
         ],
         'salutation': [
             Strip(),
-            Choice(['mr', 'ms'])
+            Choice(['mr', 'ms', None])
         ],
         'birth_year': [
             Strip(),
@@ -278,7 +278,7 @@ class ProcessorTests(TestCase):
 
 
     def test_validate_entity_properties(self):
-        """ Validating properties and returning result """
+        """ Validating entity properties """
         schema = Schema(person_spec)
         person = Person(
             first_name='Some really really long name',
@@ -292,6 +292,21 @@ class ProcessorTests(TestCase):
         self.assertTrue('last_name' in result.errors)
         self.assertTrue('salutation' in result.errors)
         self.assertTrue('birth_year' not in result.errors)
+
+    def test_validate_entity_state(self):
+        """ Validating entity state """
+        class StateValidator(AbstractValidator):
+            def validate(self, value=None, context=None):
+                return SimpleResult(['error 1', 'error2'])
+
+        schema = Schema(person_spec)
+        schema.add_state_validator(StateValidator())
+
+
+        person = Person(first_name = 'Willy', last_name = 'Wonka ')
+        result = schema.validate(person)
+        self.assertTrue('__state__' in result.errors)
+        self.assertEqual(2, len(result.errors['__state__']))
 
 
 

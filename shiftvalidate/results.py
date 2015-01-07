@@ -63,7 +63,7 @@ class ValidationResult:
     """
 
     def __init__(self):
-        self.errors = {} # todo: maybe simply use __dict__?
+        self.errors = {}
 
 
     def __bool__(self):
