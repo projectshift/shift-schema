@@ -43,18 +43,18 @@ class Length(AbstractValidator):
         # too short?
         if self.min and self.max is None:
             if length < self.min:
-                return Result(False, self.too_short)
+                return Result(self.too_short)
 
         # too long?
         if self.max and self.min is None:
             if length > self.max:
-                return Result(False, self.too_long)
+                return Result(self.too_long)
 
         # within range?
         if self.min and self.max:
             if length < self.min or length > self.max:
-                return Result(False, self.not_in_range)
+                return Result(self.not_in_range)
 
         # success otherwise
-        return Result(True)
+        return Result()
 

@@ -76,8 +76,8 @@ class PropertyTests(TestCase):
         property.add_filter(Strip(mode='both'))
         property.add_filter(Digits())
 
-        value = '  Good luck in 2015 to you!'
-        self.assertEqual('2015', property.filter_value(value))
+        value = '  Good luck in 2024 to you and your robots!'
+        self.assertEqual('2024', property.filter_value(value))
 
 
 

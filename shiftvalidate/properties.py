@@ -82,8 +82,13 @@ class Property:
         :param value:               value to validate
         :return:                    shiftvalidate.results.SimpleResult
         """
-        pass
 
+        for validator in self.validators:
+            ok = validator.validate(value)
+            if not ok:
+                print('GOT ERRORS')
+
+        return result
 
 
 

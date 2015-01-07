@@ -44,10 +44,10 @@ class Choice(AbstractValidator):
         :return:                shiftvalidate.results.SimpleResult
         """
 
-        if not value in self.choices:
-            return Result(False, self.invalid_choice)
+        if value not in self.choices:
+            return Result(self.invalid_choice)
 
         # success otherwise
-        return Result(True)
+        return Result()
 
 
