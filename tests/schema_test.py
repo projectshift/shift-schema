@@ -34,7 +34,7 @@ person_spec = {
         ],
         'birth_year': [
             Strip(),
-            Digits()
+            Digits(to_int=True)
         ]
     }
 }
@@ -59,6 +59,16 @@ class Person:
         self.email = email
         self.salutation = salutation
         self.birth_year = birth_year
+
+    def __repr__(self):
+        r = '<Person first=[{}] last=[{}] email=[{}] salutation=[{}] year=[{}]>'
+        return r.format(
+            self.first_name,
+            self.last_name,
+            self.email,
+            self.salutation,
+            self.birth_year
+        )
 
 
 # -----------------------------------------------------------------------------
@@ -222,6 +232,70 @@ class ProcessorTests(TestCase):
         self.assertIsInstance(schema.salutation, Property)
         self.assertEqual(1, len(schema.salutation.filters))
         self.assertEqual(1, len(schema.salutation.validators))
+
+
+    def test_filtering_entity(self):
+        """ Performing filtering on a model """
+
+        schema = Schema(person_spec)
+        person = Person(
+            first_name = '  Willy  ',
+            last_name = '  Wonka  ',
+            salutation = ' mr ',
+            birth_year = 'I was born in 1964'
+        )
+
+        schema.filter(person)
+        self.assertEqual('Willy', person.first_name)
+        self.assertEqual('Wonka', person.last_name)
+        self.assertEqual('mr', person.salutation)
+        self.assertEqual(1964, person.birth_year)
+
+
+    def test_use_accessors_when_filtering(self):
+        """ Filtering uses accessors if present """
+
+        schema = Schema(person_spec)
+        person = Person(
+            first_name = '  Willy  ',
+            last_name = '  Wonka  ',
+            salutation = ' mr ',
+            birth_year = 'I was born in 1964'
+        )
+
+        def getter(self):
+            return self.first_name.upper()
+        def setter(self, value):
+            self.last_name = value.upper()
+
+        # use getter
+        person.get_first_name = getter
+        person.set_last_name = setter
+
+        schema.filter(person)
+        self.assertEqual('WILLY', person.first_name)
+        self.assertEqual('WONKA', person.last_name)
+
+
+    def test_validate_entity_properties(self):
+        """ Validating properties and returning result """
+        schema = Schema(person_spec)
+        person = Person(
+            first_name='Some really really long name',
+            last_name='And a really really long last name',
+            salutation='BAD!',
+        )
+
+        result = schema.validate(person)
+        self.assertFalse(result)
+        self.assertTrue('first_name' in result.errors)
+        self.assertTrue('last_name' in result.errors)
+        self.assertTrue('salutation' in result.errors)
+        self.assertTrue('birth_year' not in result.errors)
+
+
+
+
 
 
 

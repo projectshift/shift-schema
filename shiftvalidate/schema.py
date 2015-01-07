@@ -3,6 +3,7 @@ from shiftvalidate.properties import Property, Entity, Collection
 from shiftvalidate.exceptions import PropertyExists
 from shiftvalidate.validators import AbstractValidator
 from shiftvalidate.filters import AbstractFilter
+from shiftvalidate.results import ValidationResult
 
 
 class Schema:
@@ -17,8 +18,7 @@ class Schema:
         """
         Initialize schema
         Configure schema by either passing a spec dictionary or
-        alternatively override this method in your concrete implementations
-        to define spec via setters.
+        alternatively extend from schema and implement self.schema()
 
         :param spec:            dict, schema specification
         :return:                None
@@ -78,9 +78,6 @@ class Schema:
                         self.properties[property].add_validator(obj)
                     if isinstance(obj, AbstractFilter):
                         self.properties[property].add_filter(obj)
-
-
-
 
 
     def has_property(self, name):
@@ -212,9 +209,38 @@ class Schema:
         :return:                object
         """
 
-        # go through each configured properties and filter onthe model
+        for property in self.properties:
 
-        pass
+            # go through accessor if present
+            getter = None
+            if hasattr(model, 'get_' + property):
+                getter = getattr(model, 'get_' + property)
+            setter = None
+            if hasattr(model, 'set_' + property):
+                setter = getattr(model, 'set_' + property)
+
+            # use getter
+            if getter:
+                value = getter(model)
+            else:
+                value = getattr(model, property)
+
+            # filter
+            value = self.properties[property].filter_value(
+                value=value,
+                context=model
+            )
+
+            # use setter
+            if setter:
+                setter(model, value)
+            else:
+                setattr(model, property, value)
+
+            del getter, setter
+
+
+
 
 
     def validate(self, model):
@@ -227,10 +253,31 @@ class Schema:
         :return:                shiftvalidate.results.ModelResult
         """
 
-        # go through each configured property and validate, collecting and
-        # merging results
+        result = ValidationResult()
 
-        pass
+        # validate properties
+        for property in self.properties:
+
+            # go through accessor if present
+            getter = None
+            if hasattr(model, 'get_' + property):
+                getter = getattr(model, 'get_' + property)
+
+            if getter:
+                value = getter(model)
+            else:
+                value = getattr(model, property)
+
+            ok = self.properties[property].validate_value(
+                value=value,
+                context=model
+            )
+
+            if not ok:
+                result.add_errors(property, ok)
+
+        # done
+        return result
 
 
 

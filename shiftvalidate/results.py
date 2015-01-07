@@ -63,7 +63,7 @@ class ValidationResult:
     """
 
     def __init__(self):
-        self.errors = {}
+        self.errors = {} # todo: maybe simply use __dict__?
 
 
     def __bool__(self):
@@ -103,13 +103,17 @@ class ValidationResult:
         property name or without any for state validation errors.
 
         :param property:        string, property name
-        :param errors:          string, list or aggregate dict of errors
+        :param errors:          string, list, SimpleResult or dict of errors
         :return:                None
         """
 
         # convert single error to list
         if type(errors) is str:
             errors = [errors]
+
+        # is it a simple result object?
+        if isinstance(errors, SimpleResult):
+            errors = errors.errors
 
         # create aggregate if list
         aggregate = {}
@@ -143,3 +147,13 @@ class ValidationResult:
             raise TypeError('Unable to merge: must be ValidationResult object')
 
         self.add_errors(errors=validation_result.errors)
+
+
+    def __str__(self):
+        """
+        Printable version of errors
+
+        :return:                    string
+        """
+        from pprint import pformat
+        return pformat(self.errors)

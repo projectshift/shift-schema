@@ -1,6 +1,7 @@
 from shiftvalidate.exceptions import InvalidFilter, InvalidValidator
 from shiftvalidate.filters import AbstractFilter
 from shiftvalidate.validators import AbstractValidator
+from shiftvalidate.results import SimpleResult
 
 class Property:
     """
@@ -84,10 +85,19 @@ class Property:
         :return:                    shiftvalidate.results.SimpleResult
         """
 
+        errors = []
         for validator in self.validators:
             ok = validator.validate(value)
             if not ok:
-                print('GOT ERRORS')
+                for error in ok.errors:
+                    errors.append(error)
+
+        if errors:
+            return SimpleResult(errors)
+        else:
+            return SimpleResult()
+
+
 
 
 
