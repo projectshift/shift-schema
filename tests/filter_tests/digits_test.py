@@ -36,6 +36,11 @@ class DigitsTest(TestCase):
         filter = Digits()
         self.assertEqual('', filter.filter(value))
 
+    def test_convert_to_integer(self):
+        """ Converting digits result to integer """
+        value = 'I was born in 1964'
+        filter = Digits(to_int=True)
+        self.assertEqual(1964, filter.filter(value))
 
 
 
