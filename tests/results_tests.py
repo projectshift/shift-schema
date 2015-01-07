@@ -157,3 +157,21 @@ class ValidationResultTests(TestCase):
         self.assertTrue('state_error4' in result1.errors['__state__'])
 
 
+    def test_empty_result_evaluates_to_true(self):
+        """ Empty result is valid """
+        res = ValidationResult()
+
+        self.assertTrue(res)
+        self.assertTrue(res == True)
+        self.assertTrue(res != False)
+
+    def test_result_with_errors_evaluates_to_false(self):
+        """ Result with errors is invalid """
+        res = ValidationResult()
+        res.add_errors('property', 'error')
+
+        self.assertFalse(res)
+        self.assertFalse(res == True)
+        self.assertFalse(res != False)
+
+

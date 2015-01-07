@@ -66,7 +66,37 @@ class ValidationResult:
         self.errors = {}
 
 
-    def add_errors(self, property=None, errors=None, debug=False):
+    def __bool__(self):
+        """
+        Returns boolean status
+        :return:            bool
+        """
+        return not self.errors
+
+
+    def __eq__(self, other):
+        """
+        Equals
+        Perform equality check. Usually used in boolean checks.
+
+        :param other:           value to compare to
+        :return:                bool, comparison result
+        """
+        return self.__bool__() == other
+
+
+    def __neq__(self, other):
+        """
+        Not equals
+        Perform equality check. Usually used in boolean checks.
+
+        :param other:           value to compare to
+        :return:                bool, comparison result
+        """
+        return  self.__bool__() != other
+
+
+    def add_errors(self, property=None, errors=None):
         """
         Add errors
         Accepts one or more error messages to attache possibly with related
