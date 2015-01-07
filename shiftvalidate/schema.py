@@ -14,12 +14,12 @@ class Schema:
 
     def __init__(self, spec=None):
         """
-        Initialize processor
-        Configure processor by either passing a spec dictionary or
+        Initialize schema
+        Configure schema by either passing a spec dictionary or
         alternatively override this method in your concrete implementations
         to define spec via setters.
 
-        :param spec:            dict or None, processor specification
+        :param spec:            dict, schema specification
         :return:                None
         """
 
@@ -45,7 +45,7 @@ class Schema:
         """
         Has property?
         A boolean method to check whether a property with the given name exists
-        on processor either a simple property, linked entity or collection.
+        on schema either a simple property, linked entity or collection.
 
         :param name:            string, property name to check
         :return:                bool
@@ -64,7 +64,7 @@ class Schema:
     def add_property(self, name):
         """
         Add property
-        Adds simple property to processor. Will raise PropertyExists if
+        Adds simple property to schema. Will raise PropertyExists if
         a property is already present.
 
         :param name:            string, property name
@@ -79,7 +79,7 @@ class Schema:
     def add_collection(self, name):
         """
         Add collection
-        Adds collection property to processor. Will raise PropertyExists if
+        Adds collection property to schema. Will raise PropertyExists if
         a property is already present.
 
         :param name:            string, property name
@@ -94,7 +94,7 @@ class Schema:
     def add_entity(self, name):
         """
         Add entity
-        Adds linked entity property to processor. Will raise PropertyExists if
+        Adds linked entity property to schema. Will raise PropertyExists if
         a property is already present.
 
         :param name:            string, property name

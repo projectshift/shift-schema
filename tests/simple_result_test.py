@@ -2,6 +2,7 @@ from unittest import TestCase, mock
 from nose.plugins.attrib import attr
 from shiftvalidate.results import SimpleResult
 
+@attr('simple_result')
 class SimpleResultTests(TestCase):
     """
     Example test
@@ -33,4 +34,19 @@ class SimpleResultTests(TestCase):
         self.assertTrue(res == True)
         self.assertTrue(res != False)
         self.assertTrue(bool(res) is True)
+
+    def test_set_single_error(self):
+        """ Can set single error on result """
+        error = 'Me is error message'
+        res = SimpleResult(False, error)
+        self.assertTrue(type(res.errors) is list)
+        self.assertTrue(error in res.errors)
+
+
+    def test_set_multiple_errors(self):
+        errors = ['error 1', 'error 2']
+        res = SimpleResult(False, errors)
+        self.assertTrue(type(res.errors) is list)
+        for error in errors:
+            self.assertTrue(error in res.errors)
 

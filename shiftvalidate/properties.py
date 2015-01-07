@@ -60,9 +60,9 @@ class Property:
     def filter_value(self, value, context=None):
         """
         Filter value
-        Sequentially applies every attached filter to value.
+        Sequentially applies each attached filter to value.
 
-        :param value:               str, value to filter
+        :param value:               value to filter
         :param context:             object, context (usually an entity)
         :return:                    str, filtered result
         """
@@ -74,10 +74,16 @@ class Property:
 
 
     def validate_value(self, value):
+        """
+        Validate value
+        Sequentially applies each attached validator and collect error
+        messages
+
+        :param value:               value to validate
+        :return:                    shiftvalidate.results.SimpleResult
+        """
         pass
 
-    def process_value(self, value):
-        pass
 
 
 

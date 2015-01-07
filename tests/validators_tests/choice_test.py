@@ -27,7 +27,7 @@ class ChoiceTest(TestCase):
         result = validator.validate(value)
 
         self.assertFalse(result)
-        self.assertIsNotNone(result.error)
+        self.assertIsNotNone(result.errors)
 
 
     def test_fail_with_custom_error_message(self):
@@ -35,7 +35,7 @@ class ChoiceTest(TestCase):
         error = 'Custom error'
         validator = Choice(['one', 'two', 'three'], message=error)
         result = validator.validate('four')
-        self.assertEqual(error, result.error)
+        self.assertTrue(error in result.errors)
 
 
     def test_can_validate_and_pass(self):

@@ -70,8 +70,8 @@ class PropertyTests(TestCase):
         self.assertTrue(len(property3.validators) == 0)
 
 
-    def test_can_filter_value(self):
-        """ Filtering property value with attach filters """
+    def test_filter_value(self):
+        """ Filtering property value with attached filters """
         property = Property()
         property.add_filter(Strip(mode='both'))
         property.add_filter(Digits())

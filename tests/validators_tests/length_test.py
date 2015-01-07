@@ -20,7 +20,7 @@ class LengthTest(TestCase):
         valid = validator.validate(input)
 
         self.assertFalse(valid)
-        self.assertIsNotNone(valid.error)
+        self.assertIsNotNone(valid.errors)
 
 
     def test_too_long(self):
@@ -29,7 +29,7 @@ class LengthTest(TestCase):
         validator = Length(max=3)
         valid = validator.validate(input)
         self.assertFalse(valid is True)
-        self.assertIsNotNone(valid.error)
+        self.assertIsNotNone(valid.errors)
 
 
     def test_length_range(self):
@@ -38,7 +38,7 @@ class LengthTest(TestCase):
         validator = Length(min=3, max=10)
         valid = validator.validate(value)
         self.assertFalse(valid is True)
-        self.assertIsNotNone(valid.error)
+        self.assertIsNotNone(valid.errors)
 
 
     def test_return_custom_error(self):
@@ -47,7 +47,7 @@ class LengthTest(TestCase):
         error = 'Me is custom error'
         validator = Length(min=10, message=error)
         valid = validator.validate(input)
-        self.assertEqual(error, valid.error)
+        self.assertTrue(error in valid.errors)
 
 
     def test_can_pass_validation(self):
