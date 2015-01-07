@@ -1,15 +1,16 @@
-
+from pprint import pprint
 from shiftvalidate.properties import Property, Entity, Collection
 from shiftvalidate.exceptions import PropertyExists
+from shiftvalidate.validators import AbstractValidator
+from shiftvalidate.filters import AbstractFilter
 
 
 class Schema:
     """
     Entity schema
-    Performs filtering and validation of entity property values according
-    to specified rules to return a validation result object containing
-    error messages (if any). Extend from this class and define your
-    own filtering and validation rules for your entities.
+    Contains rules for filtering and validation of an entity. Either pass in
+    a definition dictionary or extend and setup object manually to use
+    class-based schemas
     """
 
     def __init__(self, spec=None):
@@ -24,7 +25,7 @@ class Schema:
         """
 
         # state validators
-        self.state = {}
+        self.state = []
 
         # property objects (each having filters and validator)
         self.properties = {}
@@ -35,8 +36,49 @@ class Schema:
         # linked collections
         self.collections = {}
 
-        if spec is None:
-            return
+        # init from spec
+        if spec:
+            self.factory(spec)
+
+        # or create manually in subclass
+        self.schema()
+
+
+    def schema(self):
+        """
+        Schema
+        This gets called at the end of construction. Implement this method
+        in you class-based schemas.
+
+        :return:                None
+        """
+        pass
+
+
+    def factory(self, spec):
+        """
+        Factory method
+        Instantiates itself from a spec dictionary
+
+        :param spec:            dict
+        :return:                None
+        """
+
+        # add state validators
+        if 'state' in spec:
+            for state_validator in spec['state']:
+                self.add_state_validator(state_validator)
+
+        # add properties
+        if 'properties' in spec:
+            for property in spec['properties']:
+                self.add_property(property)
+                for obj in spec['properties'][property]:
+                    if isinstance(obj, AbstractValidator):
+                        self.properties[property].add_validator(obj)
+                    if isinstance(obj, AbstractFilter):
+                        self.properties[property].add_filter(obj)
+
 
 
 
@@ -59,6 +101,24 @@ class Schema:
 
         # otherwise no property
         return False
+
+
+    def add_state_validator(self, validator):
+        """
+        Add state validator
+        Adds entity state validator. Those don't validate simple properties
+        but instead validate an entity as whole. May be used to do
+        validation across several properties (passwords match and such)
+
+        :param validator:       shiftvalidate.validators.AbstractValidator
+        :return:                None
+        """
+        if not isinstance(validator, AbstractValidator):
+            err = '{} is not a subclass of {}'
+            raise TypeError(err.format(validator, AbstractValidator))
+
+        if not validator in self.state:
+            self.state.append(validator)
 
 
     def add_property(self, name):
