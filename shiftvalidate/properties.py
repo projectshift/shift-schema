@@ -73,13 +73,14 @@ class Property:
 
 
 
-    def validate_value(self, value):
+    def validate_value(self, value, context=None):
         """
         Validate value
         Sequentially applies each attached validator and collect error
         messages
 
         :param value:               value to validate
+        :param context:             object, context (usually an entity)
         :return:                    shiftvalidate.results.SimpleResult
         """
 
@@ -88,7 +89,6 @@ class Property:
             if not ok:
                 print('GOT ERRORS')
 
-        return result
 
 
 
