@@ -138,40 +138,45 @@ class Entity:
         raise TypeError(err)
 
 
-
-    def filter(self, model, context=None):
+    def filter(self, model):
         """
         Filter
         Use linked entity schema to filter provided entity.
 
         :param model:               object, an entity to process
-        :param context:             object, parent entity
         :return:                    None
         """
-        pass
+        if self.schema is None:
+            return
+
+        self.schema.filter(model)
 
 
-    def validate(self, model, context=None):
+    def validate(self, model):
         """
         Validate
         Use linked entity schema to validate provided entity and return
         ValidationResult object
 
         :param model:               object, an entity to process
-        :param context:             object, parent entity
         :return:                    shiftvalidate.results.ValidationResult
         """
-        pass
+        if self.schema is None:
+            return
+
+        result = self.schema.validate(model)
+        return result
 
 
-    def process(self, model, context=None):
+    def process(self, model):
         """
         Process
         Uses linked entity schema to both filter and validate provided entity
         in one go and return ValidationResult object.
 
         :param model:               object, an entity to process
-        :param context:             object, parent entity
         :return:                    shiftvalidate.results.ValidationResult
         """
-        pass
+        self.filter(model)
+        return self.validate(model)
+

@@ -8,70 +8,7 @@ from shiftvalidate.filters import Strip, Digits
 from shiftvalidate.results import SimpleResult
 from shiftvalidate.exceptions import PropertyExists
 
-
-# -----------------------------------------------------------------------------
-# Test helpers
-# -----------------------------------------------------------------------------
-
-class StateValidator(AbstractValidator):
-    def validate(self, value=None, context=None):
-        return SimpleResult() # always valid
-
-person_spec = {
-    'state': [StateValidator()],
-    'properties': {
-        'first_name': [
-            Strip(),
-            Length(min=1, max=10)
-        ],
-        'last_name': [
-            Strip(),
-            Length(min=1, max=10)
-        ],
-        'salutation': [
-            Strip(),
-            Choice(['mr', 'ms'])
-        ],
-        'birth_year': [
-            Strip(),
-            Digits(to_int=True)
-        ]
-    }
-}
-
-
-class Person:
-    """
-    Person
-    Represents as entity being tested
-    """
-    def __init__(
-        self,
-        first_name=None,
-        last_name=None,
-        email=None,
-        salutation=None,
-        birth_year=None
-    ):
-        self.id = 123
-        self.first_name = first_name
-        self.last_name = last_name
-        self.email = email
-        self.salutation = salutation
-        self.birth_year = birth_year
-
-    def __repr__(self):
-        r = '<Person first=[{}] last=[{}] email=[{}] salutation=[{}] year=[{}]>'
-        return r.format(
-            self.first_name,
-            self.last_name,
-            self.email,
-            self.salutation,
-            self.birth_year
-        )
-
-
-# -----------------------------------------------------------------------------
+from tests import helpers
 
 @attr('schema')
 class ProcessorTests(TestCase):
@@ -107,7 +44,7 @@ class ProcessorTests(TestCase):
     def test_add_state_validator(self):
         """ Adding entity state validator to schema """
         schema = Schema()
-        state_validator = StateValidator()
+        state_validator = helpers.StateValidator()
         schema.add_state_validator(state_validator)
         self.assertTrue(state_validator in schema.state)
 
@@ -157,7 +94,7 @@ class ProcessorTests(TestCase):
     def test_initialize_from_spec(self):
         """ Initializing schema from spec """
 
-        schema = Schema(person_spec)
+        schema = Schema(helpers.person_spec)
 
         # state
         self.assertEqual(1, len(schema.state))
@@ -190,7 +127,7 @@ class ProcessorTests(TestCase):
             def schema(self):
 
                 # state
-                self.add_state_validator(StateValidator())
+                self.add_state_validator(helpers.StateValidator())
 
                 self.add_property('first_name')
                 self.first_name.add_filter(Strip())
@@ -219,8 +156,8 @@ class ProcessorTests(TestCase):
     def test_filtering_entity(self):
         """ Performing filtering on a model """
 
-        schema = Schema(person_spec)
-        person = Person(
+        schema = Schema(helpers.person_spec)
+        person = helpers.Person(
             first_name = '  Willy  ',
             last_name = '  Wonka  ',
             salutation = ' mr ',
@@ -237,8 +174,8 @@ class ProcessorTests(TestCase):
     def test_use_accessors_when_filtering(self):
         """ Filtering uses accessors if present """
 
-        schema = Schema(person_spec)
-        person = Person(
+        schema = Schema(helpers.person_spec)
+        person = helpers.Person(
             first_name = '  Willy  ',
             last_name = '  Wonka  ',
             salutation = ' mr ',
@@ -261,8 +198,8 @@ class ProcessorTests(TestCase):
 
     def test_validate_entity_properties(self):
         """ Validating entity properties """
-        schema = Schema(person_spec)
-        person = Person(
+        schema = Schema(helpers.person_spec)
+        person = helpers.Person(
             first_name='Some really really long name',
             last_name='And a really really long last name',
             salutation='BAD!',
@@ -282,25 +219,25 @@ class ProcessorTests(TestCase):
             def validate(self, value=None, context=None):
                 return SimpleResult(['error 1', 'error2'])
 
-        schema = Schema(person_spec)
+        schema = Schema(helpers.person_spec)
         schema.add_state_validator(StateValidator())
 
 
-        person = Person(first_name = 'Willy', last_name = 'Wonka')
+        person = helpers.Person(first_name = 'Willy', last_name = 'Wonka')
         result = schema.validate(person)
         self.assertTrue('__state__' in result.errors)
         self.assertEqual(2, len(result.errors['__state__']))
 
     def test_validate_and_filter_in_one_go(self):
         """ Process entity: validate and filter at the same time"""
-        person = Person(
+        person = helpers.Person(
             first_name= '   Willy   ',
             last_name='  Not Wonka this time, but a really long last name',
             email='w.wonka@dactory.co.uk',
             salutation='dr',
             birth_year=' I was born in Chicago 1941'
         )
-        schema = Schema(person_spec)
+        schema = Schema(helpers.person_spec)
         result = schema.process(person)
 
         # assert filtered
@@ -337,9 +274,12 @@ class ProcessorTests(TestCase):
         schema.birth_year.add_filter(Strip())
         schema.birth_year.add_filter(Digits())
 
-        person = Person()
+        person = helpers.Person()
         result = schema.validate(person)
         self.assertTrue(result)
+
+
+
 
 
 

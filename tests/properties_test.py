@@ -7,6 +7,9 @@ from shiftvalidate.filters import Strip, Digits
 from shiftvalidate.validators import Length
 from shiftvalidate.schema import Schema
 
+from tests import helpers
+
+
 @attr('properties', 'property')
 class PropertyTests(TestCase):
     """
@@ -81,6 +84,9 @@ class PropertyTests(TestCase):
         self.assertEqual('2024', property.filter_value(value))
 
 
+
+
+
 @attr('properties', 'entity')
 class EntityTests(TestCase):
     """
@@ -106,6 +112,64 @@ class EntityTests(TestCase):
         entity = Entity()
         with self.assertRaises(TypeError):
             entity.set_schema(dict())
+
+    def test_can_filter_entity(self):
+        """ Filtering linked entity property """
+        model = helpers.Person(
+            first_name='   Willy    ',
+            last_name='   Wonka    ',
+        )
+
+        entity = Entity()
+        entity.set_schema(Schema(helpers.person_spec))
+        entity.filter(model)
+
+        # assert filtered
+        self.assertEqual('Willy', model.first_name)
+        self.assertEqual('Wonka', model.last_name)
+
+
+    def test_can_validate_entity(self):
+        """ Validated linked entity property """
+        model = helpers.Person(
+            first_name='   Something very-very long indeed    ',
+            last_name='   Not Wonka this time    ',
+            salutation='dr'
+        )
+
+        entity = Entity()
+        entity.set_schema(Schema(helpers.person_spec))
+        result = entity.validate(model)
+
+        self.assertFalse(result)
+        self.assertTrue('first_name' in result.errors)
+        self.assertTrue('last_name' in result.errors)
+        self.assertTrue('salutation' in result.errors)
+
+
+    def test_can_process_entity(self):
+        """ Filtering and validating at the same time """
+        model = helpers.Person(
+            first_name='   Willy    ',
+            last_name='   Wonka    ',
+            salutation='dr',
+            birth_year='Someone wrote me in 1964',
+        )
+
+        entity = Entity()
+        entity.set_schema(Schema(helpers.person_spec))
+        result = entity.process(model)
+
+        # assert filtered
+        self.assertEqual('Willy', model.first_name)
+        self.assertEqual('Wonka', model.last_name)
+        self.assertEqual(1964, model.birth_year)
+
+        # assert validated
+        self.assertFalse(result)
+        self.assertTrue('salutation' in result.errors)
+
+
 
 
 
