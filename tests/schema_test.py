@@ -33,7 +33,6 @@ class ProcessorTests(TestCase):
         self.assertTrue(schema.has_property('entity'))
         self.assertFalse(schema.has_property('nonexistent'))
 
-
     def test_add_simple_property(self):
         """ Adding simple property to schema """
         schema = Schema()
@@ -54,8 +53,6 @@ class ProcessorTests(TestCase):
         with self.assertRaises(TypeError):
             schema.add_state_validator(dict())
 
-
-
     def test_add_linked_entity_property(self):
         """ Adding linked entity property """
         schema = Schema()
@@ -69,7 +66,6 @@ class ProcessorTests(TestCase):
         schema.add_property('exists')
         with self.assertRaises(PropertyExists):
             schema.add_property('exists')
-
 
     def test_raise_on_existing_when_adding_entity(self):
         """ Raise on existing when adding entity """
@@ -153,6 +149,42 @@ class ProcessorTests(TestCase):
         self.assertEqual(1, len(schema.salutation.validators))
 
 
+    def test_use_getter_when_possible(self):
+        """ Using getter on the model if exists"""
+        class Person():
+            def __init__(self, first, last):
+                self.first = first
+                self.last = last
+
+            def get_first(self):
+                return self.first.upper()
+
+        person = Person('Willy', 'Wonka')
+        schema = Schema()
+
+        self.assertEqual('WILLY', schema.get_value(person, 'first')) # getter
+        self.assertEqual('Wonka', schema.get_value(person, 'last')) # direct
+
+
+    def test_use_setter_when_possible(self):
+        """ Using setter on the model when possible """
+        class Person():
+            def __init__(self):
+                self.first = None
+                self.last = None
+
+            def set_first(self, value):
+                self.first = value.upper()
+
+        person = Person()
+        schema = Schema()
+
+        schema.set_value(person, 'first', 'Willy')
+        schema.set_value(person, 'last', 'Wonka')
+
+        self.assertEqual('WILLY', person.first)
+        self.assertEqual('Wonka', person.last)
+
     def test_filtering_entity(self):
         """ Performing filtering on a model """
 
@@ -169,31 +201,6 @@ class ProcessorTests(TestCase):
         self.assertEqual('Wonka', person.last_name)
         self.assertEqual('mr', person.salutation)
         self.assertEqual(1964, person.birth_year)
-
-
-    def test_use_accessors_when_filtering(self):
-        """ Filtering uses accessors if present """
-
-        schema = Schema(helpers.person_spec)
-        person = helpers.Person(
-            first_name = '  Willy  ',
-            last_name = '  Wonka  ',
-            salutation = ' mr ',
-            birth_year = 'I was born in 1964'
-        )
-
-        def getter(self):
-            return self.first_name.upper()
-        def setter(self, value):
-            self.last_name = value.upper()
-
-        # use getter
-        person.get_first_name = getter
-        person.set_last_name = setter
-
-        schema.filter(person)
-        self.assertEqual('WILLY', person.first_name)
-        self.assertEqual('WONKA', person.last_name)
 
 
     def test_validate_entity_properties(self):
@@ -228,6 +235,7 @@ class ProcessorTests(TestCase):
         self.assertTrue('__state__' in result.errors)
         self.assertEqual(2, len(result.errors['__state__']))
 
+
     def test_validate_and_filter_in_one_go(self):
         """ Process entity: validate and filter at the same time"""
         person = helpers.Person(
@@ -248,7 +256,6 @@ class ProcessorTests(TestCase):
         self.assertFalse(result)
         self.assertTrue('last_name' in result.errors)
         self.assertTrue('salutation' in result.errors)
-
 
 
     def test_skip_none_value(self):
@@ -277,6 +284,12 @@ class ProcessorTests(TestCase):
         person = helpers.Person()
         result = schema.validate(person)
         self.assertTrue(result)
+
+
+
+    def test_filter_linked_entities(self):
+        """ Filtering linked entities """
+
 
 
 

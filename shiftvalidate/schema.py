@@ -160,6 +160,40 @@ class Schema:
         return object.__getattribute__(self, property)
 
 
+    def get_value(self, model, property_name):
+        """
+        Get value
+        Retrieves value from a model, possibly going through a getter
+        method if it exists or directly fetching otherwise.
+
+        :param model:           object, fetch property from it
+        :param property_name:   string, property name
+        :return:                mixed
+        """
+        if hasattr(model, 'get_' + property_name):
+            getter = getattr(model, 'get_' + property_name)
+            return getter()
+        else:
+            return getattr(model, property_name)
+
+
+    def set_value(self, model, property_name, value):
+        """
+        Set value
+        Sets value on a model, possibly going through a setter
+        method if it exists or directly setting otherwise.
+
+        :param model:           object, fetch property from it
+        :param property_name:   string, property name
+        :param value:           mixed, value to set
+        :return:                None
+        """
+        if hasattr(model, 'set_' + property_name):
+            setter = getattr(model, 'set_' + property_name)
+            return setter(value)
+        else:
+            setattr(model, property_name, value)
+
 
     def process(self, model):
         """
@@ -175,7 +209,7 @@ class Schema:
         return validation_result
 
 
-    def filter(self, model):
+    def filter(self, model, context=None):
         """
         Filter
         Performs model property value filtering by applying through every
@@ -186,43 +220,44 @@ class Schema:
         :return:                object
         """
 
+        # process properties
         for property in self.properties:
 
-            # go through accessor if present
-            getter = None
-            if hasattr(model, 'get_' + property):
-                getter = getattr(model, 'get_' + property)
-            setter = None
-            if hasattr(model, 'set_' + property):
-                setter = getattr(model, 'set_' + property)
-
-            # use getter
-            if getter:
-                value = getter(model)
-            else:
-                value = getattr(model, property)
-
-            # skip none values
+            value = self.get_value(model, property)
             if value is None:
                 continue
+
+            # simple properties get model as context
+            property_context = model
 
             # filter
             value = self.properties[property].filter_value(
                 value=value,
-                context=model
+                context=property_context
             )
 
             # use setter
-            if setter:
-                setter(model, value)
-            else:
-                setattr(model, property, value)
+            self.set_value(model, property, value)
 
-            del getter, setter
+        # process linked entities
+        for entity_property in self.entities:
+
+            entity = self.get_value(model, entity_property)
+            if entity is None:
+                continue
+
+            # nested entities get parent entity as context
+            entity_context = model
+
+            # filter
+            entity_property.filter(
+                model=entity,
+                context=entity_context
+            )
 
 
 
-    def validate(self, model):
+    def validate(self, model, context=None):
         """
         Validate
         Perform model validation by going through all attached filters
@@ -236,34 +271,53 @@ class Schema:
 
         # validate state
         for state_validator in self.state:
-            ok = state_validator.validate(value=model, context=model)
+
+            # none for simple/root, parent model for nested schemas
+            state_context = context
+
+            ok = state_validator.validate(value=model, context=state_context)
             if not ok:
                 result.add_errors(property=None, errors=ok.errors)
+
 
         # validate properties
         for property in self.properties:
 
             # go through accessor if present
-            getter = None
-            if hasattr(model, 'get_' + property):
-                getter = getattr(model, 'get_' + property)
-
-            if getter:
-                value = getter(model)
-            else:
-                value = getattr(model, property)
-
-            # skip none values
+            value = self.get_value(model, property)
             if value is None:
                 continue
 
+            # simple properties get model as context
+            property_context = model
+
+            # validate
             ok = self.properties[property].validate_value(
                 value=value,
-                context=model
+                context=property_context
             )
 
             if not ok:
                 result.add_errors(property, ok.errors)
+
+
+        # validate linked entities
+        for entity_property in self.entities:
+            entity = self.get_value(model, entity_property)
+            if entity is None:
+                continue
+
+            # nested entities get parent entity as context
+            entity_context = model
+
+            #validate
+            entity_valid = entity_property.validate(
+                model=entity,
+                context=entity_context
+            )
+            if not entity_valid:
+                result.add_errors(entity_property, entity_valid.errors)
+
 
         # done
         return result

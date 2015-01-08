@@ -138,7 +138,7 @@ class Entity:
         raise TypeError(err)
 
 
-    def filter(self, model):
+    def filter(self, model, context=None):
         """
         Filter
         Use linked entity schema to filter provided entity.
@@ -149,10 +149,10 @@ class Entity:
         if self.schema is None:
             return
 
-        self.schema.filter(model)
+        self.schema.filter(model, context)
 
 
-    def validate(self, model):
+    def validate(self, model, context=None):
         """
         Validate
         Use linked entity schema to validate provided entity and return
@@ -164,11 +164,11 @@ class Entity:
         if self.schema is None:
             return
 
-        result = self.schema.validate(model)
+        result = self.schema.validate(model, context)
         return result
 
 
-    def process(self, model):
+    def process(self, model, context=None):
         """
         Process
         Uses linked entity schema to both filter and validate provided entity
@@ -177,6 +177,6 @@ class Entity:
         :param model:               object, an entity to process
         :return:                    shiftvalidate.results.ValidationResult
         """
-        self.filter(model)
-        return self.validate(model)
+        self.filter(model, context)
+        return self.validate(model, context)
 
