@@ -96,43 +96,46 @@ class ValidationResult:
         return  self.__bool__() != other
 
 
-    def add_errors(self, property=None, errors=None):
+    def add_errors(self, errors, property_name=None):
         """
         Add errors
-        Accepts one or more error messages to attache possibly with related
+        Accepts one or more error messages to attach possibly with related
         property name or without any for state validation errors.
 
-        :param property:        string, property name
-        :param errors:          string, list, SimpleResult or dict of errors
+        :param errors:          string or list
+        :param property_name:   string, property name
         :return:                None
         """
 
-        # convert single error to list
+        # convert to list
         if type(errors) is str:
             errors = [errors]
 
-        # is it a simple result object?
-        if isinstance(errors, SimpleResult):
-            errors = errors.errors
-
-        # create aggregate if list
-        aggregate = {}
-        if type(errors) is list:
-            if property:
-                aggregate[property] = errors
+        # add property errors
+        if property_name:
+            if property_name in self.errors:
+                self.errors[property_name].extend(errors)
             else:
-                aggregate['__state__'] = errors
-
-        # already an aggregate?
-        if type(errors) is dict:
-            aggregate = errors
-
-        # now process aggregate
-        for index in aggregate.keys():
-            if index not in self.errors:
-                self.errors[index] = aggregate[index] # set
+                self.errors[property_name] = errors
+        # add state errors
+        else:
+            if '__state__' in self.errors:
+                self.errors['__state__'].extend(errors)
             else:
-                self.errors[index].extend(aggregate[index]) # or append
+                self.errors['__state__'] = errors
+
+
+    def add_nested_errors(self, property_name, errors):
+        """
+        Add nested error set
+        Attaches an aggregate of errors to a property. Such an aggregate
+        usually results from a nestend entity validation.
+
+        :param property_name:        string, property name
+        :param errors:              dict, error set to attach
+        :return:                    None
+        """
+        self.errors[property_name] = errors
 
 
     def merge(self, validation_result):
@@ -146,7 +149,12 @@ class ValidationResult:
         if not isinstance(validation_result, ValidationResult):
             raise TypeError('Unable to merge: must be ValidationResult object')
 
-        self.add_errors(errors=validation_result.errors)
+        errors = validation_result.errors
+        for property_name in errors:
+            if property_name in self.errors:
+                self.errors[property_name].extend(errors[property_name])
+            else:
+                self.errors[property_name] = errors[property_name]
 
 
     def __str__(self):

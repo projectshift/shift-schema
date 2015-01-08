@@ -223,6 +223,8 @@ class Schema:
         # process properties
         for property in self.properties:
 
+            # print('FILTERING PROPERTY:', property)
+
             value = self.get_value(model, property)
             if value is None:
                 continue
@@ -237,6 +239,7 @@ class Schema:
             )
 
             # use setter
+            # print('SETTING FILTER VALUE OF [{}] to [{}]'.format(property, value))
             self.set_value(model, property, value)
 
         # process linked entities
@@ -250,7 +253,7 @@ class Schema:
             entity_context = model
 
             # filter
-            entity_property.filter(
+            self.entities[entity_property].filter(
                 model=entity,
                 context=entity_context
             )
@@ -277,7 +280,7 @@ class Schema:
 
             ok = state_validator.validate(value=model, context=state_context)
             if not ok:
-                result.add_errors(property=None, errors=ok.errors)
+                result.add_errors(property_name=None, errors=ok.errors)
 
 
         # validate properties
@@ -298,7 +301,7 @@ class Schema:
             )
 
             if not ok:
-                result.add_errors(property, ok.errors)
+                result.add_errors(property_name=property, errors=ok.errors)
 
 
         # validate linked entities
@@ -311,12 +314,15 @@ class Schema:
             entity_context = model
 
             #validate
-            entity_valid = entity_property.validate(
+            entity_valid = self.entities[entity_property].validate(
                 model=entity,
                 context=entity_context
             )
             if not entity_valid:
-                result.add_errors(entity_property, entity_valid.errors)
+                result.add_nested_errors(
+                    property_name=entity_property,
+                    errors=entity_valid.errors
+                )
 
 
         # done

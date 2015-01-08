@@ -286,9 +286,69 @@ class ProcessorTests(TestCase):
         self.assertTrue(result)
 
 
+    def test_process_aggregates(self):
+        """ Processing nested aggregates """
 
-    def test_filter_linked_entities(self):
-        """ Filtering linked entities """
+        class Person:
+            def __init__(self, first, last, born, spouse=None):
+                self.first = first
+                self.last = last
+                self.born = born
+                self.spouse = spouse
+            def __repr__(self):
+                r = '<Person first=[{}] last=[{}] born=[{}] spouse=[{}]>'
+                return r.format(self.first, self.last, self.born, self.spouse)
+
+
+        yoko = Person(first='  Yoko  ', last='  Ono  ', born='born in 1933')
+        john = Person(first='  John  ', last='  Lennon  ', born='born in 1940')
+        john.spouse = yoko
+
+        class PersonSchema(Schema):
+            def schema(self):
+                self.add_property('first')
+                self.first.add_filter(Strip())
+                self.first.add_validator(Length(max=2))
+
+                self.add_property('last')
+                self.last.add_filter(Strip())
+                self.last.add_validator(Length(max=2))
+
+                self.add_property('born')
+                self.born.add_filter(Digits(to_int=True))
+
+        schema = PersonSchema()
+        schema.add_entity('spouse')
+        schema.spouse.set_schema(PersonSchema())
+
+        result = schema.process(john)
+        self.assertFalse(result)
+
+        # assert aggregate root filtered
+        self.assertEqual('John', john.first)
+        self.assertEqual('Lennon', john.last)
+
+        # and validated
+        self.assertTrue('first' in result.errors)
+        self.assertTrue('last' in result.errors)
+
+        # assert nested entity filtered
+        self.assertEqual('Yoko', john.spouse.first)
+        self.assertEqual('Yoko', yoko.first)
+        self.assertEqual('Ono', yoko.last)
+
+        # and validated
+        self.assertTrue('first' in result.errors['spouse'])
+        self.assertTrue('last' in result.errors['spouse'])
+
+
+
+
+
+
+
+
+
 
 
 

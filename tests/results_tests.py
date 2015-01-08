@@ -64,19 +64,35 @@ class ValidationResultTests(TestCase):
         res = ValidationResult()
         self.assertIsInstance(res, ValidationResult)
 
+    def test_empty_result_evaluates_to_true(self):
+        """ Empty result is valid """
+        res = ValidationResult()
+
+        self.assertTrue(res)
+        self.assertTrue(res == True)
+        self.assertTrue(res != False)
+
+    def test_result_with_errors_evaluates_to_false(self):
+        """ Result with errors is invalid """
+        res = ValidationResult()
+        res.errors['property'] = 'error'
+        self.assertFalse(res)
+        self.assertFalse(res == True)
+        self.assertFalse(res != False)
+
+
     def test_add_single_error(self):
         """ Adding single error to result """
         error = 'me is single error'
         res = ValidationResult()
-        res.add_errors('property', error)
+        res.add_errors(error, 'property')
         self.assertTrue(error in res.errors['property'])
-
 
     def test_add_multiple_errors(self):
         """ Adding multiple errors to result """
         errors = ['error 1', 'error 2']
         res = ValidationResult()
-        res.add_errors('property', errors)
+        res.add_errors(errors, 'property')
         for error in errors:
             self.assertTrue(error in res.errors['property'])
 
@@ -85,7 +101,7 @@ class ValidationResultTests(TestCase):
         """ Adding state errors to result """
         errors = ['error 1', 'error 2']
         res = ValidationResult()
-        res.add_errors(errors=errors)
+        res.add_errors(errors)
         for error in errors:
             self.assertTrue(error in res.errors['__state__'])
 
@@ -96,24 +112,24 @@ class ValidationResultTests(TestCase):
         error1 = 'error 1'
         error2 = 'error 2'
         res1 = ValidationResult()
-        res1.add_errors('property', error1)
-        res1.add_errors('property', error2)
+        res1.add_errors(error1, 'property')
+        res1.add_errors(error2, 'property')
         self.assertEqual(2, len(res1.errors['property']))
 
         # multiples
         errors1 = ['error1', 'error2']
         errors2 = ['error3', 'error4']
         res2 = ValidationResult()
-        res2.add_errors('property', errors1)
-        res2.add_errors('property', errors2)
+        res2.add_errors(errors1,'property')
+        res2.add_errors(errors2,'property')
         self.assertEqual(4, len(res2.errors['property']))
 
         # state errors
         errors1 = ['error1', 'error2']
         errors2 = ['error3', 'error4']
         res3 = ValidationResult()
-        res3.add_errors(errors=errors1)
-        res3.add_errors(errors=errors2)
+        res3.add_errors(errors1)
+        res3.add_errors(errors2)
         self.assertEqual(4, len(res3.errors['__state__']))
 
 
@@ -129,14 +145,14 @@ class ValidationResultTests(TestCase):
         """ Merging two result objects """
 
         result1 = ValidationResult()
-        result1.add_errors('property1', ['prop1_error1', 'prop1_error2'])
-        result1.add_errors('property2', ['prop2_error1', 'prop2_error2'])
-        result1.add_errors(errors =['state_error1', 'state_error2'])
+        result1.add_errors(['prop1_error1', 'prop1_error2'], 'property1')
+        result1.add_errors(['prop2_error1', 'prop2_error2'], 'property2')
+        result1.add_errors(['state_error1', 'state_error2'])
 
         result2 = ValidationResult()
-        result2.add_errors('property2', ['prop2_error3', 'prop2_error4'])
-        result2.add_errors('property3', ['prop3_error1', 'prop3_error2'])
-        result2.add_errors(errors =['state_error3', 'state_error4'])
+        result2.add_errors(['prop2_error3', 'prop2_error4'], 'property2')
+        result2.add_errors(['prop3_error1', 'prop3_error2'], 'property3')
+        result2.add_errors(['state_error3', 'state_error4'])
 
         # do it
         result1.merge(result2)
@@ -158,21 +174,6 @@ class ValidationResultTests(TestCase):
         self.assertTrue('state_error4' in result1.errors['__state__'])
 
 
-    def test_empty_result_evaluates_to_true(self):
-        """ Empty result is valid """
-        res = ValidationResult()
 
-        self.assertTrue(res)
-        self.assertTrue(res == True)
-        self.assertTrue(res != False)
-
-    def test_result_with_errors_evaluates_to_false(self):
-        """ Result with errors is invalid """
-        res = ValidationResult()
-        res.add_errors('property', 'error')
-
-        self.assertFalse(res)
-        self.assertFalse(res == True)
-        self.assertFalse(res != False)
 
 
