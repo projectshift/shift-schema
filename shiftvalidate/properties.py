@@ -3,6 +3,11 @@ from shiftvalidate.filters import AbstractFilter
 from shiftvalidate.validators import AbstractValidator
 from shiftvalidate.results import SimpleResult
 
+class Collection:
+    """ Collections are not yet implemented """
+    pass
+
+
 class Property:
     """
     Property
@@ -100,14 +105,76 @@ class Property:
 
 
 
-
-
-
-
-
-
 class Entity:
-    pass
+    """
+    Entity
+    Represents linked entity existing on a property of another one. Mostly
+    used for cases when you need to process a complex entity aggregate
+    that is being persisted via cascades. For example a person and a
+    linked address entity. Linked entities allow you to arbitrarily nest
+    schemas.
+    """
 
-class Collection:
-    pass
+    def __init__(self):
+        """
+        Initialize entity property
+        Defines instance-level container for linked entity schema.
+
+        :return:                    None
+        """
+        self.schema = None
+
+    def set_schema(self, schema):
+        """
+        Set schema
+        Attaches nested schema to filter and liked entity. Will raise
+        TypeError if trying to attach something other than schema.
+
+        :param schema:              shiftvalidate.schema.Schema
+        :return:                    None
+        """
+        from shiftvalidate.schema import Schema
+        if isinstance(schema, Schema):
+            self.schema = schema
+            return
+
+        err = 'Linked entity schema must be of type {}'.format(Schema)
+        raise TypeError(err)
+
+
+
+
+
+    def filter(self, model):
+        """
+        Filter
+        Use linked entity schema to filter provided entity.
+
+        :param model:               object, an entity to process
+        :return:                    None
+        """
+        pass
+
+
+    def validate(self, model):
+        """
+        Validate
+        Use linked entity schema to validate provided entity and return
+        ValidationResult object
+
+        :param model:               object, an entity to process
+        :return:                    shiftvalidate.results.ValidationResult
+        """
+        pass
+
+
+    def process(self, model):
+        """
+        Process
+        Uses linked entity schema to both filter and validate provided entity
+        in one go and return ValidationResult object.
+
+        :param model:               object, an entity to process
+        :return:                    shiftvalidate.results.ValidationResult
+        """
+        pass

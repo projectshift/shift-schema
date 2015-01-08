@@ -1,4 +1,3 @@
-from pprint import pprint
 from shiftvalidate.properties import Property, Entity, Collection
 from shiftvalidate.exceptions import PropertyExists
 from shiftvalidate.validators import AbstractValidator
@@ -225,6 +224,10 @@ class Schema:
             else:
                 value = getattr(model, property)
 
+            # skip none values
+            if value is None:
+                continue
+
             # filter
             value = self.properties[property].filter_value(
                 value=value,
@@ -238,8 +241,6 @@ class Schema:
                 setattr(model, property, value)
 
             del getter, setter
-
-
 
 
 
@@ -273,6 +274,10 @@ class Schema:
                 value = getter(model)
             else:
                 value = getattr(model, property)
+
+            # skip none values
+            if value is None:
+                continue
 
             ok = self.properties[property].validate_value(
                 value=value,

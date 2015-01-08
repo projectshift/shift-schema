@@ -1,20 +1,21 @@
 from unittest import TestCase, mock
 from nose.plugins.attrib import attr
 
-from shiftvalidate.properties import Property
+from shiftvalidate.properties import Property, Entity
 from shiftvalidate.exceptions import InvalidFilter, InvalidValidator
 from shiftvalidate.filters import Strip, Digits
 from shiftvalidate.validators import Length
+from shiftvalidate.schema import Schema
 
-@attr('property')
+@attr('properties', 'property')
 class PropertyTests(TestCase):
     """
     Simple property tests
-    This hold tests for single processor property
+    This hold tests for simple schema property
     """
 
-    def test_create_property(self):
-        """ Can create property """
+    def test_create_simple_property(self):
+        """ Can create simple property """
         property = Property()
         self.assertIsInstance(property, Property)
 
@@ -78,6 +79,33 @@ class PropertyTests(TestCase):
 
         value = '  Good luck in 2024 to you and your robots!'
         self.assertEqual('2024', property.filter_value(value))
+
+
+@attr('properties', 'entity')
+class EntityTests(TestCase):
+    """
+    Linked entity property tests
+    This hold tests for linked entity schema property
+    """
+
+    def test_create_linked_entity_property(self):
+        """ Can create linked entity property """
+        entity = Entity()
+        self.assertIsInstance(entity, Entity)
+
+
+    def test_setting_schema(self):
+        """ Attaching nested schema """
+        schema = Schema()
+        entity = Entity()
+        entity.set_schema(schema)
+        self.assertEqual(schema, entity.schema)
+
+    def test_raise_when_setting_bad_schema(self):
+        """ Raise when trying to set schema of bad type """
+        entity = Entity()
+        with self.assertRaises(TypeError):
+            entity.set_schema(dict())
 
 
 

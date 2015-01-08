@@ -6,7 +6,7 @@ from shiftvalidate.filters import Digits
 
 @attr('filter', 'digits')
 class DigitsTest(TestCase):
-    """ String strip filter test"""
+    """ String digits filter test"""
 
     def test_create(self):
         """ Can create digits filter """
@@ -41,6 +41,8 @@ class DigitsTest(TestCase):
         value = 'I was born in 1964'
         filter = Digits(to_int=True)
         self.assertEqual(1964, filter.filter(value))
+
+
 
 
 

@@ -44,6 +44,7 @@ class SimpleResultTests(TestCase):
 
 
     def test_set_multiple_errors(self):
+        """ Can set multiple errors on result """
         errors = ['error 1', 'error 2']
         res = SimpleResult(errors)
         self.assertTrue(type(res.errors) is list)
@@ -125,7 +126,7 @@ class ValidationResultTests(TestCase):
 
 
     def test_merging_two_results(self):
-        """ Merging to result objects """
+        """ Merging two result objects """
 
         result1 = ValidationResult()
         result1.add_errors('property1', ['prop1_error1', 'prop1_error2'])

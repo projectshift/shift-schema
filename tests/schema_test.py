@@ -30,7 +30,7 @@ person_spec = {
         ],
         'salutation': [
             Strip(),
-            Choice(['mr', 'ms', None])
+            Choice(['mr', 'ms'])
         ],
         'birth_year': [
             Strip(),
@@ -293,6 +293,7 @@ class ProcessorTests(TestCase):
         self.assertTrue('salutation' in result.errors)
         self.assertTrue('birth_year' not in result.errors)
 
+
     def test_validate_entity_state(self):
         """ Validating entity state """
         class StateValidator(AbstractValidator):
@@ -303,10 +304,61 @@ class ProcessorTests(TestCase):
         schema.add_state_validator(StateValidator())
 
 
-        person = Person(first_name = 'Willy', last_name = 'Wonka ')
+        person = Person(first_name = 'Willy', last_name = 'Wonka')
         result = schema.validate(person)
         self.assertTrue('__state__' in result.errors)
         self.assertEqual(2, len(result.errors['__state__']))
+
+    def test_validate_and_filter_in_one_go(self):
+        """ Process entity: validate and filter at the same time"""
+        person = Person(
+            first_name= '   Willy   ',
+            last_name='  Not Wonka this time, but a really long last name',
+            email='w.wonka@dactory.co.uk',
+            salutation='dr',
+            birth_year=' I was born in Chicago 1941'
+        )
+        schema = Schema(person_spec)
+        result = schema.process(person)
+
+        # assert filtered
+        self.assertEqual('Willy', person.first_name)
+        self.assertEqual(1941, person.birth_year)
+
+        # assert has validation errors
+        self.assertFalse(result)
+        self.assertTrue('last_name' in result.errors)
+        self.assertTrue('salutation' in result.errors)
+
+
+
+    def test_skip_none_value(self):
+        """ Processing skips none values """
+        schema = Schema()
+        schema.add_property('first_name')
+        schema.first_name.add_filter(Strip())
+        schema.first_name.add_validator(Length(max=10))
+
+        schema.add_property('last_name')
+        schema.last_name.add_filter(Strip())
+        schema.last_name.add_validator(Length(max=10))
+
+        schema.add_property('email')
+        schema.email.add_filter(Strip())
+        schema.email.add_validator(Length(max=10))
+
+        schema.add_property('salutation')
+        schema.salutation.add_filter(Strip())
+        schema.salutation.add_validator(Choice(['mr', 'ms']))
+
+        schema.add_property('birth_year')
+        schema.birth_year.add_filter(Strip())
+        schema.birth_year.add_filter(Digits())
+
+        person = Person()
+        result = schema.validate(person)
+        self.assertTrue(result)
+
 
 
 

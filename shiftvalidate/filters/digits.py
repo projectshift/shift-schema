@@ -28,6 +28,7 @@ class Digits(AbstractFilter):
         :param context:         object, filtering context
         :return:                filtered value
         """
+
         if not type(value) is str:
             raise UnsupportedValueType('Invalid type of value str expected')
 
