@@ -2,7 +2,7 @@ from unittest import TestCase, mock
 from nose.plugins.attrib import attr
 
 from shiftvalidate.schema import Schema
-from shiftvalidate.properties import Property, Collection, Entity
+from shiftvalidate.properties import Property, Entity
 from shiftvalidate.validators import AbstractValidator, Length, Choice
 from shiftvalidate.filters import Strip, Digits
 from shiftvalidate.results import SimpleResult
@@ -91,11 +91,9 @@ class ProcessorTests(TestCase):
         schema = Schema()
         schema.add_property('property')
         schema.add_entity('entity')
-        schema.add_collection('collection')
 
         self.assertTrue(schema.has_property('property'))
         self.assertTrue(schema.has_property('entity'))
-        self.assertTrue(schema.has_property('collection'))
         self.assertFalse(schema.has_property('nonexistent'))
 
 
@@ -120,12 +118,6 @@ class ProcessorTests(TestCase):
             schema.add_state_validator(dict())
 
 
-    def test_add_collection_property(self):
-        """ Adding collection property to schema """
-        schema = Schema()
-        schema.add_collection('friends')
-        self.assertEqual(1, len(schema.collections))
-        self.assertIsInstance(schema.collections['friends'], Collection)
 
     def test_add_linked_entity_property(self):
         """ Adding linked entity property """
@@ -141,12 +133,6 @@ class ProcessorTests(TestCase):
         with self.assertRaises(PropertyExists):
             schema.add_property('exists')
 
-    def test_raise_on_existing_when_adding_collection(self):
-        """ Raise on existing when adding collection """
-        schema = Schema()
-        schema.add_property('exists')
-        with self.assertRaises(PropertyExists):
-            schema.add_collection('exists')
 
     def test_raise_on_existing_when_adding_entity(self):
         """ Raise on existing when adding entity """
@@ -166,10 +152,6 @@ class ProcessorTests(TestCase):
         # entity
         schema.add_entity('spouse')
         self.assertIsInstance(schema.spouse, Entity)
-
-        # collection
-        schema.add_collection('friends')
-        self.assertIsInstance(schema.friends, Collection)
 
 
     def test_initialize_from_spec(self):

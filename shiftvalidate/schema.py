@@ -1,4 +1,4 @@
-from shiftvalidate.properties import Property, Entity, Collection
+from shiftvalidate.properties import Property, Entity
 from shiftvalidate.exceptions import PropertyExists
 from shiftvalidate.validators import AbstractValidator
 from shiftvalidate.filters import AbstractFilter
@@ -31,9 +31,6 @@ class Schema:
 
         # linked entities
         self.entities = {}
-
-        # linked collections
-        self.collections = {}
 
         # init from spec
         if spec:
@@ -83,14 +80,12 @@ class Schema:
         """
         Has property?
         A boolean method to check whether a property with the given name exists
-        on schema either a simple property, linked entity or collection.
+        on schema either a simple property, linked entity.
 
         :param name:            string, property name to check
         :return:                bool
         """
         if name in self.properties:
-            return True
-        if name in self.collections:
             return True
         if name in self.entities:
             return True
@@ -132,21 +127,6 @@ class Schema:
         self.properties[name] = Property()
 
 
-    def add_collection(self, name):
-        """
-        Add collection
-        Adds collection property to schema. Will raise PropertyExists if
-        a property is already present.
-
-        :param name:            string, property name
-        :return:                None
-        """
-        if self.has_property(name):
-            err = 'Property "{}" already exists'
-            raise PropertyExists(err.format(name))
-        self.collections[name] = Collection()
-
-
     def add_entity(self, name):
         """
         Add entity
@@ -165,19 +145,17 @@ class Schema:
     def __getattr__(self, property):
         """
         Get attribute
-        Searches for an attribute in properties, linked entities and collections
+        Searches for an attribute in properties, linked entities
         and returns the first result found.
 
         :param property:        a property to get
-        :return:                Property, Entity or Collection
+        :return:                Property, Entity
         """
 
         if property in self.properties.keys():
             return self.properties[property]
         if property in self.entities.keys():
             return self.entities[property]
-        if property in self.collections:
-            return self.collections[property]
 
         return object.__getattribute__(self, property)
 

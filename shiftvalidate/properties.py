@@ -3,10 +3,6 @@ from shiftvalidate.filters import AbstractFilter
 from shiftvalidate.validators import AbstractValidator
 from shiftvalidate.results import SimpleResult
 
-class Collection:
-    """ Collections are not yet implemented """
-    pass
-
 
 class Property:
     """
@@ -143,38 +139,39 @@ class Entity:
 
 
 
-
-
-    def filter(self, model):
+    def filter(self, model, context=None):
         """
         Filter
         Use linked entity schema to filter provided entity.
 
         :param model:               object, an entity to process
+        :param context:             object, parent entity
         :return:                    None
         """
         pass
 
 
-    def validate(self, model):
+    def validate(self, model, context=None):
         """
         Validate
         Use linked entity schema to validate provided entity and return
         ValidationResult object
 
         :param model:               object, an entity to process
+        :param context:             object, parent entity
         :return:                    shiftvalidate.results.ValidationResult
         """
         pass
 
 
-    def process(self, model):
+    def process(self, model, context=None):
         """
         Process
         Uses linked entity schema to both filter and validate provided entity
         in one go and return ValidationResult object.
 
         :param model:               object, an entity to process
+        :param context:             object, parent entity
         :return:                    shiftvalidate.results.ValidationResult
         """
         pass
