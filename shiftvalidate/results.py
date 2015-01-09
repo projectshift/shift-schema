@@ -131,10 +131,12 @@ class ValidationResult:
         Attaches an aggregate of errors to a property. Such an aggregate
         usually results from a nestend entity validation.
 
-        :param property_name:        string, property name
-        :param errors:              dict, error set to attach
+        :param property_name:       string, property name
+        :param errors:              dict, ValidationResult, error set to attach
         :return:                    None
         """
+        if isinstance(errors, ValidationResult):
+            errors = errors.errors
         self.errors[property_name] = errors
 
 
@@ -157,7 +159,7 @@ class ValidationResult:
                 self.errors[property_name] = errors[property_name]
 
 
-    def __str__(self):
+    def __repr__(self):
         """
         Printable version of errors
 
@@ -165,3 +167,31 @@ class ValidationResult:
         """
         from pprint import pformat
         return pformat(self.errors)
+
+
+    def translate_errors(self, errors, translator):
+        """
+        Translate errors
+        Recursively goes through a dictionary of errors and applies passed
+        translator to each error.
+
+        :param errors:              dict, nested error set
+        :param translator:          function, translation func
+        :return:                    dict
+        """
+        for property in errors:
+            property_errors = errors[property]
+
+            if type(property_errors) is list:
+                for index, error in enumerate(property_errors):
+                    errors[property][index] = translator(error)
+            elif type(property_errors) is dict:
+                errors[property] = self.translate_errors(
+                    property_errors,
+                    translator
+                )
+
+        return errors
+
+
+
