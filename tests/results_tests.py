@@ -189,7 +189,7 @@ class ValidationResultTests(TestCase):
         # do it
         result1.add_nested_errors('result2', result2)
         self.assertTrue('result2' in result1.errors)
-        self.assertEqual(result2, result1.errors['result2'])
+        self.assertEqual(result2.errors, result1.errors['result2'])
 
 
     @attr('zz')
