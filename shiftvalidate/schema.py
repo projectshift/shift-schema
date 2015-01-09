@@ -13,6 +13,10 @@ class Schema:
     class-based schemas
     """
 
+    # locale (shared by all instances)
+    _locale = 'en'
+
+
     def __init__(self, spec=None):
         """
         Initialize schema
@@ -38,6 +42,22 @@ class Schema:
 
         # or create manually in subclass
         self.schema()
+
+
+    @classmethod
+    def set_locale(cls, locale):
+        """
+        Set locale
+        Sets locale as class-level property shared by all instances. This
+        will get passed to validators and used for translations of errors.
+
+        :param locale:          string, locale code
+        :return:                None
+        """
+        import re
+        match = re.match(r'^[a-z]+', locale.lower())
+        if match:
+            cls._locale = match.group()
 
 
     def schema(self):
