@@ -23,34 +23,6 @@ class ProcessorTests(TestCase):
         schema = Schema()
         self.assertIsInstance(schema, Schema)
 
-    def test_set_locale(self):
-        """ Can set schema locale """
-
-        schema = Schema()
-
-        Schema.set_locale('en')
-        self.assertEqual('en', schema._locale)
-
-        Schema.set_locale('en_US')
-        self.assertEqual('en', schema._locale)
-
-        Schema.set_locale('EN-US')
-        self.assertEqual('en', schema._locale)
-
-
-    def test_schema_locales_shared_by_instances(self):
-        """ Locale setting is class-level and shared by instances """
-        schema1 = Schema()
-        Schema.set_locale('RU-RU')
-
-        schema2 = Schema()
-        schema3 = Schema()
-
-        self.assertEqual('ru', schema1._locale)
-        self.assertEqual('ru', schema2._locale)
-        self.assertEqual('ru', schema3._locale)
-
-
     def test_check_existence(self):
         """ Can check existence of properties, entities and collection """
         schema = Schema()

@@ -169,29 +169,6 @@ class ValidationResult:
         return pformat(self.errors)
 
 
-    def translate_errors(self, errors, translator):
-        """
-        Translate errors
-        Recursively goes through a dictionary of errors and applies passed
-        translator to each error.
-
-        :param errors:              dict, nested error set
-        :param translator:          function, translation func
-        :return:                    dict
-        """
-        for property in errors:
-            property_errors = errors[property]
-
-            if type(property_errors) is list:
-                for index, error in enumerate(property_errors):
-                    errors[property][index] = translator(error)
-            elif type(property_errors) is dict:
-                errors[property] = self.translate_errors(
-                    property_errors,
-                    translator
-                )
-
-        return errors
 
 
 

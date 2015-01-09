@@ -64,6 +64,7 @@ class ValidationResultTests(TestCase):
         res = ValidationResult()
         self.assertIsInstance(res, ValidationResult)
 
+
     def test_empty_result_evaluates_to_true(self):
         """ Empty result is valid """
         res = ValidationResult()
@@ -192,40 +193,7 @@ class ValidationResultTests(TestCase):
         self.assertEqual(result2.errors, result1.errors['result2'])
 
 
-    @attr('zz')
-    def test_translate_result(self):
-        """ Translating nested result with arbitrary translator"""
 
-        result1 = ValidationResult()
-        result1.add_errors('prop1_error1', 'property1')
-        result1.add_errors(['prop2_error1', 'prop2_error2'], 'property2')
-        result1.add_errors(['state_error1', 'state_error2'])
-
-        result2 = ValidationResult()
-        result2.add_errors(['prop2_error3', 'prop2_error4'], 'property2')
-        result2.add_errors(['prop3_error1', 'prop3_error2'], 'property3')
-        result2.add_errors(['state_error3', 'state_error4'])
-        result1.add_nested_errors('result2', result2)
-
-        def translator(input):
-            return 'ZZZ' + input
-
-        translated = result1.translate_errors(result1.errors, translator)
-
-        # assert root translated
-        self.assertEqual('ZZZprop1_error1', result1.errors['property1'][0])
-        self.assertEqual('ZZZstate_error1', result1.errors['__state__'][0])
-
-        # assert nested errors translated
-        self.assertEqual(
-            'ZZZprop3_error1',
-            result1.errors['result2']['property3'][0]
-        )
-
-        self.assertEqual(
-            'ZZZstate_error3',
-            result1.errors['result2']['__state__'][0]
-        )
 
 
 
