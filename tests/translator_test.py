@@ -41,16 +41,11 @@ class ProcessorTests(TestCase):
 
     def test_append_custom_translations_dir(self):
         """ Appending custom dir with translations """
-        dir1 = os.path.dirname(os.path.realpath(__file__))
-        dir1 = os.path.join(dir1, '_assets', 'translations')
-        dir2 = '/nonexistent'
-
+        dir = os.path.dirname(os.path.realpath(__file__))
+        dir = os.path.join(dir, '_assets', 'translations')
         trans = Translator()
-        trans.add_location(dir1)
-        trans.add_location(dir2)
-
-        self.assertTrue(dir1 in trans.dirs)
-        self.assertFalse(dir2 in trans.dirs)
+        trans.add_location(dir)
+        self.assertTrue(dir in trans.dirs)
 
     def test_get_preloaded_translations(self):
         """ Return preloaded translations if present """
