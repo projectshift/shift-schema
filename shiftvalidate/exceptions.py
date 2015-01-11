@@ -48,3 +48,11 @@ class UnsupportedValueType(ShiftValidateException, TypeError):
     by filter and validators.
     """
     pass
+
+class NoTranslations(ShiftValidateException, ValueError):
+    """
+    Translation not found
+    Indicates that no translation dictionary exists in registered path
+    for the locale provided
+    """
+    pass

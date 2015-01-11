@@ -29,7 +29,6 @@ class SimpleResult:
         """
         return len(self.errors) == 0
 
-
     def __eq__(self, other):
         """
         Equals
