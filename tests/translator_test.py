@@ -38,7 +38,6 @@ class ProcessorTests(TestCase):
         self.assertEqual('en', trans.normalize_locale(locale2))
         self.assertEqual('en', trans.normalize_locale(locale3))
 
-
     def test_append_custom_translations_dir(self):
         """ Appending custom dir with translations """
         dir = os.path.dirname(os.path.realpath(__file__))

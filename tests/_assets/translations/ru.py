@@ -5,6 +5,5 @@ Holds customized validation messages for russian language
 """
 translations = {
     '__meta__': 'Customized translations for Russian',
-    '__meta2__': 'Customized translations for Russian'
 }
 
