@@ -1,7 +1,7 @@
 
 from shiftvalidate.validators import AbstractValidator, Length, Choice
 from shiftvalidate.filters import Strip, Digits
-from shiftvalidate.results import SimpleResult
+from shiftvalidate.result import Error
 
 # -----------------------------------------------------------------------------
 # Test helpers
@@ -9,7 +9,7 @@ from shiftvalidate.results import SimpleResult
 
 class StateValidator(AbstractValidator):
     def validate(self, value=None, context=None):
-        return SimpleResult() # always valid
+        return Error() # always valid
 
 person_spec = {
     'state': [StateValidator()],
