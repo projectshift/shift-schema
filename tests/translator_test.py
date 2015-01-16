@@ -5,13 +5,8 @@ import os
 from shiftvalidate.translator import Translator
 from shiftvalidate.exceptions import NoTranslations
 
-@attr('schema')
-class ProcessorTests(TestCase):
-    """
-    Entity processor tests
-    This hold tests for entity processor. Since it is abstract we'll need to
-    test it through a concrete implementation.
-    """
+@attr('translator')
+class TranslatorTests(TestCase):
 
     def test_create_translator(self):
         """ Creating a translator """

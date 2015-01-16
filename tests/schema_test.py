@@ -11,12 +11,7 @@ from shiftvalidate.exceptions import PropertyExists
 from tests import helpers
 
 @attr('schema')
-class ProcessorTests(TestCase):
-    """
-    Entity processor tests
-    This hold tests for entity processor. Since it is abstract we'll need to
-    test it through a concrete implementation.
-    """
+class SchemaTests(TestCase):
 
     def test_create_schema(self):
         """ Create processor, define filters  and validators"""
@@ -219,12 +214,12 @@ class ProcessorTests(TestCase):
         self.assertTrue('salutation' in result.errors)
         self.assertTrue('birth_year' not in result.errors)
 
-
     def test_validate_entity_state(self):
         """ Validating entity state """
+        error = SimpleResult('entity invalid')
         class StateValidator(AbstractValidator):
             def validate(self, value=None, context=None):
-                return SimpleResult(['error 1', 'error2'])
+                return error
 
         schema = Schema(helpers.person_spec)
         schema.add_state_validator(StateValidator())
@@ -232,8 +227,9 @@ class ProcessorTests(TestCase):
 
         person = helpers.Person(first_name = 'Willy', last_name = 'Wonka')
         result = schema.validate(person)
+
         self.assertTrue('__state__' in result.errors)
-        self.assertEqual(2, len(result.errors['__state__']))
+        self.assertTrue(error in result.errors['__state__'])
 
 
     def test_validate_and_filter_in_one_go(self):
@@ -284,7 +280,6 @@ class ProcessorTests(TestCase):
         person = helpers.Person()
         result = schema.validate(person)
         self.assertTrue(result)
-
 
     def test_process_aggregates(self):
         """ Processing nested aggregates """

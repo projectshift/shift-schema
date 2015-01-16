@@ -4,7 +4,7 @@ from nose.plugins.attrib import attr
 from shiftvalidate.properties import Property, Entity
 from shiftvalidate.exceptions import InvalidFilter, InvalidValidator
 from shiftvalidate.filters import Strip, Digits
-from shiftvalidate.validators import Length
+from shiftvalidate.validators import Length, Digits as DigitsValidator
 from shiftvalidate.schema import Schema
 
 from tests import helpers
@@ -83,8 +83,22 @@ class PropertyTests(TestCase):
         value = '  Good luck in 2024 to you and your robots!'
         self.assertEqual('2024', property.filter_value(value))
 
+    def test_validate_value_and_pass(self):
+        """ Validate simple property and pass """
+        property = Property()
+        property.add_validator(Length(min=3))
+        result = property.validate_value('me is longer than three')
+        self.assertTrue(type(result) is list)
+        self.assertTrue(len(result) == 0)
 
 
+    def test_validate_property_and_fail(self):
+        """ Validate simple property and fail (return errors) """
+        property = Property()
+        property.add_validator(Length(min=30))
+        property.add_validator(DigitsValidator())
+        result = property.validate_value('shorter than thirty')
+        self.assertTrue(len(result) == 2)
 
 
 @attr('properties', 'entity')

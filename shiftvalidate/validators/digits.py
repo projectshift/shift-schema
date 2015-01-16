@@ -10,7 +10,7 @@ class Digits(AbstractValidator):
     Validates that passed in value consists only of digits.
     """
 
-    not_digital = 'Provided value must be digits-only.'
+    not_digital = 'Must only consist of digits.'
 
     def __init__(self, message=None):
         """

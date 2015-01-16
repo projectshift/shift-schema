@@ -1,7 +1,6 @@
 from shiftvalidate.exceptions import InvalidFilter, InvalidValidator
 from shiftvalidate.filters import AbstractFilter
 from shiftvalidate.validators import AbstractValidator
-from shiftvalidate.results import SimpleResult
 
 
 class Property:
@@ -88,15 +87,11 @@ class Property:
 
         errors = []
         for validator in self.validators:
-            ok = validator.validate(value)
+            ok = validator.validate(value, context)
             if not ok:
-                for error in ok.errors:
-                    errors.append(error)
+                errors.append(ok)
 
-        if errors:
-            return SimpleResult(errors)
-        else:
-            return SimpleResult()
+        return errors
 
 
 
@@ -104,20 +99,14 @@ class Property:
 class Entity:
     """
     Entity
-    Represents linked entity existing on a property of another one. Mostly
-    used for cases when you need to process a complex entity aggregate
+    Represents linked entity schema existing on a property of another one.
+    Mostly used for cases when you need to process a complex entity aggregate
     that is being persisted via cascades. For example a person and a
     linked address entity. Linked entities allow you to arbitrarily nest
     schemas.
     """
 
     def __init__(self):
-        """
-        Initialize entity property
-        Defines instance-level container for linked entity schema.
-
-        :return:                    None
-        """
         self.schema = None
 
     def set_schema(self, schema):

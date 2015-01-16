@@ -1,3 +1,4 @@
+from shiftvalidate.exceptions import InvalidErrorType
 
 class SimpleResult:
     """
@@ -82,13 +83,22 @@ class ValidationResult:
         Accepts one or more error messages to attach possibly with related
         property name or without any for state validation errors.
 
-        :param errors:          string or list
+        :param errors:          SimpleResult or a list of those
         :param property_name:   string, property name
         :return:                None
         """
 
+        # check errors
+        exception = 'Error must be a SimpleResult or a list of those'
+        if not isinstance(errors, SimpleResult) and type(errors) is not list:
+            raise InvalidErrorType(exception)
+        elif type(errors) is list:
+            for error in errors:
+                if not isinstance(error, SimpleResult):
+                    raise InvalidErrorType(exception)
+
         # convert to list
-        if type(errors) is str:
+        if isinstance(errors, SimpleResult):
             errors = [errors]
 
         # add property errors
@@ -97,6 +107,7 @@ class ValidationResult:
                 self.errors[property_name].extend(errors)
             else:
                 self.errors[property_name] = errors
+
         # add state errors
         else:
             if '__state__' in self.errors:

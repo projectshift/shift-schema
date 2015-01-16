@@ -33,6 +33,12 @@ class InvalidFilter(ShiftValidateException, TypeError):
     """
     pass
 
+class InvalidErrorType(ShiftValidateException, TypeError):
+    """
+    Invalid error
+    Raised when using strings instead of result objects
+    """
+    pass
 
 class InvalidOption(ShiftValidateException, ValueError):
     """
@@ -40,6 +46,8 @@ class InvalidOption(ShiftValidateException, ValueError):
     Indicates an invalid option or option value passed to filter or validator
     """
     pass
+
+
 
 class UnsupportedValueType(ShiftValidateException, TypeError):
     """

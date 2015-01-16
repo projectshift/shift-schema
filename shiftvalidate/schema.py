@@ -239,7 +239,6 @@ class Schema:
             )
 
             # use setter
-            # print('SETTING FILTER VALUE OF [{}] to [{}]'.format(property, value))
             self.set_value(model, property, value)
 
         # process linked entities
@@ -275,13 +274,12 @@ class Schema:
         # validate state
         for state_validator in self.state:
 
-            # none for simple/root, parent model for nested schemas
-            state_context = context
+            # none for root, parent model for nested schemas
+            state_ctx = context
 
-            ok = state_validator.validate(value=model, context=state_context)
+            ok = state_validator.validate(value=model, context=state_ctx)
             if not ok:
-                result.add_errors(property_name=None, errors=ok.errors)
-
+                result.add_errors(property_name=None, errors=ok)
 
         # validate properties
         for property in self.properties:
@@ -295,13 +293,14 @@ class Schema:
             property_context = model
 
             # validate
-            ok = self.properties[property].validate_value(
+            errors = self.properties[property].validate_value(
                 value=value,
                 context=property_context
             )
 
-            if not ok:
-                result.add_errors(property_name=property, errors=ok.errors)
+            if errors:
+                result.add_errors(errors=errors, property_name=property)
+
 
 
         # validate linked entities
@@ -314,14 +313,15 @@ class Schema:
             entity_context = model
 
             #validate
-            entity_valid = self.entities[entity_property].validate(
+            ok = self.entities[entity_property].validate(
                 model=entity,
                 context=entity_context
             )
-            if not entity_valid:
+
+            if not ok:
                 result.add_nested_errors(
                     property_name=entity_property,
-                    errors=entity_valid.errors
+                    errors=ok.errors
                 )
 
 
