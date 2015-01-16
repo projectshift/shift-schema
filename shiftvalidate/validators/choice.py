@@ -1,5 +1,5 @@
 from shiftvalidate.validators.abstract_validator import AbstractValidator
-from shiftvalidate.results import SimpleResult as Result
+from shiftvalidate.results import SimpleResult
 from shiftvalidate.exceptions import InvalidOption
 
 class Choice(AbstractValidator):
@@ -45,9 +45,9 @@ class Choice(AbstractValidator):
         """
 
         if value not in self.choices:
-            return Result(self.invalid_choice)
+            return SimpleResult(self.invalid_choice)
 
         # success otherwise
-        return Result()
+        return SimpleResult()
 
 

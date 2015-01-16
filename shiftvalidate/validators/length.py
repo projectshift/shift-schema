@@ -1,5 +1,5 @@
 from shiftvalidate.validators.abstract_validator import AbstractValidator
-from shiftvalidate.results import SimpleResult as Result
+from shiftvalidate.results import SimpleResult
 
 class Length(AbstractValidator):
 
@@ -43,18 +43,18 @@ class Length(AbstractValidator):
         # too short?
         if self.min and self.max is None:
             if length < self.min:
-                return Result(self.too_short)
+                return SimpleResult(self.too_short, (self.min,))
 
         # too long?
         if self.max and self.min is None:
             if length > self.max:
-                return Result(self.too_long)
+                return SimpleResult(self.too_long, (self.max,))
 
         # within range?
         if self.min and self.max:
             if length < self.min or length > self.max:
-                return Result(self.not_in_range)
+                return SimpleResult(self.not_in_range, (self.min, self.max))
 
         # success otherwise
-        return Result()
+        return SimpleResult()
 

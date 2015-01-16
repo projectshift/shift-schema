@@ -2,52 +2,33 @@
 class SimpleResult:
     """
     Simple result
-    Represents result of a single check against a validator. This is
-    a boolean object that evaluates to True or False but also hold one or
-    several validation error messages.
+    Represents a result of performing single validation check. Evaluates
+    to True in case of no errors. May contain error message/code and
+    an optional set of kwargs to be used at translation.
     """
-    def __init__(self, errors=None):
+    def __init__(self, error=None, kwargs=None):
         """
         Initialize the result
-        Sets boolean result status and an optional error message
+        Sets error message and optional dynamic kwargs for formatting and
+        translations.
 
-        :param valid:           bool, result
-        :param error:           string or iterable of error messages (optional)
+        :param error:           str or None, error message
         :return:                None
         """
-        self.errors = []
-        if type(errors) is str:
-            self.errors = [errors]
-        elif errors is not None:
-            self.errors = list(errors)
-
+        self.error = error
+        self.kwargs = kwargs
 
     def __bool__(self):
-        """
-        Returns boolean status
-        :return:            bool
-        """
-        return len(self.errors) == 0
+        """ Evaluate to boolean """
+        return self.error is None
 
     def __eq__(self, other):
-        """
-        Equals
-        Perform equality check. Usually used in boolean checks.
-
-        :param other:           value to compare to
-        :return:                bool, comparison result
-        """
+        """ Compare to value """
         return self.__bool__() == other
 
 
     def __neq__(self, other):
-        """
-        Not equals
-        Perform equality check. Usually used in boolean checks.
-
-        :param other:           value to compare to
-        :return:                bool, comparison result
-        """
+        """ Compare to value """
         return  self.__bool__() != other
 
 

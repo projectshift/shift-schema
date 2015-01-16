@@ -1,11 +1,13 @@
 from shiftvalidate.validators.abstract_validator import AbstractValidator
 from shiftvalidate.validators.choice import Choice
 from shiftvalidate.validators.length import Length
+from shiftvalidate.validators.digits import Digits
 
 __all__ = [
     'AbstractValidator',
     'Choice',
     'Length',
+    'Digits',
 ]
 
 

@@ -17,7 +17,7 @@ class SimpleResultTests(TestCase):
 
     def test_simple_result_failure_evaluates_to_false(self):
         """ Falsy result evaluates to boolean false """
-        res = SimpleResult(errors='error')
+        res = SimpleResult(error='error')
 
         self.assertFalse(res)
         self.assertTrue(not res)
@@ -26,7 +26,7 @@ class SimpleResultTests(TestCase):
         self.assertTrue(bool(res) is False)
 
 
-    def test_simple_result_succes_evaluates_to_true(self):
+    def test_simple_result_success_evaluates_to_true(self):
         """ Truthy result evaluates to  boolean true"""
         res = SimpleResult()
 
@@ -35,21 +35,6 @@ class SimpleResultTests(TestCase):
         self.assertTrue(res != False)
         self.assertTrue(bool(res) is True)
 
-    def test_set_single_error(self):
-        """ Can set single error on result """
-        error = 'Me is error message'
-        res = SimpleResult(error)
-        self.assertTrue(type(res.errors) is list)
-        self.assertTrue(error in res.errors)
-
-
-    def test_set_multiple_errors(self):
-        """ Can set multiple errors on result """
-        errors = ['error 1', 'error 2']
-        res = SimpleResult(errors)
-        self.assertTrue(type(res.errors) is list)
-        for error in errors:
-            self.assertTrue(error in res.errors)
 
 
 @attr('results', 'validation')

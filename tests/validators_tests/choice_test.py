@@ -17,7 +17,7 @@ class ChoiceTest(TestCase):
     def test_raise_if_choices_not_iterable(self):
         """ Raise an exception if choices not interable """
         with self.assertRaises(InvalidOption):
-            validator = Choice(123)
+            Choice(123)
 
 
     def test_fail_if_not_in_choises(self):
@@ -27,7 +27,7 @@ class ChoiceTest(TestCase):
         result = validator.validate(value)
 
         self.assertFalse(result)
-        self.assertIsNotNone(result.errors)
+        self.assertTrue(type(result.error) is str)
 
 
     def test_fail_with_custom_error_message(self):
@@ -35,7 +35,7 @@ class ChoiceTest(TestCase):
         error = 'Custom error'
         validator = Choice(['one', 'two', 'three'], message=error)
         result = validator.validate('four')
-        self.assertTrue(error in result.errors)
+        self.assertEqual(error, result.error)
 
 
     def test_can_validate_and_pass(self):
