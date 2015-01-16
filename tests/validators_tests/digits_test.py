@@ -17,25 +17,25 @@ class DigitsTest(TestCase):
         """ Validating digits and failing """
         value = '123r456'
         validator = Digits()
-        result = validator.validate(value)
-        self.assertFalse(result)
-        self.assertTrue(type(result.error) is str)
+        error = validator.validate(value)
+        self.assertTrue(error)
+        self.assertTrue(type(error.message) is str)
 
 
     def test_can_fail_with_custom_message(self):
         """ Digits validator accepts custom error """
-        error = 'Me is custom error'
-        validator = Digits(error)
-        result = validator.validate('123r456')
-        self.assertEqual(error, result.error)
+        msg = 'Me is custom error'
+        validator = Digits(msg)
+        error = validator.validate('123r456')
+        self.assertEqual(msg, error.message)
 
 
     def test_can_pass(self):
         """ Valid digits input passes validation  """
 
         validator = Digits()
-        result1 = validator.validate('123456')
-        result2 = validator.validate(123456)
+        error1 = validator.validate('123456')
+        error2 = validator.validate(123456)
 
-        self.assertTrue(result1)
-        self.assertTrue(result2)
+        self.assertFalse(error1)
+        self.assertFalse(error2)

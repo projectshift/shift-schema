@@ -5,12 +5,21 @@ class Error:
     indicate whether the result is valid. In case it's not wil hold the
     error message and optional kwargs for parametrized translation.
     """
-    def __init__(self, error=None, kwargs=None):
-        self.error = error
+    def __init__(self, message=None, kwargs=None):
+        """
+        Initialize
+        Accepts error message and optional iterable of parameters used to
+        format at translation time.
+
+        :param message:             str or None
+        :param kwargs:              iterable or None
+        :return:                    None
+        """
+        self.message = message
         self.kwargs = kwargs
 
     def __bool__(self):
-        return self.error is not None
+        return self.message is not None
 
     def __eq__(self, other):
         return self.__bool__() == other
