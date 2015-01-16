@@ -63,7 +63,7 @@ class SimpleProperty:
         """
         errors = []
         for validator in self.validators:
-            error = validator.validate(value, context)
+            error = validator.run(value, context)
             if error:
                 errors.append(error)
 

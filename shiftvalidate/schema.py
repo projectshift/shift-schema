@@ -1,3 +1,7 @@
+from shiftvalidate.property import SimpleProperty, EntityProperty
+from shiftvalidate.filters import AbstractFilter
+from shiftvalidate.validators import AbstractValidator
+from shiftvalidate.exceptions import InvalidValidator, PropertyExists
 
 class Schema:
     """
@@ -27,10 +31,149 @@ class Schema:
 
     def factory(self, spec):
         """
-        Factory method
-        Configures itself from a spec dictionary
-
+        Factory method: configures itself from a spec dictionary
         :param spec: dict
         :return: None
         """
+        if 'state' in spec:
+            for state_validator in spec['state']:
+                self.add_state_validator(state_validator)
+
+        if 'property' in spec:
+            for property_name in spec['properties']:
+                self.add_property(property_name)
+                for obj in spec['properties'][property_name]:
+                    if isinstance(obj, AbstractFilter):
+                        self.properties[property_name].add_filter(obj)
+                    elif isinstance(obj, AbstractValidator):
+                        self.properties[property_name].add_validator(obj)
+
+    def has_property(self, property_name):
+        """
+        Check if schema has property
+        :param property_name: str, name to check
+        :return: bool
+        """
+        if property_name in self.properties:
+            return True
+        elif property_name in self.entities:
+            return True
+        else:
+            return False
+
+    def __getattr__(self, property_name):
+        """
+        Implements property access
+        :param property_name: name to get
+        :return: obj, property
+        """
+        if property_name in self.properties:
+            return self.properties[property_name]
+        elif property_name in self.entities:
+            return self.entities[property_name]
+        else:
+            return object.__getattribute__(self, property_name)
+
+
+    def add_state_validator(self, validator):
+        """
+        Add entity state validator
+        :param validator: a validator, implementing AbstractValidator
+        :return: None
+        """
+        if not isinstance(validator, AbstractValidator):
+            err = '{} is not a subclass of {}'
+            raise InvalidValidator(err.format(validator, AbstractValidator))
+
+        if validator not in self.state:
+            self.state.append(validator)
+
+    def add_property(self, property_name):
+        """
+        Add simple property to schema
+        :param property_name: str, property name
+        :return: None
+        """
+        if self.has_property(property_name):
+            err = 'Property "{}" already exists'
+            raise PropertyExists(err.format(property_name))
+        self.properties[property_name] = SimpleProperty()
+
+    def add_entity(self, property_name):
+        """
+        Add entity property to schema
+        :param property_name: str, property name
+        :return: None
+        """
+        if self.has_property(property_name):
+            err = 'Property "{}" already exists'
+            raise PropertyExists(err.format(property_name))
+        self.entities[property_name] = EntityProperty()
+
+    def get(self, model, property_name):
+        """
+        Get property from model. Use getter if possible.
+        :param model: model or dict
+        :param property_name: str, name on the model
+        :return: mixed
+        """
+        if type(model) is dict and property_name in model:
+            return model[property_name]
+        elif hasattr(model, 'get_' + property_name):
+            getter = getattr(model, 'get_' + property_name)
+            return getter()
+        else:
+            return getattr(model, property_name)
+
+    def set(self, model, property_name, value):
+        """
+        Set model property to value. Use setter if possible.
+        :param model: model object or dict
+        :param property_name: str, name on the model
+        :param value: mixed, a value to set
+        :return: None
+        """
+        if type(model) is dict:
+            model[property_name] = value
+        elif hasattr(model, 'set_' + property_name):
+            setter = getattr(model, 'set_' + property_name)
+            setter(value)
+        else:
+            setattr(model, property_name, value)
+
+    def process(self, model, context=None):
+        """
+        Perform validation and filtering at the same time, return a
+        validation result object.
+
+        :param model: object or dict
+        :param context: object, dict or None
+        :return: shiftvalidate.result.Result
+        """
+        self.filter(model, context)
+        return self.validate(model, context)
+
+    def filter(self, model, context=None):
+        """
+        Perform filtering on the model. Wil change model in place.
+        :param model: object or dict
+        :param context: object, dict or None
+        :return: None
+        """
+        pass
+
+    def validate(self, model, context=None):
+        """
+        Validate model and return validation result object
+        :param model:  object or dict
+        :param context: object, dict or None
+        :return: shiftvalidate.result.Result
+        """
+
+
+
+
+
+
+
 
