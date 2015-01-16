@@ -11,6 +11,10 @@ class StateValidator(AbstractValidator):
     def validate(self, value=None, context=None):
         return Error() # always valid
 
+class StateValidatorInvalid(AbstractValidator):
+    def validate(self, value=None, context=None):
+        return Error('always invalid') # always invalid
+
 person_spec = {
     'state': [StateValidator()],
     'properties': {

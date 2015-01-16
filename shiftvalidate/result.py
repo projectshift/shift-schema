@@ -1,3 +1,6 @@
+from pprint import pformat
+from shiftvalidate.exceptions import InvalidErrorType
+
 class Error:
     """
     Error
@@ -26,3 +29,61 @@ class Error:
 
     def __neq__(self, other):
         return self.__bool__() != other
+
+class Result:
+    """
+    Result
+    Represents result of validating with a schema. Contains properties and
+    their errors but can also contain nested results for nested schemas.
+    """
+    def __init__(self, errors=None):
+        if not errors:
+            errors = dict()
+        self.errors = errors
+
+    def __bool__(self):
+        return not self.errors
+
+    def __eq__(self, other):
+        return self.__bool__() == other
+
+    def __ne__(self, other):
+        return self.__bool__() != other
+
+    def __repr__(self):
+        return pformat(self.errors)
+
+    def add_errors(self, errors, property_name=None):
+        """ Add one or several errors """
+        if type(errors) is not list:
+            errors = list(errors)
+        for error in errors:
+            if not isinstance(error, Error):
+                err = 'Error must be of type {}'
+                raise InvalidErrorType(err.format(Error))
+
+        if property_name:
+            if property_name in self.errors:
+                self.errors[property_name].extend(errors)
+            else:
+                self.errors[property_name] = errors
+        else:
+            if '__state__' in self.errors:
+                self.errors['__state__'].extend(errors)
+            else:
+                self.errors['__state__'] = errors
+
+    def add_nested_errors(self):
+        """ Attach aggregate of errors to a property"""
+        pass
+
+    def merge(self, another):
+        """ Merge another result into itself"""
+        pass
+
+
+
+
+
+
+

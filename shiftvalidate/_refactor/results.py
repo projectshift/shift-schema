@@ -28,7 +28,7 @@ class SimpleResult:
         return self.__bool__() == other
 
 
-    def __neq__(self, other):
+    def __ne__(self, other):
         """ Compare to value """
         return  self.__bool__() != other
 
@@ -66,7 +66,7 @@ class ValidationResult:
         return self.__bool__() == other
 
 
-    def __neq__(self, other):
+    def __ne__(self, other):
         """
         Not equals
         Perform equality check. Usually used in boolean checks.

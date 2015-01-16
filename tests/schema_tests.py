@@ -2,6 +2,7 @@ from unittest import TestCase
 from nose.plugins.attrib import attr
 
 from shiftvalidate.schema import Schema
+from shiftvalidate.result import Result
 from shiftvalidate.property import SimpleProperty, EntityProperty
 from shiftvalidate.exceptions import PropertyExists, InvalidValidator
 from tests import helpers
@@ -148,11 +149,27 @@ class ErrorTest(TestCase):
 
     def test_filter_entity(self):
         """ Filtering entity with schema """
-        self.fail()
+        schema = Schema(helpers.person_spec)
+        person = helpers.Person(
+            first_name = '  Willy  ',
+            last_name = '  Wonka  ',
+            salutation = ' mr ',
+            birth_year = 'I was born in 1964'
+        )
+        schema.filter(person)
+        self.assertEqual('Willy', person.first_name)
+        self.assertEqual('Wonka', person.last_name)
+        self.assertEqual('mr', person.salutation)
+        self.assertEqual(1964, person.birth_year)
 
     def test_validate_state(self):
         """ Validating entity state """
-        self.fail()
+        model = helpers.Person()
+        schema = Schema()
+        schema.add_state_validator(helpers.StateValidatorInvalid())
+        result = schema.validate(model)
+        self.assertIsInstance(result, Result)
+        self.assertFalse(result)
 
     def test_validate_simple_properties(self):
         """ Validating simple properties """

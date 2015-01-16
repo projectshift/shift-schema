@@ -1,7 +1,7 @@
 from unittest import TestCase
 from nose.plugins.attrib import attr
 
-from shiftvalidate.result import Error
+from shiftvalidate.result import Error, Result
 
 @attr('result', 'error')
 class ErrorTest(TestCase):
@@ -24,3 +24,12 @@ class ErrorTest(TestCase):
         self.assertFalse(err)
         self.assertFalse(err == True)
         self.assertFalse(err != False)
+
+@attr('result', 'result')
+class ResultTest(TestCase):
+    def test_create_error(self):
+        """ Creating result object """
+        msgs = {'what?': 'error'}
+        result = Result(msgs)
+        self.assertIsInstance(result, Result)
+        self.assertEquals(msgs, result.errors)

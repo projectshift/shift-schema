@@ -1,4 +1,5 @@
 from shiftvalidate.property import SimpleProperty, EntityProperty
+from shiftvalidate.result import Error, Result
 from shiftvalidate.filters import AbstractFilter
 from shiftvalidate.validators import AbstractValidator
 from shiftvalidate.exceptions import InvalidValidator, PropertyExists
@@ -160,7 +161,19 @@ class Schema:
         :param context: object, dict or None
         :return: None
         """
-        pass
+        property_context = model # simple properties context
+        for property_name in self.properties:
+            value = self.get(model, property_name)
+            if value is None:
+                continue
+
+            value = self.properties[property_name].filter_value(
+                value=value,
+                context=property_context
+            )
+            self.set(model, property_name, value)
+
+
 
     def validate(self, model, context=None):
         """
@@ -169,6 +182,17 @@ class Schema:
         :param context: object, dict or None
         :return: shiftvalidate.result.Result
         """
+        result = Result()
+
+        # validate state
+        for state_validator in self.state:
+            state_ctx = context # none or parent model (for nested schemas)
+            error = state_validator.run(model, state_ctx)
+            if error:
+                result.add_errors(property_name=None, errors=error)
+
+        return result
+
 
 
 
