@@ -39,7 +39,7 @@ class Schema:
             for state_validator in spec['state']:
                 self.add_state_validator(state_validator)
 
-        if 'property' in spec:
+        if 'properties' in spec:
             for property_name in spec['properties']:
                 self.add_property(property_name)
                 for obj in spec['properties'][property_name]:

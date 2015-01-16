@@ -2,8 +2,9 @@ from unittest import TestCase
 from nose.plugins.attrib import attr
 
 from shiftvalidate.schema import Schema
+from shiftvalidate.property import SimpleProperty, EntityProperty
 from shiftvalidate.exceptions import PropertyExists, InvalidValidator
-from tests.helpers import person_spec, Person, StateValidator
+from tests import helpers
 
 @attr('schema')
 class ErrorTest(TestCase):
@@ -21,9 +22,19 @@ class ErrorTest(TestCase):
         self.assertTrue(schema.has_property('simple_property'))
         self.assertTrue(schema.has_property('entity_property'))
 
+    def test_access_properties_through_overloading(self):
+        """ Overload access to schema properties """
+        schema = Schema()
+        schema.add_property('first_name')
+        schema.add_entity('spouse')
+        self.assertIsInstance(schema.first_name, SimpleProperty)
+        self.assertIsInstance(schema.spouse, EntityProperty)
+        with self.assertRaises(AttributeError):
+            self.assertIsInstance(schema.nothinghere, EntityProperty)
+
     def test_add_state_validator(self):
         """ Adding entity state validator to schema """
-        validator = StateValidator()
+        validator = helpers.StateValidator()
         schema = Schema()
         schema.add_state_validator(validator)
         self.assertTrue(validator in schema.state)
@@ -85,7 +96,6 @@ class ErrorTest(TestCase):
         schema = Schema()
         self.assertEqual('some value', schema.get(model, 'someproperty'))
 
-
     def test_model_setter_on_dict(self):
         """ Using model setter for dictionary-models"""
         model = dict()
@@ -113,6 +123,30 @@ class ErrorTest(TestCase):
         schema = Schema()
         schema.set(model, 'someproperty', 'SOME VALUE')
         self.assertEqual('SOME VALUE', model.someproperty)
+
+    def test_create_from_spec(self):
+        """ Creating schema from spec"""
+        schema = Schema(spec=helpers.person_spec)
+        self.assertEqual(1, len(schema.state))
+        self.assertIsInstance(schema.first_name, SimpleProperty)
+        self.assertEqual(1, len(schema.first_name.filters))
+        self.assertEqual(1, len(schema.first_name.validators))
+        self.assertIsInstance(schema.last_name, SimpleProperty)
+        self.assertEqual(1, len(schema.last_name.filters))
+        self.assertEqual(1, len(schema.last_name.validators))
+
+
+    def test_create_by_subclassing(self):
+        """ Creating schema in subclass """
+        class MySchema(Schema):
+            def schema(self):
+                self.add_property('property')
+                self.add_entity('entity')
+
+        schema = MySchema()
+        self.assertTrue(schema.has_property('property'))
+        self.assertTrue(schema.has_property('entity'))
+
 
 
 
