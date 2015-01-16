@@ -135,7 +135,6 @@ class ErrorTest(TestCase):
         self.assertEqual(1, len(schema.last_name.filters))
         self.assertEqual(1, len(schema.last_name.validators))
 
-
     def test_create_by_subclassing(self):
         """ Creating schema in subclass """
         class MySchema(Schema):
@@ -146,6 +145,34 @@ class ErrorTest(TestCase):
         schema = MySchema()
         self.assertTrue(schema.has_property('property'))
         self.assertTrue(schema.has_property('entity'))
+
+    def test_filter_entity(self):
+        """ Filtering entity with schema """
+        self.fail()
+
+    def test_validate_state(self):
+        """ Validating entity state """
+        self.fail()
+
+    def test_validate_simple_properties(self):
+        """ Validating simple properties """
+        self.fail()
+
+    def test_validate_entity_property(self):
+        """ Validated linked entity properties with nested schemas """
+        self.fail()
+
+    def test_validate_required(self):
+        """ Validate required properties/entities """
+        self.fail()
+
+    def test_skip_none_values(self):
+        """ Filtering and validation is skipped if value is None"""
+        self.fail()
+
+    def test_process_aggregates(self):
+        """ Processing nested aggregate schemas """
+        self.fail()
 
 
 
