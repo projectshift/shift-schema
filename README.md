@@ -23,16 +23,16 @@ the simples being initialization from spec dictionary:
 from shiftvalidate.schema import Schema
 shiftvalidate import validators as validator
 
-schema = Schema(dict(
-    name = dict(
+schema = Schema({
+    'name' = dict(
         required=True,
         validators = [validator.Length(min=3, max=100)]
     ),
-    email = dict(
+    'name' = dict(
         required=True,
         validators = [validator.Email()]
     )
-))
+})
 ```
 
 Alternatively you can create a schema by subclassing Schema object:
