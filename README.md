@@ -28,7 +28,7 @@ schema = Schema({
         required=True,
         validators = [validator.Length(min=3, max=100)]
     ),
-    'name' = dict(
+    'email' = dict(
         required=True,
         validators = [validator.Email()]
     )
