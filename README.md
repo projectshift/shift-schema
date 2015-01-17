@@ -12,13 +12,14 @@ the trend in web frameworks but it never felt right.
 Main idea: decouple filtering and validation rules from web forms into
 flexible shemas, then reuse those shemas in forms as well as apis and cli.
 
-Schema:
+schema:
+======
 
 Schema is a collection of rules to filter and validate properties of your
 model (object or dictionary). There are several ways to create a schema
 the simples being initialization from spec dictionary:
 
-```
+```python
 from shiftvalidate.schema import Schema
 shiftvalidate import validators as validator
 
@@ -36,7 +37,10 @@ schema = Schema(dict(
 
 Alternatively you can create a schema by subclassing Schema object:
 
-```
+```python
+from shiftvalidate.schema import Schema
+shiftvalidate import validators as validator
+
 class MySchema(Schema):
     def schema(self):
         self.add_property('name')
