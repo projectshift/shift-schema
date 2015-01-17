@@ -24,14 +24,16 @@ from shiftvalidate.schema import Schema
 shiftvalidate import validators as validator
 
 schema = Schema({
-    'name' = dict(
-        required=True,
-        validators = [validator.Length(min=3, max=100)]
-    ),
-    'email' = dict(
-        required=True,
-        validators = [validator.Email()]
-    )
+    'properties': {
+        'name' = dict(
+            required=True,
+            validators = [validator.Length(min=3, max=100)]
+        ),
+        'email' = dict(
+            required=True,
+            validators = [validator.Email()]
+        )    
+    }
 })
 ```
 
@@ -61,3 +63,24 @@ valid = schema.process(model)
 print(valid == True) # False - validaation failed
 print(valid.errors) # errors: name='Required', email='Invalid'
 ```
+
+Besides validators you can also attach filters to your schema. Those will be applied in turn and update model data in-place before doing any validations.
+
+```
+person = Person(name='   Morty   ', birthyear = 'born in 1900')
+schema = Schema({
+    'properties': {
+        'name': dict(
+            filters: [Strip()]
+        ),
+        'birthyear': dict(
+            filters: [Digits(to_int=True)]
+        )
+    }
+})
+
+print(person.name) # 'Morty' (stripped of spaces)
+print(person.birthyar) # 1900 (int)
+```
+
+
