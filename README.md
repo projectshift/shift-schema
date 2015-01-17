@@ -52,7 +52,7 @@ class MySchema(Schema):
 
 schema = MySchema()
 ```
-You can then use this schema to filter and validate your schema, or `process` it (filter and validate as single operation).
+You can then use this schema to filter and validate your model data, or `process` it (filter and validate as single operation).
 To validate a model pass it to your schema and get back `Result`:
 
 ```python
