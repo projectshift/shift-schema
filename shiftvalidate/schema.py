@@ -250,6 +250,7 @@ class Schema:
                 value=value,
                 context=property_ctx
             )
+
             if errors:
                 result.add_errors(errors, property_name)
 
@@ -261,14 +262,14 @@ class Schema:
                 continue
 
             entity_ctx = model # model for nested entities
-            nested_valid = self.entities[property_name].schema.validate(
+            nested_valid = self.entities[property_name].validate(
                 model=entity,
                 context=entity_ctx
             )
 
             # required and missing?
             if type(nested_valid) is list:
-                result.add_errors(property_name, nested_valid)
+                result.add_errors(nested_valid, property_name)
 
             # or is a nested result?
             elif isinstance(nested_valid, Result) and not nested_valid:

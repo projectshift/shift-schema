@@ -24,13 +24,13 @@ person_spec = {
             required=True,
             required_message='ZZZ',
             filters=[Strip()],
-            validators=[Length(min=1, max=10)],
+            validators=[Length(min=2, max=10)],
         ),
         'last_name': dict(
             required=True,
             required_message='ZZZ',
             filters=[Strip()],
-            validators=[Length(min=1, max=10)],
+            validators=[Length(min=2, max=10)],
         ),
         'salutation': dict(
             filters=[Strip()],
@@ -50,13 +50,13 @@ person_spec_aggregate = {
             required=True,
             required_message='ZZZ',
             filters=[Strip()],
-            validators=[Length(min=1, max=10)],
+            validators=[Length(min=2, max=10)],
         ),
         'last_name': dict(
             required=True,
             required_message='ZZZ',
             filters=[Strip()],
-            validators=[Length(min=1, max=10)],
+            validators=[Length(min=2, max=10)],
         ),
         'salutation': dict(
             filters=[Strip()],

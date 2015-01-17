@@ -27,8 +27,12 @@ class Error:
     def __eq__(self, other):
         return self.__bool__() == other
 
-    def __neq__(self, other):
+    def __ne__(self, other):
         return self.__bool__() != other
+
+    def __repr__(self):
+        r = '<{} object message="{}">'
+        return r.format(self.__class__.__qualname__, self.message)
 
 class Result:
     """

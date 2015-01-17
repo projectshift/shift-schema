@@ -191,33 +191,75 @@ class ErrorTest(TestCase):
         self.assertTrue('last_name' in result.errors)
         self.assertTrue('salutation' in result.errors)
 
-    def test_validate_entity_property(self):
-        """ Validated linked entity properties with nested schemas """
-        schema = Schema()
-        schema.add_entity('friend')
-        schema.friend.schema = schema
-        self.fail('VALIDATE LINKED ENTITY HERE')
-
-    def test_validate_and_filter(self):
-        """ Process: validation and filtering as single operation"""
-        self.fail()
-
-
     def test_require_simple_properties(self):
         """ Validate required simple properties """
-        self.fail()
+        class Model:
+            def __init__(self):
+                self.property=None
+
+        model = Model()
+        schema = Schema()
+        schema.add_property('property')
+        schema.property.required=True
+        schema.property.required_message='Property required!'
+        result = schema.validate(model)
+        self.assertFalse(result)
+        self.assertTrue('property' in result.errors)
+        self.assertEqual(
+            schema.property.required_message,
+            result.errors['property'][0].message
+        )
+
+    def test_validate_entity_property(self):
+        """ Validated linked entity properties with nested schemas """
+        model = helpers.Person()
+        model.spouse = helpers.Person(first_name='W', last_name='X')
+
+        schema = Schema()
+        schema.add_entity('spouse')
+        schema.spouse.schema = Schema(helpers.person_spec)
+        result = schema.validate(model)
+
+        self.assertFalse(result)
+        self.assertTrue('first_name' in result.errors['spouse'])
+        self.assertTrue('last_name' in result.errors['spouse'])
 
     def test_require_linked_entities(self):
         """ Validate required linked entities"""
-        self.fail()
+        class Model:
+            def __init__(self):
+                self.entity=None
 
-    def test_skip_none_values(self):
-        """ Filtering and validation is skipped if value is None"""
-        self.fail()
+        model = Model()
+        schema = Schema()
+        schema.add_entity('entity')
+        schema.entity.schema=Schema()
+        schema.entity.required=True
+        schema.entity.required_message='Entity required!'
+        result = schema.validate(model)
 
-    def test_process_aggregates(self):
-        """ Processing nested aggregate schemas """
-        self.fail()
+        self.assertFalse(result)
+        self.assertTrue('entity' in result.errors)
+        self.assertEqual(
+            schema.entity.required_message,
+            result.errors['entity'][0].message
+        )
+
+    def test_validate_and_filter(self):
+        """ Process: validation and filtering as single operation"""
+        person = helpers.Person(first_name='   W   ')
+        person.spouse = helpers.Person(first_name='   X   ')
+        schema = Schema(helpers.person_spec_aggregate)
+        result = schema.process(person)
+
+        self.assertEqual('W', person.first_name)
+        self.assertEqual('X', person.spouse.first_name)
+
+        self.assertTrue('first_name' in result.errors) # too short
+        self.assertTrue('first_name' in result.errors['spouse'])
+
+        self.assertTrue('last_name' in result.errors) # required
+        self.assertTrue('last_name' in result.errors['spouse'])
 
 
 

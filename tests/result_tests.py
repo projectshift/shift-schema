@@ -45,7 +45,7 @@ class ResultTest(TestCase):
 
     def test_result_with_errors_if_false(self):
         """ Result with errors evaluates to False """
-        result = Result({'what?': 'error'})
+        result = Result({'what': 'error'})
         self.assertFalse(result)
         self.assertTrue(result == False)
         self.assertTrue(result != True)
