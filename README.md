@@ -1,7 +1,7 @@
 [![Build Status](https://api.travis-ci.org/projectshift/shift-validate.svg)](https://travis-ci.org/projectshift/shift-validate)
 
-shift-validate
-==============
+# shift-validate
+
 
 Entity validation library for Python3. Can filter and validate data in model 
 objects and simple dictionaries with flexible schemas. 
@@ -12,8 +12,8 @@ the trend in web frameworks but it never felt right.
 Main idea: decouple filtering and validation rules from web forms into
 flexible shemas, then reuse those shemas in forms as well as apis and cli.
 
-schema:
-======
+## schema:
+
 
 Schema is a collection of rules to filter and validate properties of your
 model (object or dictionary). There are several ways to create a schema
@@ -54,6 +54,9 @@ class MySchema(Schema):
 
 schema = MySchema()
 ```
+
+## validation:
+
 You can then use this schema to filter and validate your model data, or `process` it (filter and validate as single operation).
 To validate a model pass it to your schema and get back `Result`:
 
@@ -63,6 +66,10 @@ valid = schema.process(model)
 print(valid == True) # False - validaation failed
 print(valid.errors) # errors: name='Required', email='Invalid'
 ```
+
+There is a number of common validators provided and you can easily plug your own.
+
+## filtering:
 
 Besides validators you can also attach filters to your schema. Those will be applied in turn and update model data in-place before doing any validations.
 
@@ -82,5 +89,7 @@ schema = Schema({
 print(person.name) # 'Morty' (stripped of spaces)
 print(person.birthyar) # 1900 (int)
 ```
+
+As with validators there are some filters provided and you can easily plug your own.
 
 
