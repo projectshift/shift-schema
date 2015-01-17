@@ -49,5 +49,7 @@ class MySchema(Schema):
         
         self.add_property('email')
         self.email.add_validator(validator.Email)
+
+schema = MySchema()
 ```
 
