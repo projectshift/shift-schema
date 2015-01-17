@@ -12,6 +12,12 @@ the trend in web frameworks but it never felt right.
 Main idea: decouple filtering and validation rules from web forms into
 flexible shemas, then reuse those shemas in forms as well as apis and cli.
 
+## model:
+
+You can use any kind of object or a dictionary as your model.
+If you use filtering model data will be changed in-place by applying 
+filters you define. 
+
 ## schema:
 
 
