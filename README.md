@@ -15,8 +15,8 @@ flexible shemas, then reuse those shemas in forms as well as apis and cli.
 ## model:
 
 You can use any kind of object or a dictionary as your model.
-If you use filtering model data will be changed in-place by applying 
-filters you define. 
+If you use filtering model will be changed in-place by applying 
+the filters you define. 
 
 ## schema:
 
