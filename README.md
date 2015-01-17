@@ -57,7 +57,7 @@ To validate a model pass it to your schema and get back `Result`:
 
 ```python
 model = dict(name=None, email='BAD')
-valid = schema.validate(model)
+valid = schema.process(model)
 print(valid == True) # False - validaation failed
 print(valid.errors) # errors: name='Required', email='Invalid'
 ```
