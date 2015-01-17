@@ -1,5 +1,5 @@
 from pprint import pformat
-from shiftvalidate.exceptions import InvalidErrorType
+from shiftvalidate.exceptions import InvalidErrorType, InvalidResultType
 
 class Error:
     """
@@ -56,7 +56,7 @@ class Result:
     def add_errors(self, errors, property_name=None):
         """ Add one or several errors """
         if type(errors) is not list:
-            errors = list(errors)
+            errors = [errors]
         for error in errors:
             if not isinstance(error, Error):
                 err = 'Error must be of type {}'
@@ -73,13 +73,25 @@ class Result:
             else:
                 self.errors['__state__'] = errors
 
-    def add_nested_errors(self):
+
+    def add_nested_errors(self, errors, property_name):
         """ Attach aggregate of errors to a property"""
-        pass
+        if isinstance(errors, Result):
+            errors = errors.errors
+        self.errors[property_name] = errors
 
     def merge(self, another):
         """ Merge another result into itself"""
-        pass
+        if not isinstance(another, Result):
+            err = 'Unable to merge: must be "{}", got "{}"'
+            raise InvalidResultType(err.format(Result, another))
+
+        errors = another.errors
+        for property_name in errors:
+            if property_name in self.errors:
+                self.errors[property_name].extend(errors[property_name])
+            else:
+                self.errors[property_name] = errors[property_name]
 
 
 

@@ -36,7 +36,14 @@ class InvalidFilter(ShiftValidateException, TypeError):
 class InvalidErrorType(ShiftValidateException, TypeError):
     """
     Invalid error
-    Raised when using strings instead of result objects
+    Raised when using strings instead of Error objects
+    """
+    pass
+
+class InvalidResultType(ShiftValidateException, TypeError):
+    """
+    Invalid result
+    Raised when using invalid validation result objects
     """
     pass
 

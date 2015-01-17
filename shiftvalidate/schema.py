@@ -75,7 +75,6 @@ class Schema:
         else:
             return object.__getattribute__(self, property_name)
 
-
     def add_state_validator(self, validator):
         """
         Add entity state validator
