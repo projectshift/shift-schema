@@ -52,4 +52,12 @@ class MySchema(Schema):
 
 schema = MySchema()
 ```
+You can then use this schema to filter and validate your schema, or `process` it (filter and validate as single operation).
+To validate a model pass it to your schema and get back `Result`:
 
+```python
+model = dict(name=None, email='BAD')
+valid = schema.validate(model)
+print(valid == True) # False - validaation failed
+print(valid.errors) # errors: name='Required', email='Invalid'
+```
