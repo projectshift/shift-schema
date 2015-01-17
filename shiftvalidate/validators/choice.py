@@ -1,5 +1,5 @@
 from shiftvalidate.validators.abstract_validator import AbstractValidator
-from shiftvalidate.results import SimpleResult
+from shiftvalidate.result import Error
 from shiftvalidate.exceptions import InvalidOption
 
 class Choice(AbstractValidator):
@@ -37,17 +37,17 @@ class Choice(AbstractValidator):
         """
         Validate
         Perform value validation against validation settings and return
-        simple result object
+        error object.
 
         :param value:           str, value to check
         :param context:         object or None, validation context
-        :return:                shiftvalidate.results.SimpleResult
+        :return:                shiftvalidate.result.Error
         """
 
         if value not in self.choices:
-            return SimpleResult(self.invalid_choice)
+            return Error(self.invalid_choice)
 
         # success otherwise
-        return SimpleResult()
+        return Error()
 
 

@@ -1,4 +1,6 @@
 from abc import ABCMeta, abstractmethod
+from shiftvalidate.result import Error
+from shiftvalidate.exceptions import InvalidErrorType
 
 class AbstractValidator(metaclass=ABCMeta):
     """
@@ -13,12 +15,32 @@ class AbstractValidator(metaclass=ABCMeta):
         Validate
         Abstract validation method: implement this in your concrete
         validators. Performs validation of provided value optionally with
-        context (object being validated) and returns a result that if
-        either boolean true, or a string representing error message.
+        context (object being validated) and returns a result Error object
+        that evaluates to boolean.
 
         :param value:               a value to validate
         :param context:             validation context
-        :return:                    True or string error
+        :return:                    shiftvalidate.result.Error
         """
         return
 
+    def run(self, value, context=None):
+        """
+        Run validation
+        Wraps concrete implementation to ensure custom validators return
+        proper type of result.
+
+        :param value:               a value to validate
+        :param context:             validation context
+        :return:                    shiftvalidate.result.Error
+        """
+        res = self.validate(value, context)
+        if not isinstance(res, Error):
+            err = 'Validator "{}" result must be of type "{}", got "{}"'
+            raise InvalidErrorType(err.format(
+                self.__class__.__name__,
+                Error,
+                type(res))
+            )
+
+        return res

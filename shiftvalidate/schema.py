@@ -1,332 +1,285 @@
-from shiftvalidate.properties import Property, Entity
-from shiftvalidate.exceptions import PropertyExists
-from shiftvalidate.validators import AbstractValidator
+from shiftvalidate.property import SimpleProperty, EntityProperty
+from shiftvalidate.result import Error, Result
 from shiftvalidate.filters import AbstractFilter
-from shiftvalidate.results import ValidationResult
-
+from shiftvalidate.validators import AbstractValidator
+from shiftvalidate.exceptions import InvalidValidator, PropertyExists
 
 class Schema:
     """
-    Entity schema
-    Contains rules for filtering and validation of an entity. Either pass in
-    a definition dictionary or extend and setup object manually to use
-    class-based schemas
+    Schema
+    Contains rules for filtering and validation of an entity. Can be
+    instantiated from spec, configured manually or by extending.
     """
 
     def __init__(self, spec=None):
-        """
-        Initialize schema
-        Configure schema by either passing a spec dictionary or
-        alternatively extend from schema and implement self.schema()
-
-        :param spec:            dict, schema specification
-        :return:                None
-        """
-
-        # state validators
         self.state = []
-
-        # property objects (each having filters and validator)
         self.properties = {}
-
-        # linked entities
         self.entities = {}
 
-        # init from spec
+        # create from spec
         if spec:
             self.factory(spec)
 
-        # or create manually in subclass
+        # or by subclassing
         self.schema()
-
 
     def schema(self):
         """
-        Schema
-        This gets called at the end of construction. Implement this method
-        in you class-based schemas.
-
-        :return:                None
+        Schema: Implement this in subclasses and configure your rules here
+        :return: None
         """
         pass
 
-
     def factory(self, spec):
         """
-        Factory method
-        Instantiates itself from a spec dictionary
-
-        :param spec:            dict
-        :return:                None
+        Factory method: configures itself from a spec dictionary
+        :param spec: dict
+        :return: None
         """
-
-        # add state validators
         if 'state' in spec:
             for state_validator in spec['state']:
                 self.add_state_validator(state_validator)
 
-        # add properties
+        if 'entities' in spec:
+            for property_name in spec['entities']:
+                self.add_entity(property_name)
+                prop = self.entities[property_name]
+                prop_spec = spec['entities'][property_name]
+
+                required = bool(prop_spec.get('required', False))
+                if required:
+                    prop.required = required
+
+                msg = prop_spec.get('required_message')
+                if msg:
+                    prop.required_message = msg
+
+                schema = prop_spec.get('schema')
+                if schema:
+                    prop.schema = schema
+
         if 'properties' in spec:
-            for property in spec['properties']:
-                self.add_property(property)
-                for obj in spec['properties'][property]:
-                    if isinstance(obj, AbstractValidator):
-                        self.properties[property].add_validator(obj)
-                    if isinstance(obj, AbstractFilter):
-                        self.properties[property].add_filter(obj)
+            for property_name in spec['properties']:
+                self.add_property(property_name)
+                prop = self.properties[property_name]
+                prop_spec = spec['properties'][property_name]
 
+                required = bool(prop_spec.get('required', False))
+                if required:
+                    prop.required = required
 
-    def has_property(self, name):
+                msg = prop_spec.get('required_message')
+                if msg:
+                    prop.required_message = msg
+
+                prop_filters = prop_spec.get('filters')
+                if prop_filters:
+                    for filter in prop_filters:
+                        prop.add_filter(filter)
+
+                prop_validators = prop_spec.get('validators')
+                if prop_validators:
+                    for validator in prop_validators:
+                        prop.add_validator(validator)
+
+    def has_property(self, property_name):
         """
-        Has property?
-        A boolean method to check whether a property with the given name exists
-        on schema either a simple property, linked entity.
-
-        :param name:            string, property name to check
-        :return:                bool
+        Check if schema has property
+        :param property_name: str, name to check
+        :return: bool
         """
-        if name in self.properties:
+        if property_name in self.properties:
             return True
-        if name in self.entities:
+        elif property_name in self.entities:
             return True
+        else:
+            return False
 
-        # otherwise no property
-        return False
-
+    def __getattr__(self, property_name):
+        """
+        Implements property access
+        :param property_name: name to get
+        :return: obj, property
+        """
+        if property_name in self.properties:
+            return self.properties[property_name]
+        elif property_name in self.entities:
+            return self.entities[property_name]
+        else:
+            return object.__getattribute__(self, property_name)
 
     def add_state_validator(self, validator):
         """
-        Add state validator
-        Adds entity state validator. Those don't validate simple properties
-        but instead validate an entity as whole. May be used to do
-        validation across several properties (passwords match and such)
-
-        :param validator:       shiftvalidate.validators.AbstractValidator
-        :return:                None
+        Add entity state validator
+        :param validator: a validator, implementing AbstractValidator
+        :return: None
         """
         if not isinstance(validator, AbstractValidator):
             err = '{} is not a subclass of {}'
-            raise TypeError(err.format(validator, AbstractValidator))
+            raise InvalidValidator(err.format(validator, AbstractValidator))
 
-        if not validator in self.state:
+        if validator not in self.state:
             self.state.append(validator)
 
-
-    def add_property(self, name):
+    def add_property(self, property_name):
         """
-        Add property
-        Adds simple property to schema. Will raise PropertyExists if
-        a property is already present.
-
-        :param name:            string, property name
-        :return:                None
+        Add simple property to schema
+        :param property_name: str, property name
+        :return: None
         """
-        if self.has_property(name):
+        if self.has_property(property_name):
             err = 'Property "{}" already exists'
-            raise PropertyExists(err.format(name))
-        self.properties[name] = Property()
+            raise PropertyExists(err.format(property_name))
+        self.properties[property_name] = SimpleProperty()
 
-
-    def add_entity(self, name):
+    def add_entity(self, property_name):
         """
-        Add entity
-        Adds linked entity property to schema. Will raise PropertyExists if
-        a property is already present.
-
-        :param name:            string, property name
-        :return:                None
+        Add entity property to schema
+        :param property_name: str, property name
+        :return: None
         """
-        if self.has_property(name):
+        if self.has_property(property_name):
             err = 'Property "{}" already exists'
-            raise PropertyExists(err.format(name))
-        self.entities[name] = Entity()
+            raise PropertyExists(err.format(property_name))
+        self.entities[property_name] = EntityProperty()
 
-
-    def __getattr__(self, property):
+    def get(self, model, property_name):
         """
-        Get attribute
-        Searches for an attribute in properties, linked entities
-        and returns the first result found.
-
-        :param property:        a property to get
-        :return:                Property, Entity
+        Get property from model. Use getter if possible.
+        :param model: model or dict
+        :param property_name: str, name on the model
+        :return: mixed
         """
-
-        if property in self.properties.keys():
-            return self.properties[property]
-        if property in self.entities.keys():
-            return self.entities[property]
-
-        return object.__getattribute__(self, property)
-
-
-    def get_value(self, model, property_name):
-        """
-        Get value
-        Retrieves value from a model, possibly going through a getter
-        method if it exists or directly fetching otherwise.
-
-        :param model:           object, fetch property from it
-        :param property_name:   string, property name
-        :return:                mixed
-        """
-        if hasattr(model, 'get_' + property_name):
+        if type(model) is dict and property_name in model:
+            return model[property_name]
+        elif hasattr(model, 'get_' + property_name):
             getter = getattr(model, 'get_' + property_name)
             return getter()
         else:
             return getattr(model, property_name)
 
-
-    def set_value(self, model, property_name, value):
+    def set(self, model, property_name, value):
         """
-        Set value
-        Sets value on a model, possibly going through a setter
-        method if it exists or directly setting otherwise.
-
-        :param model:           object, fetch property from it
-        :param property_name:   string, property name
-        :param value:           mixed, value to set
-        :return:                None
+        Set model property to value. Use setter if possible.
+        :param model: model object or dict
+        :param property_name: str, name on the model
+        :param value: mixed, a value to set
+        :return: None
         """
-        if hasattr(model, 'set_' + property_name):
+        if type(model) is dict:
+            model[property_name] = value
+        elif hasattr(model, 'set_' + property_name):
             setter = getattr(model, 'set_' + property_name)
-            return setter(value)
+            setter(value)
         else:
             setattr(model, property_name, value)
 
-
-    def process(self, model):
+    def process(self, model=None, context=None):
         """
-        Process
-        Accepts an entity than applies its filters and performs validation
-        afterwards to return validation result object
+        Perform validation and filtering at the same time, return a
+        validation result object.
 
-        :param model:           object, an object to process
-        :return:                shiftvalidate.results.ModelResult
+        :param model: object or dict
+        :param context: object, dict or None
+        :return: shiftvalidate.result.Result
         """
-        self.filter(model)
-        validation_result = self.validate(model)
-        return validation_result
+        self.filter(model, context)
+        return self.validate(model, context)
 
-
-    def filter(self, model, context=None):
+    def filter(self, model=None, context=None):
         """
-        Filter
-        Performs model property value filtering by applying through every
-        attached filter. Will change model in place and return it. This
-        can be used before persisting to database to ensure valid data.
-
-        :param model:           object, an entity to filter
-        :return:                object
+        Perform filtering on the model. Will change model in place.
+        :param model: object or dict
+        :param context: object, dict or None
+        :return: None
         """
+        if model is None:
+            return
 
-        # process properties
-        for property in self.properties:
-
-            # print('FILTERING PROPERTY:', property)
-
-            value = self.get_value(model, property)
+        # properties
+        for property_name in self.properties:
+            value = self.get(model, property_name)
             if value is None:
                 continue
 
-            # simple properties get model as context
-            property_context = model
-
-            # filter
-            value = self.properties[property].filter_value(
+            property_context = model # simple properties context
+            value = self.properties[property_name].filter_value(
                 value=value,
                 context=property_context
             )
+            self.set(model, property_name, value)
 
-            # use setter
-            self.set_value(model, property, value)
-
-        # process linked entities
-        for entity_property in self.entities:
-
-            entity = self.get_value(model, entity_property)
+        # entities
+        for property_name in self.entities:
+            entity = self.get(model, property_name)
             if entity is None:
                 continue
 
-            # nested entities get parent entity as context
-            entity_context = model
-
-            # filter
-            self.entities[entity_property].filter(
+            entity_ctx = model # nested entities get parent for context
+            self.entities[property_name].filter(
                 model=entity,
-                context=entity_context
+                context=entity_ctx
             )
+            # self.set(model, property_name, entity)
 
-
-
-    def validate(self, model, context=None):
+    def validate(self, model=None, context=None):
         """
-        Validate
-        Perform model validation by going through all attached filters
-        and validators and collect results into a result object.
-
-        :param model:           object, an entity fo filter and validate
-        :return:                shiftvalidate.results.ModelResult
+        Validate model and return validation result object
+        :param model:  object or dict
+        :param context: object, dict or None
+        :return: shiftvalidate.result.Result
         """
-
-        result = ValidationResult()
+        result = Result()
 
         # validate state
         for state_validator in self.state:
-
-            # none for root, parent model for nested schemas
-            state_ctx = context
-
-            ok = state_validator.validate(value=model, context=state_ctx)
-            if not ok:
-                result.add_errors(property_name=None, errors=ok)
+            state_ctx = context  # none or parent model (for nested schemas)
+            error = state_validator.run(model, state_ctx)
+            if error:
+                result.add_errors(property_name=None, errors=error)
 
         # validate properties
-        for property in self.properties:
-
-            # go through accessor if present
-            value = self.get_value(model, property)
-            if value is None:
+        for property_name in self.properties:
+            value = self.get(model, property_name)
+            required = self.properties[property_name].required
+            if value is None and not required:
                 continue
 
-            # simple properties get model as context
-            property_context = model
-
-            # validate
-            errors = self.properties[property].validate_value(
+            property_ctx = model # model for simple properties
+            errors = self.properties[property_name].validate_value(
                 value=value,
-                context=property_context
+                context=property_ctx
             )
 
             if errors:
-                result.add_errors(errors=errors, property_name=property)
-
-
+                result.add_errors(errors, property_name)
 
         # validate linked entities
-        for entity_property in self.entities:
-            entity = self.get_value(model, entity_property)
-            if entity is None:
+        for property_name in self.entities:
+            entity = self.get(model, property_name)
+            required = self.entities[property_name].required
+            if entity is None and not required:
                 continue
 
-            # nested entities get parent entity as context
-            entity_context = model
-
-            #validate
-            ok = self.entities[entity_property].validate(
+            entity_ctx = model # model for nested entities
+            nested_valid = self.entities[property_name].validate(
                 model=entity,
-                context=entity_context
+                context=entity_ctx
             )
 
-            if not ok:
+            # required and missing?
+            if type(nested_valid) is list:
+                result.add_errors(nested_valid, property_name)
+
+            # or is a nested result?
+            elif isinstance(nested_valid, Result) and not nested_valid:
                 result.add_nested_errors(
-                    property_name=entity_property,
-                    errors=ok.errors
+                    property_name=property_name,
+                    errors=nested_valid.errors
                 )
 
-
-        # done
         return result
+
 
 
 

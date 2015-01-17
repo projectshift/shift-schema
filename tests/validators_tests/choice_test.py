@@ -24,21 +24,22 @@ class ChoiceTest(TestCase):
         """ Fail validation if value not in choices """
         value = 'four'
         validator = Choice(['one', 'two', 'three'])
-        result = validator.validate(value)
+        error = validator.run(value)
 
-        self.assertFalse(result)
-        self.assertTrue(type(result.error) is str)
+        self.assertTrue(error)
+        self.assertTrue(type(error.message) is str)
 
 
     def test_fail_with_custom_error_message(self):
         """ Can fail with custom error message """
-        error = 'Custom error'
-        validator = Choice(['one', 'two', 'three'], message=error)
-        result = validator.validate('four')
-        self.assertEqual(error, result.error)
+        msg = 'Custom error'
+        validator = Choice(['one', 'two', 'three'], message=msg)
+        error = validator.run('four')
+        self.assertEqual(msg, error.message)
 
 
     def test_can_validate_and_pass(self):
         """ Valid value passes validation """
         validator = Choice('spam')
-        self.assertTrue(validator.validate('s')) # s in spam
+        error = validator.run('s')
+        self.assertFalse(error)

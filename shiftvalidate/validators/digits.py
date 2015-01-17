@@ -1,5 +1,5 @@
 from shiftvalidate.validators.abstract_validator import AbstractValidator
-from shiftvalidate.results import SimpleResult
+from shiftvalidate.result import Error
 from shiftvalidate.exceptions import InvalidOption
 
 
@@ -38,9 +38,9 @@ class Digits(AbstractValidator):
         value = str(value)
         match = re.match(r'^\d+', value)
         if not match or value != match.group():
-            return SimpleResult(self.not_digital)
+            return Error(self.not_digital)
 
         # success otherwise
-        return SimpleResult()
+        return Error()
 
 

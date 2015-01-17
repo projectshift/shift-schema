@@ -73,7 +73,6 @@ class PropertyTests(TestCase):
         self.assertTrue(len(property3.filters) == 0)
         self.assertTrue(len(property3.validators) == 0)
 
-
     def test_filter_value(self):
         """ Filtering property value with attached filters """
         property = Property()
