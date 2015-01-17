@@ -77,7 +77,7 @@ There is a number of common validators provided and you can easily plug your own
 
 ## filtering:
 
-Besides validators you can also attach filters to your schema. Those will be applied in turn and update model data in-place before doing any validations.
+You can attach filters to your schema. Those will be applied in turn and update model data in-place before doing any validations.
 
 ```
 person = Person(name='   Morty   ', birthyear = 'born in 1900')
