@@ -6,7 +6,7 @@
 Entity validation library for Python3. Can filter and validate data in model 
 objects and simple dictionaries with flexible schemas. 
 
-Why: validation and filtering of incoming data with form objects seems to be
+Because validation and filtering of data with form objects seems to be
 the trend in web frameworks but it never felt right.
 
 Main idea: decouple filtering and validation rules from web forms into
