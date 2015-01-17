@@ -21,7 +21,10 @@ class SimplePropertyTests(TestCase):
 
     def test_access_simple_property_required_status(self):
         """ Access required status through property descriptors """
-        self.fail()
+        prop = SimpleProperty()
+        self.assertFalse(prop.required)
+        prop.required = True
+        self.assertTrue(prop.required)
 
     def test_adding_filter(self):
         """ Add filter to property """
@@ -89,7 +92,11 @@ class SimplePropertyTests(TestCase):
 
     def test_validate_required_property(self):
         """ Validating required simple properties """
-        self.fail()
+        prop = SimpleProperty()
+        prop.required = True
+        result = prop.validate_value()
+        self.assertTrue(type(result) is list)
+        self.assertEqual(1, len(result))
 
 
 @attr('property', 'entity')
@@ -180,4 +187,9 @@ class EntityPropertyTests(TestCase):
 
     def test_validate_required_entity(self):
         """ Validating required entity properties """
-        self.fail()
+        prop = EntityProperty()
+        prop.required = True
+        prop.schema = Schema()
+        result = prop.validate()
+        self.assertTrue(type(result) is list)
+        self.assertEqual(1, len(result))

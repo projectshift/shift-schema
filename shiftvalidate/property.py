@@ -2,6 +2,7 @@ from shiftvalidate.filters import AbstractFilter
 from shiftvalidate.validators import AbstractValidator
 from shiftvalidate.exceptions import InvalidFilter, InvalidValidator
 from shiftvalidate.exceptions import InvalidSchemaType
+from shiftvalidate.result import Result, Error
 
 class SimpleProperty:
     """
@@ -11,6 +12,7 @@ class SimpleProperty:
     """
     def __init__(self):
         self._required = False
+        self._required_message = "Property is required and can't be empty"
         self.filters = []
         self.validators = []
 
@@ -21,6 +23,14 @@ class SimpleProperty:
     @required.setter
     def required(self, value):
         self._required = bool(value)
+
+    @property
+    def required_message(self):
+        return self._required_message
+
+    @required_message.setter
+    def required_message(self, msg):
+        self._required_message = msg
 
     def add_filter(self, filter):
         """
@@ -50,7 +60,7 @@ class SimpleProperty:
         self.validators.append(validator)
         return self
 
-    def filter_value(self, value, context=None):
+    def filter_value(self, value=None, context=None):
         """
         Sequentially applies all the filters to provided value
 
@@ -58,12 +68,13 @@ class SimpleProperty:
         :param context: filtering context, usually parent entity
         :return: filtered value
         """
-        for filter in self.filters:
-            value = filter.filter(value, context=context)
-
+        if value is None:
+            return
+        for filter_obj in self.filters:
+            value = filter_obj.filter(value, context=context)
         return value
 
-    def validate_value(self, value, context=None):
+    def validate_value(self, value=None, context=None):
         """
         Sequentially apply each validator to value and collect errors.
 
@@ -71,6 +82,9 @@ class SimpleProperty:
         :param context: validation context, usually parent entity
         :return: list of errors (if any)
         """
+        if value is None and self.required:
+            return [Error(self.required_message)]
+
         errors = []
         for validator in self.validators:
             error = validator.run(value, context)
@@ -87,8 +101,10 @@ class EntityProperty:
     for validation of nested models in aggregates and allows arbitrary
     nesting o schemas.
     """
+
     def __init__(self):
         self._required = False
+        self._required_message = "Entity is required and can't be empty"
         self._schema = None
 
     @property
@@ -98,6 +114,14 @@ class EntityProperty:
     @required.setter
     def required(self, value):
         self._required = bool(value)
+
+    @property
+    def required_message(self):
+        return self._required_message
+
+    @required_message.setter
+    def required_message(self, msg):
+        self._required_message = msg
 
     @property
     def schema(self):
@@ -113,21 +137,23 @@ class EntityProperty:
         err = 'Nested schema must be of type "{}" got "{}"'
         raise InvalidSchemaType(err.format(Schema, schema))
 
-    def filter(self, model, context=None):
+    def filter(self, model=None, context=None):
         """ Perform model filtering """
-        if self._schema is None:
+        if self._schema is None or model is None:
             return
         self._schema.filter(model, context)
 
-    def validate(self, model, context=None):
+    def validate(self, model=None, context=None):
         """ Perform model validation """
-        if self._schema is None:
+        if self._schema is None or (model is None and not self.required):
             return
+        if model is None and self.required:  # validate required
+            return [Error(self.required_message)]
 
         result = self._schema.validate(model, context)
         return result
 
-    def process(self, model, context=None):
+    def process(self, model=None, context=None):
         """ Filter and validate model in one operation """
         self.filter(model, context)
         return self.validate(model, context)

@@ -40,14 +40,47 @@ class Schema:
             for state_validator in spec['state']:
                 self.add_state_validator(state_validator)
 
+        if 'entities' in spec:
+            for property_name in spec['entities']:
+                self.add_entity(property_name)
+                prop = self.entities[property_name]
+                prop_spec = spec['entities'][property_name]
+
+                required = bool(prop_spec.get('required', False))
+                if required:
+                    prop.required = required
+
+                msg = prop_spec.get('required_message')
+                if msg:
+                    prop.required_message = msg
+
+                schema = prop_spec.get('schema')
+                if schema:
+                    prop.schema = schema
+
         if 'properties' in spec:
             for property_name in spec['properties']:
                 self.add_property(property_name)
-                for obj in spec['properties'][property_name]:
-                    if isinstance(obj, AbstractFilter):
-                        self.properties[property_name].add_filter(obj)
-                    elif isinstance(obj, AbstractValidator):
-                        self.properties[property_name].add_validator(obj)
+                prop = self.properties[property_name]
+                prop_spec = spec['properties'][property_name]
+
+                required = bool(prop_spec.get('required', False))
+                if required:
+                    prop.required = required
+
+                msg = prop_spec.get('required_message')
+                if msg:
+                    prop.required_message = msg
+
+                prop_filters = prop_spec.get('filters')
+                if prop_filters:
+                    for filter in prop_filters:
+                        prop.add_filter(filter)
+
+                prop_validators = prop_spec.get('validators')
+                if prop_validators:
+                    for validator in prop_validators:
+                        prop.add_validator(validator)
 
     def has_property(self, property_name):
         """
@@ -141,7 +174,7 @@ class Schema:
         else:
             setattr(model, property_name, value)
 
-    def process(self, model, context=None):
+    def process(self, model=None, context=None):
         """
         Perform validation and filtering at the same time, return a
         validation result object.
@@ -153,13 +186,15 @@ class Schema:
         self.filter(model, context)
         return self.validate(model, context)
 
-    def filter(self, model, context=None):
+    def filter(self, model=None, context=None):
         """
         Perform filtering on the model. Will change model in place.
         :param model: object or dict
         :param context: object, dict or None
         :return: None
         """
+        if model is None:
+            return
 
         # properties
         for property_name in self.properties:
@@ -187,7 +222,7 @@ class Schema:
             )
             # self.set(model, property_name, entity)
 
-    def validate(self, model, context=None):
+    def validate(self, model=None, context=None):
         """
         Validate model and return validation result object
         :param model:  object or dict
@@ -206,7 +241,8 @@ class Schema:
         # validate properties
         for property_name in self.properties:
             value = self.get(model, property_name)
-            if value is None:
+            required = self.properties[property_name].required
+            if value is None and not required:
                 continue
 
             property_ctx = model # model for simple properties
@@ -220,7 +256,8 @@ class Schema:
         # validate linked entities
         for property_name in self.entities:
             entity = self.get(model, property_name)
-            if entity is None:
+            required = self.entities[property_name].required
+            if entity is None and not required:
                 continue
 
             entity_ctx = model # model for nested entities
@@ -229,7 +266,12 @@ class Schema:
                 context=entity_ctx
             )
 
-            if not nested_valid:
+            # required and missing?
+            if type(nested_valid) is list:
+                result.add_errors(property_name, nested_valid)
+
+            # or is a nested result?
+            elif isinstance(nested_valid, Result) and not nested_valid:
                 result.add_nested_errors(
                     property_name=property_name,
                     errors=nested_valid.errors

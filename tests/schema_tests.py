@@ -127,9 +127,10 @@ class ErrorTest(TestCase):
 
     def test_create_from_spec(self):
         """ Creating schema from spec"""
-        schema = Schema(spec=helpers.person_spec)
+        schema = Schema(spec=helpers.person_spec_aggregate)
         self.assertEqual(1, len(schema.state))
 
+        # import pdb;pdb.set_trace()
         self.assertIsInstance(schema.first_name, SimpleProperty)
         self.assertEqual(1, len(schema.first_name.filters))
         self.assertEqual(1, len(schema.first_name.validators))
@@ -139,6 +140,7 @@ class ErrorTest(TestCase):
         self.assertEqual(1, len(schema.last_name.filters))
         self.assertEqual(1, len(schema.last_name.validators))
         self.assertTrue(schema.last_name.required)
+
 
     def test_create_by_subclassing(self):
         """ Creating schema in subclass """

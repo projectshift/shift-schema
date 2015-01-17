@@ -20,53 +20,58 @@ class StateValidatorInvalid(AbstractValidator):
 person_spec = {
     'state': [StateValidator()],
     'properties': {
-        'first_name': [
-            '__required__',
-            Strip(),
-            Length(min=2, max=10)
-        ],
-        'last_name': [
-            '__required__',
-            Strip(),
-            Length(min=2, max=10)
-        ],
-        'salutation': [
-            Strip(),
-            Choice(['mr', 'ms'])
-        ],
-        'birth_year': [
-            Strip(),
-            Digits(to_int=True)
-        ]
-    }
+        'first_name': dict(
+            required=True,
+            required_message='ZZZ',
+            filters=[Strip()],
+            validators=[Length(min=1, max=10)],
+        ),
+        'last_name': dict(
+            required=True,
+            required_message='ZZZ',
+            filters=[Strip()],
+            validators=[Length(min=1, max=10)],
+        ),
+        'salutation': dict(
+            filters=[Strip()],
+            validators=[Choice(['mr', 'ms'])]
+        ),
+        'birth_year': dict(
+            filters=[Strip(), Digits(to_int=True)]
+        ),
+    },
 }
 
 # aggregate person spec (contains nested schema)
 person_spec_aggregate = {
     'state': [StateValidator()],
     'properties': {
-        'first_name': [
-            '__required__',
-            Strip(),
-            Length(min=1, max=10)
-        ],
-        'last_name': [
-            '__required__',
-            Strip(),
-            Length(min=1, max=10)
-        ],
-        'salutation': [
-            Strip(),
-            Choice(['mr', 'ms'])
-        ],
-        'birth_year': [
-            Strip(),
-            Digits(to_int=True)
-        ],
-        'spouse': [
-            '__required__',
-            Schema(person_spec)
-        ]
+        'first_name': dict(
+            required=True,
+            required_message='ZZZ',
+            filters=[Strip()],
+            validators=[Length(min=1, max=10)],
+        ),
+        'last_name': dict(
+            required=True,
+            required_message='ZZZ',
+            filters=[Strip()],
+            validators=[Length(min=1, max=10)],
+        ),
+        'salutation': dict(
+            filters=[Strip()],
+            validators=[Choice(['mr', 'ms'])]
+        ),
+        'birth_year': dict(
+            filters=[Strip(), Digits(to_int=True)]
+        ),
+    },
+    'entities' : {
+        'spouse': dict(
+            required=True,
+            required_message='XXX',
+            schema=Schema(person_spec)
+        )
     }
 }
 
