@@ -155,24 +155,37 @@ class Schema:
 
     def filter(self, model, context=None):
         """
-        Perform filtering on the model. Wil change model in place.
+        Perform filtering on the model. Will change model in place.
         :param model: object or dict
         :param context: object, dict or None
         :return: None
         """
-        property_context = model # simple properties context
+
+        # properties
         for property_name in self.properties:
             value = self.get(model, property_name)
             if value is None:
                 continue
 
+            property_context = model # simple properties context
             value = self.properties[property_name].filter_value(
                 value=value,
                 context=property_context
             )
             self.set(model, property_name, value)
 
+        # entities
+        for property_name in self.entities:
+            entity = self.get(model, property_name)
+            if entity is None:
+                continue
 
+            entity_ctx = model # nested entities get parent for context
+            self.entities[property_name].filter(
+                model=entity,
+                context=entity_ctx
+            )
+            # self.set(model, property_name, entity)
 
     def validate(self, model, context=None):
         """
@@ -185,10 +198,42 @@ class Schema:
 
         # validate state
         for state_validator in self.state:
-            state_ctx = context # none or parent model (for nested schemas)
+            state_ctx = context  # none or parent model (for nested schemas)
             error = state_validator.run(model, state_ctx)
             if error:
                 result.add_errors(property_name=None, errors=error)
+
+        # validate properties
+        for property_name in self.properties:
+            value = self.get(model, property_name)
+            if value is None:
+                continue
+
+            property_ctx = model # model for simple properties
+            errors = self.properties[property_name].validate_value(
+                value=value,
+                context=property_ctx
+            )
+            if errors:
+                result.add_errors(errors, property_name)
+
+        # validate linked entities
+        for property_name in self.entities:
+            entity = self.get(model, property_name)
+            if entity is None:
+                continue
+
+            entity_ctx = model # model for nested entities
+            nested_valid = self.entities[property_name].schema.validate(
+                model=entity,
+                context=entity_ctx
+            )
+
+            if not nested_valid:
+                result.add_nested_errors(
+                    property_name=property_name,
+                    errors=nested_valid.errors
+                )
 
         return result
 

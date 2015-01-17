@@ -47,6 +47,13 @@ class InvalidResultType(ShiftValidateException, TypeError):
     """
     pass
 
+class InvalidSchemaType(ShiftValidateException, TypeError):
+    """
+    Invalid schema
+    Raised when trying to nest schema of bad type in property
+    """
+    pass
+
 class InvalidOption(ShiftValidateException, ValueError):
     """
     Invalid exists

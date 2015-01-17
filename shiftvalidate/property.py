@@ -1,6 +1,7 @@
 from shiftvalidate.filters import AbstractFilter
 from shiftvalidate.validators import AbstractValidator
 from shiftvalidate.exceptions import InvalidFilter, InvalidValidator
+from shiftvalidate.exceptions import InvalidSchemaType
 
 class SimpleProperty:
     """
@@ -9,8 +10,17 @@ class SimpleProperty:
     validators for this value
     """
     def __init__(self):
+        self._required = False
         self.filters = []
         self.validators = []
+
+    @property
+    def required(self):
+        return self._required
+
+    @required.setter
+    def required(self, value):
+        self._required = bool(value)
 
     def add_filter(self, filter):
         """
@@ -71,4 +81,54 @@ class SimpleProperty:
 
 
 class EntityProperty:
-    pass
+    """
+    Entity property
+    Contains nested schema existing on a property of another schema. Used
+    for validation of nested models in aggregates and allows arbitrary
+    nesting o schemas.
+    """
+    def __init__(self):
+        self._required = False
+        self._schema = None
+
+    @property
+    def required(self):
+        return self._required
+
+    @required.setter
+    def required(self, value):
+        self._required = bool(value)
+
+    @property
+    def schema(self):
+        return self._schema
+
+    @schema.setter
+    def schema(self, schema):
+        from shiftvalidate.schema import Schema
+        if isinstance(schema, Schema):
+            self._schema = schema
+            return
+
+        err = 'Nested schema must be of type "{}" got "{}"'
+        raise InvalidSchemaType(err.format(Schema, schema))
+
+    def filter(self, model, context=None):
+        """ Perform model filtering """
+        if self._schema is None:
+            return
+        self._schema.filter(model, context)
+
+    def validate(self, model, context=None):
+        """ Perform model validation """
+        if self._schema is None:
+            return
+
+        result = self._schema.validate(model, context)
+        return result
+
+    def process(self, model, context=None):
+        """ Filter and validate model in one operation """
+        self.filter(model, context)
+        return self.validate(model, context)
+

@@ -2,10 +2,14 @@
 from unittest import TestCase, mock
 from nose.plugins.attrib import attr
 
-from shiftvalidate.property import SimpleProperty
+from shiftvalidate.schema import Schema
+from shiftvalidate.property import SimpleProperty, EntityProperty
 from shiftvalidate.exceptions import InvalidFilter, InvalidValidator
+from shiftvalidate.exceptions import InvalidSchemaType
 from shiftvalidate.filters import Strip, Digits
 from shiftvalidate.validators import Length, Digits as DigitsValidator
+
+from tests import helpers
 
 @attr('property', 'simple')
 class SimplePropertyTests(TestCase):
@@ -14,6 +18,10 @@ class SimplePropertyTests(TestCase):
         """ Creating simple property """
         prop = SimpleProperty()
         self.assertIsInstance(prop, SimpleProperty)
+
+    def test_access_simple_property_required_status(self):
+        """ Access required status through property descriptors """
+        self.fail()
 
     def test_adding_filter(self):
         """ Add filter to property """
@@ -78,3 +86,98 @@ class SimplePropertyTests(TestCase):
         property.add_validator(DigitsValidator())
         result = property.validate_value('shorter than thirty')
         self.assertTrue(len(result) == 2)
+
+    def test_validate_required_property(self):
+        """ Validating required simple properties """
+        self.fail()
+
+
+@attr('property', 'entity')
+class EntityPropertyTests(TestCase):
+
+    def test_create_entity_property(self):
+        """ Creating entity property """
+        prop = EntityProperty()
+        self.assertIsInstance(prop, EntityProperty)
+
+    def test_access_entity_property_required_status(self):
+        """ Access required status through property descriptors """
+        prop = EntityProperty()
+        self.assertFalse(prop.required)
+        prop.required = True
+        self.assertTrue(prop.required)
+
+    def test_accessing_schema(self):
+        """ Accessing nested schema with property descriptors """
+        schema = Schema()
+        prop = EntityProperty()
+        self.assertIsNone(prop.schema)
+        prop.schema = schema
+        self.assertEqual(schema, prop.schema)
+
+    def test_type_check_schema(self):
+        """ Raise error on setting invalid schema """
+        prop = EntityProperty()
+        with self.assertRaises(InvalidSchemaType):
+            prop.schema = dict()
+
+    def test_filtering_model(self):
+        """ Filtering nested entity """
+        model = helpers.Person(
+            first_name='   Willy    ',
+            last_name='   Wonka    ',
+        )
+        prop = EntityProperty()
+        prop.schema = Schema(helpers.person_spec)
+        prop.filter(model)
+        self.assertEqual('Willy', model.first_name)
+        self.assertEqual('Wonka', model.last_name)
+
+    def test_validating_model(self):
+        """ Validated nested entity """
+        class Model: pass
+        class Nested: pass
+        nested = Nested()
+        model = Model()
+        model.nested = nested
+
+        class NestedSchema(Schema): pass
+
+        nested_schema = NestedSchema()
+        nested_schema.add_state_validator(helpers.StateValidatorInvalid())
+
+        schema = Schema()
+        schema.add_entity('nested')
+        schema.nested.schema = nested_schema
+
+        prop = EntityProperty()
+        prop.schema = schema
+        result = prop.validate(model)
+        self.assertFalse(result)
+        self.assertEqual(1, len(result.errors['nested']['__state__']))
+
+    def test_filter_and_validate(self):
+        """ Process: filter and validate in single operation """
+        nested = helpers.Person(
+            first_name='   W    ',
+            last_name='   W    ',
+        )
+        model = helpers.Person()
+        model.nested = nested
+
+        nested_schema = Schema(helpers.person_spec)
+        schema = Schema()
+        schema.add_entity('nested')
+        schema.nested.schema = nested_schema
+        result = schema.process(model)
+
+        self.assertEqual('W', model.nested.first_name)
+        self.assertEqual('W', model.nested.last_name)
+
+        self.assertFalse(result)
+        self.assertTrue('first_name' in result.errors['nested'])
+        self.assertTrue('last_name' in result.errors['nested'])
+
+    def test_validate_required_entity(self):
+        """ Validating required entity properties """
+        self.fail()

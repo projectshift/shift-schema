@@ -2,6 +2,7 @@
 from shiftvalidate.validators import AbstractValidator, Length, Choice
 from shiftvalidate.filters import Strip, Digits
 from shiftvalidate.result import Error
+from shiftvalidate.schema import Schema
 
 # -----------------------------------------------------------------------------
 # Test helpers
@@ -15,14 +16,42 @@ class StateValidatorInvalid(AbstractValidator):
     def validate(self, value=None, context=None):
         return Error('always invalid') # always invalid
 
+# simple person spec
 person_spec = {
     'state': [StateValidator()],
     'properties': {
         'first_name': [
+            '__required__',
+            Strip(),
+            Length(min=2, max=10)
+        ],
+        'last_name': [
+            '__required__',
+            Strip(),
+            Length(min=2, max=10)
+        ],
+        'salutation': [
+            Strip(),
+            Choice(['mr', 'ms'])
+        ],
+        'birth_year': [
+            Strip(),
+            Digits(to_int=True)
+        ]
+    }
+}
+
+# aggregate person spec (contains nested schema)
+person_spec_aggregate = {
+    'state': [StateValidator()],
+    'properties': {
+        'first_name': [
+            '__required__',
             Strip(),
             Length(min=1, max=10)
         ],
         'last_name': [
+            '__required__',
             Strip(),
             Length(min=1, max=10)
         ],
@@ -33,6 +62,10 @@ person_spec = {
         'birth_year': [
             Strip(),
             Digits(to_int=True)
+        ],
+        'spouse': [
+            '__required__',
+            Schema(person_spec)
         ]
     }
 }

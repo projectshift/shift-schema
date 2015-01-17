@@ -1,4 +1,4 @@
-from unittest import TestCase
+from unittest import TestCase, mock
 from nose.plugins.attrib import attr
 
 from shiftvalidate.schema import Schema
@@ -129,12 +129,16 @@ class ErrorTest(TestCase):
         """ Creating schema from spec"""
         schema = Schema(spec=helpers.person_spec)
         self.assertEqual(1, len(schema.state))
+
         self.assertIsInstance(schema.first_name, SimpleProperty)
         self.assertEqual(1, len(schema.first_name.filters))
         self.assertEqual(1, len(schema.first_name.validators))
+        self.assertTrue(schema.first_name.required)
+
         self.assertIsInstance(schema.last_name, SimpleProperty)
         self.assertEqual(1, len(schema.last_name.filters))
         self.assertEqual(1, len(schema.last_name.validators))
+        self.assertTrue(schema.last_name.required)
 
     def test_create_by_subclassing(self):
         """ Creating schema in subclass """
@@ -173,14 +177,36 @@ class ErrorTest(TestCase):
 
     def test_validate_simple_properties(self):
         """ Validating simple properties """
-        self.fail()
+        schema = Schema(helpers.person_spec)
+        person = helpers.Person(
+            first_name='Some really really long name',
+            last_name='And a really really long last name',
+            salutation='BAD!',
+        )
+        result = schema.validate(person)
+        self.assertFalse(result)
+        self.assertTrue('first_name' in result.errors)
+        self.assertTrue('last_name' in result.errors)
+        self.assertTrue('salutation' in result.errors)
 
     def test_validate_entity_property(self):
         """ Validated linked entity properties with nested schemas """
+        schema = Schema()
+        schema.add_entity('friend')
+        schema.friend.schema = schema
+        self.fail('VALIDATE LINKED ENTITY HERE')
+
+    def test_validate_and_filter(self):
+        """ Process: validation and filtering as single operation"""
         self.fail()
 
-    def test_validate_required(self):
-        """ Validate required properties/entities """
+
+    def test_require_simple_properties(self):
+        """ Validate required simple properties """
+        self.fail()
+
+    def test_require_linked_entities(self):
+        """ Validate required linked entities"""
         self.fail()
 
     def test_skip_none_values(self):
