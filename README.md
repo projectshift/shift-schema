@@ -6,9 +6,6 @@
 Filtering and validation library for Python3. Can filter and validate data in 
 model objects and simple dictionaries with flexible schemas. 
 
-Because validation and filtering of data with form objects seems to be
-the trend in web frameworks but it never felt right.
-
 Main idea: decouple filtering and validation rules from web forms into
 flexible schemas, then reuse those schemas in forms as well as apis and cli.
 
