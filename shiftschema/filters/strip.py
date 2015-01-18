@@ -1,5 +1,5 @@
-from shiftvalidate.filters import AbstractFilter
-from shiftvalidate.exceptions import UnsupportedValueType, InvalidOption
+from shiftschema.filters import AbstractFilter
+from shiftschema.exceptions import UnsupportedValueType, InvalidOption
 
 
 class Strip(AbstractFilter):

@@ -26,8 +26,8 @@ model (object or dictionary). There are several ways to create a schema
 the simples being initialization from spec dictionary:
 
 ```python
-from shiftvalidate.schema import Schema
-shiftvalidate import validators as validator
+from shiftschema.schema import Schema
+from shiftschema import validators as validator
 
 schema = Schema({
     'properties': {
@@ -45,8 +45,8 @@ schema = Schema({
 Alternatively you can create a schema by subclassing Schema object:
 
 ```python
-from shiftvalidate.schema import Schema
-shiftvalidate import validators as validator
+from shiftschema.schema import Schema
+from shiftschema import validators as validator
 
 class MySchema(Schema):
     def schema(self):

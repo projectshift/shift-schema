@@ -1,5 +1,5 @@
-from shiftvalidate.filters import AbstractFilter
-from shiftvalidate.exceptions import UnsupportedValueType
+from shiftschema.filters import AbstractFilter
+from shiftschema.exceptions import UnsupportedValueType
 import re
 
 class Digits(AbstractFilter):

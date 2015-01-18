@@ -1,5 +1,5 @@
-from shiftvalidate.validators.abstract_validator import AbstractValidator
-from shiftvalidate.result import Error
+from shiftschema.validators.abstract_validator import AbstractValidator
+from shiftschema.result import Error
 
 class Length(AbstractValidator):
 
@@ -35,7 +35,7 @@ class Length(AbstractValidator):
 
         :param value:           str, value to check
         :param context:         object or None, validation context
-        :return:                shiftvalidate.results.SimpleResult
+        :return:                shiftschema.results.SimpleResult
         """
 
         length = len(str(value))

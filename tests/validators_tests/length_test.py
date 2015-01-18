@@ -1,6 +1,6 @@
 from unittest import TestCase, mock
 from nose.plugins.attrib import attr
-from shiftvalidate.validators import Length
+from shiftschema.validators import Length
 
 
 @attr('validator', 'length')

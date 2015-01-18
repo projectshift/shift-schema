@@ -1,6 +1,6 @@
-from shiftvalidate.filters.abstract_filter import AbstractFilter
-from shiftvalidate.filters.digits import Digits
-from shiftvalidate.filters.strip import Strip
+from shiftschema.filters.abstract_filter import AbstractFilter
+from shiftschema.filters.digits import Digits
+from shiftschema.filters.strip import Strip
 
 __all__ = [
     'AbstractFilter'

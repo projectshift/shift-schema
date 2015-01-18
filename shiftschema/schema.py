@@ -1,7 +1,7 @@
-from shiftvalidate.property import SimpleProperty, EntityProperty
-from shiftvalidate.result import Error, Result
-from shiftvalidate.validators import AbstractValidator
-from shiftvalidate.exceptions import InvalidValidator, PropertyExists
+from shiftschema.property import SimpleProperty, EntityProperty
+from shiftschema.result import Error, Result
+from shiftschema.validators import AbstractValidator
+from shiftschema.exceptions import InvalidValidator, PropertyExists
 
 class Schema:
     """
@@ -179,7 +179,7 @@ class Schema:
 
         :param model: object or dict
         :param context: object, dict or None
-        :return: shiftvalidate.result.Result
+        :return: shiftschema.result.Result
         """
         self.filter(model, context)
         return self.validate(model, context)
@@ -225,7 +225,7 @@ class Schema:
         Validate model and return validation result object
         :param model:  object or dict
         :param context: object, dict or None
-        :return: shiftvalidate.result.Result
+        :return: shiftschema.result.Result
         """
         locale = None
         translator=None

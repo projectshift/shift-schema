@@ -2,12 +2,12 @@
 from unittest import TestCase, mock
 from nose.plugins.attrib import attr
 
-from shiftvalidate.schema import Schema
-from shiftvalidate.property import SimpleProperty, EntityProperty
-from shiftvalidate.exceptions import InvalidFilter, InvalidValidator
-from shiftvalidate.exceptions import InvalidSchemaType
-from shiftvalidate.filters import Strip, Digits
-from shiftvalidate.validators import Length, Digits as DigitsValidator
+from shiftschema.schema import Schema
+from shiftschema.property import SimpleProperty, EntityProperty
+from shiftschema.exceptions import InvalidFilter, InvalidValidator
+from shiftschema.exceptions import InvalidSchemaType
+from shiftschema.filters import Strip, Digits
+from shiftschema.validators import Length, Digits as DigitsValidator
 
 from tests import helpers
 

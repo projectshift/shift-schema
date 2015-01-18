@@ -1,6 +1,6 @@
-from shiftvalidate.validators.abstract_validator import AbstractValidator
-from shiftvalidate.result import Error
-from shiftvalidate.exceptions import InvalidOption
+from shiftschema.validators.abstract_validator import AbstractValidator
+from shiftschema.result import Error
+from shiftschema.exceptions import InvalidOption
 
 class Choice(AbstractValidator):
     """
@@ -41,7 +41,7 @@ class Choice(AbstractValidator):
 
         :param value:           str, value to check
         :param context:         object or None, validation context
-        :return:                shiftvalidate.result.Error
+        :return:                shiftschema.result.Error
         """
 
         if value not in self.choices:

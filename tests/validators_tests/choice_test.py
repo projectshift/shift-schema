@@ -1,8 +1,8 @@
 from unittest import TestCase, mock
 from nose.plugins.attrib import attr
 
-from shiftvalidate.validators import Choice
-from shiftvalidate.exceptions import InvalidOption
+from shiftschema.validators import Choice
+from shiftschema.exceptions import InvalidOption
 
 
 @attr('validator', 'choice')

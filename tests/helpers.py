@@ -1,8 +1,8 @@
 
-from shiftvalidate.validators import AbstractValidator, Length, Choice
-from shiftvalidate.filters import Strip, Digits
-from shiftvalidate.result import Error
-from shiftvalidate.schema import Schema
+from shiftschema.validators import AbstractValidator, Length, Choice
+from shiftschema.filters import Strip, Digits
+from shiftschema.result import Error
+from shiftschema.schema import Schema
 
 # -----------------------------------------------------------------------------
 # Test helpers

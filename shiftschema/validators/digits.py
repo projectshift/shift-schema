@@ -1,6 +1,6 @@
-from shiftvalidate.validators.abstract_validator import AbstractValidator
-from shiftvalidate.result import Error
-from shiftvalidate.exceptions import InvalidOption
+from shiftschema.validators.abstract_validator import AbstractValidator
+from shiftschema.result import Error
+from shiftschema.exceptions import InvalidOption
 
 
 
@@ -31,7 +31,7 @@ class Digits(AbstractValidator):
 
         :param value:           value to check, cast to string
         :param context:         object or None, validation context
-        :return:                shiftvalidate.results.SimpleResult
+        :return:                shiftschema.results.SimpleResult
         """
         import re
 

@@ -1,7 +1,7 @@
-from shiftvalidate.validators.abstract_validator import AbstractValidator
-from shiftvalidate.validators.choice import Choice
-from shiftvalidate.validators.digits import Digits
-from shiftvalidate.validators.length import Length
+from shiftschema.validators.abstract_validator import AbstractValidator
+from shiftschema.validators.choice import Choice
+from shiftschema.validators.digits import Digits
+from shiftschema.validators.length import Length
 
 
 

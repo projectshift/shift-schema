@@ -1,8 +1,8 @@
 from unittest import TestCase, mock
 from nose.plugins.attrib import attr
 
-from shiftvalidate.filters import Strip
-from shiftvalidate.exceptions import InvalidOption, UnsupportedValueType
+from shiftschema.filters import Strip
+from shiftschema.exceptions import InvalidOption, UnsupportedValueType
 
 @attr('filter', 'strip')
 class StripTest(TestCase):

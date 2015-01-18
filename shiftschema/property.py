@@ -1,8 +1,8 @@
-from shiftvalidate.filters import AbstractFilter
-from shiftvalidate.validators import AbstractValidator
-from shiftvalidate.exceptions import InvalidFilter, InvalidValidator
-from shiftvalidate.exceptions import InvalidSchemaType
-from shiftvalidate.result import Result, Error
+from shiftschema.filters import AbstractFilter
+from shiftschema.validators import AbstractValidator
+from shiftschema.exceptions import InvalidFilter, InvalidValidator
+from shiftschema.exceptions import InvalidSchemaType
+from shiftschema.result import Result, Error
 
 class SimpleProperty:
     """
@@ -129,7 +129,7 @@ class EntityProperty:
 
     @schema.setter
     def schema(self, schema):
-        from shiftvalidate.schema import Schema
+        from shiftschema.schema import Schema
         if isinstance(schema, Schema):
             self._schema = schema
             return

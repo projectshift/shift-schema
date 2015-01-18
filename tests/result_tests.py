@@ -1,8 +1,8 @@
 from unittest import TestCase
 from nose.plugins.attrib import attr
 
-from shiftvalidate.result import Error, Result
-from shiftvalidate.exceptions import InvalidErrorType, InvalidResultType
+from shiftschema.result import Error, Result
+from shiftschema.exceptions import InvalidErrorType, InvalidResultType
 
 @attr('result', 'error')
 class ErrorTest(TestCase):

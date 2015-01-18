@@ -1,6 +1,6 @@
 from abc import ABCMeta, abstractmethod
-from shiftvalidate.result import Error
-from shiftvalidate.exceptions import InvalidErrorType
+from shiftschema.result import Error
+from shiftschema.exceptions import InvalidErrorType
 
 class AbstractValidator(metaclass=ABCMeta):
     """
@@ -20,7 +20,7 @@ class AbstractValidator(metaclass=ABCMeta):
 
         :param value:               a value to validate
         :param context:             validation context
-        :return:                    shiftvalidate.result.Error
+        :return:                    shiftschema.result.Error
         """
         return
 
@@ -32,7 +32,7 @@ class AbstractValidator(metaclass=ABCMeta):
 
         :param value:               a value to validate
         :param context:             validation context
-        :return:                    shiftvalidate.result.Error
+        :return:                    shiftschema.result.Error
         """
         res = self.validate(value, context)
         if not isinstance(res, Error):

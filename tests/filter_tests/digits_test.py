@@ -1,8 +1,8 @@
 from unittest import TestCase, mock
 from nose.plugins.attrib import attr
 
-from shiftvalidate.exceptions import UnsupportedValueType
-from shiftvalidate.filters import Digits
+from shiftschema.exceptions import UnsupportedValueType
+from shiftschema.filters import Digits
 
 @attr('filter', 'digits')
 class DigitsTest(TestCase):

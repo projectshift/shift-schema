@@ -1,6 +1,6 @@
 import os
 from importlib.machinery import SourceFileLoader
-from shiftvalidate.exceptions import NoTranslations
+from shiftschema.exceptions import NoTranslations
 
 
 class Translator:

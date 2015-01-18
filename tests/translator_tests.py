@@ -2,8 +2,8 @@ from unittest import TestCase
 from nose.plugins.attrib import attr
 
 import os
-from shiftvalidate.translator import Translator
-from shiftvalidate.exceptions import NoTranslations
+from shiftschema.translator import Translator
+from shiftschema.exceptions import NoTranslations
 
 @attr('translator')
 class TranslatorTests(TestCase):
@@ -17,7 +17,7 @@ class TranslatorTests(TestCase):
         """ Translator has default path to translations """
         dir = os.path.dirname(os.path.realpath(__file__))
         dir = os.path.realpath(dir + '/../')
-        dir = os.path.join(dir, 'shiftvalidate', 'translations')
+        dir = os.path.join(dir, 'shiftschema', 'translations')
 
         trans = Translator()
         self.assertTrue(dir in trans.dirs)

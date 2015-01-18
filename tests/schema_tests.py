@@ -1,10 +1,10 @@
 from unittest import TestCase, mock
 from nose.plugins.attrib import attr
 
-from shiftvalidate.schema import Schema
-from shiftvalidate.result import Result
-from shiftvalidate.property import SimpleProperty, EntityProperty
-from shiftvalidate.exceptions import PropertyExists, InvalidValidator
+from shiftschema.schema import Schema
+from shiftschema.result import Result
+from shiftschema.property import SimpleProperty, EntityProperty
+from shiftschema.exceptions import PropertyExists, InvalidValidator
 from tests import helpers
 
 @attr('schema')

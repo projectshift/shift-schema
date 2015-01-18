@@ -1,6 +1,6 @@
 from pprint import pformat
 from copy import deepcopy
-from shiftvalidate.exceptions import InvalidErrorType, InvalidResultType
+from shiftschema.exceptions import InvalidErrorType, InvalidResultType
 
 class Error:
     """
