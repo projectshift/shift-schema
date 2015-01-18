@@ -23,7 +23,26 @@ the filters you define.
 
 Schema is a collection of rules to filter and validate properties of your
 model (object or dictionary). There are several ways to create a schema
-the simples being initialization from spec dictionary:
+most nice being by subclassing `Schema` object:
+
+
+```python
+from shiftschema.schema import Schema
+from shiftschema import validators as validator
+
+class MySchema(Schema):
+    def schema(self):
+        self.add_property('name')
+        self.name.required=True
+        self.name.add_validator(validator.Length(min=3, max=100))
+        
+        self.add_property('email')
+        self.email.add_validator(validator.Email)
+
+schema = MySchema()
+```
+
+Or alternatively you can pass spec dictionary to constructor:
 
 ```python
 from shiftschema.schema import Schema
@@ -42,23 +61,8 @@ schema = Schema({
 })
 ```
 
-Alternatively you can create a schema by subclassing Schema object:
 
-```python
-from shiftschema.schema import Schema
-from shiftschema import validators as validator
 
-class MySchema(Schema):
-    def schema(self):
-        self.add_property('name')
-        self.name.required=True
-        self.name.add_validator(validator.Length(min=3, max=100))
-        
-        self.add_property('email')
-        self.email.add_validator(validator.Email)
-
-schema = MySchema()
-```
 
 ## validation:
 
