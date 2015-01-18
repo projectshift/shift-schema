@@ -1,4 +1,5 @@
 from pprint import pformat
+from copy import deepcopy
 from shiftvalidate.exceptions import InvalidErrorType, InvalidResultType
 
 class Error:
@@ -40,10 +41,12 @@ class Result:
     Represents result of validating with a schema. Contains properties and
     their errors but can also contain nested results for nested schemas.
     """
-    def __init__(self, errors=None):
+    def __init__(self, errors=None, translator=None, locale='en'):
         if not errors:
             errors = dict()
         self.errors = errors
+        self.translator = translator
+        self.locale=locale
 
     def __bool__(self):
         return not self.errors
@@ -96,7 +99,64 @@ class Result:
                 self.errors[property_name].extend(errors[property_name])
             else:
                 self.errors[property_name] = errors[property_name]
+                
+    def get_messages(self):
+        """ Get a dictionary of translated messages """
 
+        locale = self.locale
+        if self.translator:
+            translator = self.translator.translate
+        else:
+            def translator(error, locale):
+                return error
+
+        errors = deepcopy(self.errors)
+        errors = self._translate_errors(errors, translator, locale)
+        return errors
+
+    def _translate_errors(self, errors, translate, locale):
+        for property_name in errors:
+            property_errors = errors[property_name]
+            if type(property_errors) is list:
+                for index,error in enumerate(property_errors):
+                    message = translate(error.message, locale)
+                    if error.kwargs:
+                        message = message.format(error.kwargs)
+                    errors[property_name][index] = message
+            elif type(property_errors) is dict:
+                errors[property_name] = self._translate_errors(
+                    property_errors, translate, locale
+                )
+
+        return errors
+
+
+
+    #
+    #
+    # def translate_errors(self, errors, translator):
+    #     """
+    #     Translate errors
+    #     Recursively goes through a dictionary of errors and applies passed
+    #     translator to each error.
+    #
+    #     :param errors:              dict, nested error set
+    #     :param translator:          function, translation func
+    #     :return:                    dict
+    #     """
+    #     for property in errors:
+    #         property_errors = errors[property]
+    #
+    #         if type(property_errors) is list:
+    #             for index, error in enumerate(property_errors):
+    #                 errors[property][index] = translator(error)
+    #         elif type(property_errors) is dict:
+    #             errors[property] = self.translate_errors(
+    #                 property_errors,
+    #                 translator
+    #             )
+    #
+    #     return errors
 
 
 

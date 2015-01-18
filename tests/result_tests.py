@@ -161,4 +161,26 @@ class ResultTest(TestCase):
         self.assertTrue(Error('state_error3') in result1.errors['__state__'])
         self.assertTrue(Error('state_error4') in result1.errors['__state__'])
 
+    @attr('fixme')
+    def test_get_messages(self):
+        """ Getting translated messages """
+        result = Result()
+        result.add_errors([Error('Untranslated')])
+
+        print(result.errors)
+
+        messages = result.get_messages()
+
+        # assert translated
+        for property_name in messages:
+            if type(messages[property_name]) is not list:
+                continue
+            for error in messages[property_name]:
+                self.assertTrue(type(error) is str)
+
+        self.assertTrue('Untranslated' in result.errors)
+        print(messages)
+
+
+
 

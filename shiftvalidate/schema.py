@@ -1,6 +1,5 @@
 from shiftvalidate.property import SimpleProperty, EntityProperty
 from shiftvalidate.result import Error, Result
-from shiftvalidate.filters import AbstractFilter
 from shiftvalidate.validators import AbstractValidator
 from shiftvalidate.exceptions import InvalidValidator, PropertyExists
 
@@ -229,7 +228,9 @@ class Schema:
         :param context: object, dict or None
         :return: shiftvalidate.result.Result
         """
-        result = Result()
+        locale = None
+        translator=None
+        result = Result(translator=translator, locale=locale)
 
         # validate state
         for state_validator in self.state:
