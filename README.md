@@ -97,4 +97,28 @@ print(person.birthyar) # 1900 (int)
 
 As with validators there are some filters provided and you can easily plug your own.
 
+## errors are objects:
+
+Validation on a model gets you a `Result` objects that evaluates to boolean
+True or False depending on if it was valid or not:
+
+```python
+valid = schema.validate(model)
+valid # shiftschema.result.Result
+bool(valid) # False, if has errors
+```
+
+All the errors the result contains are `Error` objects simple validators return.
+You can easily get those errors as string messages with:
+
+```python
+errors_dict = result.get_messages()
+```
+
+All errors are translated, so you can have them in any language supported
+by passing a locale (defaults to 'en'):
+
+```python
+errors_dict = result.get_messages(locale='en')
+```
 
