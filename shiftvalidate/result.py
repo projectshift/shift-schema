@@ -80,7 +80,6 @@ class Result:
             else:
                 self.errors['__state__'] = errors
 
-
     def add_nested_errors(self, errors, property_name):
         """ Attach aggregate of errors to a property"""
         if isinstance(errors, Result):
@@ -100,63 +99,46 @@ class Result:
             else:
                 self.errors[property_name] = errors[property_name]
                 
-    def get_messages(self):
+    def get_messages(self, locale=None):
         """ Get a dictionary of translated messages """
+        if locale is None:
+            locale = self.locale
 
-        locale = self.locale
         if self.translator:
-            translator = self.translator.translate
+            def translate(error):
+                return self.translator.translate(error, locale)
         else:
-            def translator(error, locale):
+            def translate(error, locale):
                 return error
 
         errors = deepcopy(self.errors)
-        errors = self._translate_errors(errors, translator, locale)
+        errors = self._translate_errors(errors, translate)
         return errors
 
-    def _translate_errors(self, errors, translate, locale):
+    def _translate_errors(self, errors, translate):
+        """ Recursively apply translate callback to each error message"""
         for property_name in errors:
             property_errors = errors[property_name]
             if type(property_errors) is list:
                 for index,error in enumerate(property_errors):
-                    message = translate(error.message, locale)
-                    if error.kwargs:
-                        message = message.format(error.kwargs)
+                    message = translate(error.message)
+                    message = self.format_error(message, error.kwargs)
                     errors[property_name][index] = message
             elif type(property_errors) is dict:
                 errors[property_name] = self._translate_errors(
-                    property_errors, translate, locale
+                    property_errors, translate
                 )
 
         return errors
 
+    def format_error(self, error, args=None):
+        """ Format error with positional or named arguments (if any) """
+        if type(args) is dict:
+            return error.format(**args)
+        if type(args) is list or type(args) is tuple:
+            return error.format(*args)
 
-
-    #
-    #
-    # def translate_errors(self, errors, translator):
-    #     """
-    #     Translate errors
-    #     Recursively goes through a dictionary of errors and applies passed
-    #     translator to each error.
-    #
-    #     :param errors:              dict, nested error set
-    #     :param translator:          function, translation func
-    #     :return:                    dict
-    #     """
-    #     for property in errors:
-    #         property_errors = errors[property]
-    #
-    #         if type(property_errors) is list:
-    #             for index, error in enumerate(property_errors):
-    #                 errors[property][index] = translator(error)
-    #         elif type(property_errors) is dict:
-    #             errors[property] = self.translate_errors(
-    #                 property_errors,
-    #                 translator
-    #             )
-    #
-    #     return errors
+        return error
 
 
 

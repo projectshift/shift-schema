@@ -161,25 +161,70 @@ class ResultTest(TestCase):
         self.assertTrue(Error('state_error3') in result1.errors['__state__'])
         self.assertTrue(Error('state_error4') in result1.errors['__state__'])
 
-    @attr('fixme')
-    def test_get_messages(self):
-        """ Getting translated messages """
+    def test_translate_messages(self):
+        """ Translating nested result with arbitrary translator"""
+
+        p1 = [Error('prop1_error1')]
+        p2 = [Error('prop2_error1', Error('prop2_error2'))]
+        s1 = [Error('state_error1'), Error('state_error2')]
+
+        p22 = [Error('prop2_error3'), Error('prop2_error4')]
+        p3 = [Error('prop3_error1'), Error('prop3_error2')]
+        s2 = [Error('state_error3'), Error('state_error4')]
+
+
+        result1 = Result()
+        result1.add_errors(p1, 'property1')
+        result1.add_errors(p2, 'property2')
+        result1.add_errors(s1)
+
+        result2 = Result()
+        result2.add_errors(p22, 'property2')
+        result2.add_errors(p3, 'property3')
+        result2.add_errors(s2)
+        result1.add_nested_errors(result2, 'result2')
+
+        def translator(input):
+            return 'ZZZ' + input
+
+        translated = result1._translate_errors(result1.errors, translator)
+
+        # assert root translated
+        self.assertEqual('ZZZprop1_error1', result1.errors['property1'][0])
+        self.assertEqual('ZZZstate_error1', result1.errors['__state__'][0])
+
+        # assert nested errors translated
+        self.assertEqual(
+            'ZZZprop3_error1',
+            result1.errors['result2']['property3'][0]
+        )
+
+        self.assertEqual(
+            'ZZZstate_error3',
+            result1.errors['result2']['__state__'][0]
+        )
+
+    def test_formatting_messages(self):
+        """ Error messages formatted with parameters (if any) """
         result = Result()
-        result.add_errors([Error('Untranslated')])
 
-        print(result.errors)
+        no = 'Me has no params'
+        no_params = None
+        self.assertEqual(no, result.format_error(no, no_params))
 
-        messages = result.get_messages()
+        positional = 'I have positionals: one {} two {} and {}'
+        positional_params = [1, 2, 3]
+        self.assertEqual(
+            positional.format(*positional_params),
+            result.format_error(positional, positional_params)
+        )
 
-        # assert translated
-        for property_name in messages:
-            if type(messages[property_name]) is not list:
-                continue
-            for error in messages[property_name]:
-                self.assertTrue(type(error) is str)
-
-        self.assertTrue('Untranslated' in result.errors)
-        print(messages)
+        named = 'I have named params {one} and {two}'
+        named_params = dict(one='FIRST', two='SECOND')
+        self.assertEqual(
+            named.format(**named_params),
+            result.format_error(named, named_params)
+        )
 
 
 
