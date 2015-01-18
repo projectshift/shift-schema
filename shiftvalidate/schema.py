@@ -9,7 +9,6 @@ class Schema:
     Contains rules for filtering and validation of an entity. Can be
     instantiated from spec, configured manually or by extending.
     """
-
     def __init__(self, spec=None):
         self.state = []
         self.properties = {}
