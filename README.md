@@ -133,10 +133,10 @@ and locale in to result objects they create. So you can simply:
 ```python
 from shiftschema.schema import Schema
 
-schema.translator # preconfigured with default translations
-schema.translator.add_.location(path) # but you can add your own
-schema.locale # is 'en' by default
-schema.locale = 'ru' # but you can change that
+Schema.translator # preconfigured with default translations
+Schema.translator.add_.location(path) # but you can add your own
+Schema.locale # is 'en' by default
+Schema.locale = 'ru' # but you can change that
 ```
 
 After setting those you will get errors by default in Russian with
