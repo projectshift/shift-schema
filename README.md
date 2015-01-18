@@ -100,7 +100,7 @@ As with validators there are some filters provided and you can easily plug your 
 ## errors are objects:
 
 Validation on a model gets you a `Result` objects that evaluates to boolean
-True or False depending on if it was valid or not:
+`True` or `False` depending on if it was valid or not:
 
 ```python
 valid = schema.validate(model)
@@ -108,8 +108,9 @@ valid # shiftschema.result.Result
 bool(valid) # False, if has errors
 ```
 
-All the errors the result contains are `Error` objects simple validators return.
-You can easily get those errors as string messages with:
+All the errors the result contains are `Error` objects that 
+simple validators (like `Length`)return. You can easily get those errors as string 
+messages with:
 
 ```python
 errors_dict = result.get_messages()
@@ -119,6 +120,32 @@ All errors are translated, so you can have them in any language supported
 by passing a locale (defaults to 'en'):
 
 ```python
-errors_dict = result.get_messages(locale='en')
+errors_dict = result.get_messages(locale='en') # translate to locale
+```
+
+## translation:
+
+You can pass `translator` and `locale` to `Result` object manually but
+the most easy way to use translations is through globally available
+`Translator` that exists on the `Schema`. Schemas will inject this translator
+and locale in to result objects they create. So you can simply:
+
+```python
+from shiftschema.schema import Schema
+
+schema.translator # preconfigured with default translations
+schema.translator.add_.location(path) # but you can add your own
+schema.locale # is 'en' by default
+schema.locale = 'ru' # but you can change that
+```
+
+After setting those you will get errors by default in Russian with
+your custom translations loaded.
+
+```python
+valid = schema.validate(model)
+if not valid:
+    valid.get_messages() # in russian per global setting
+    valid.get_messages(locale='en') # or whatever you specify
 ```
 
