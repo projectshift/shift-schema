@@ -13,7 +13,7 @@ class MessageTranslationsTests(TestCase):
     def validate_messages(self, expected, actual):
         """ A helper to check messages """
         for exp in expected:
-            error = 'Expected message [{}] not found.'.format(expected)
+            error = 'Expected message [{}] not found.'.format(exp)
             self.assertTrue(exp in actual, msg=error)
 
     def result(self):
@@ -58,8 +58,24 @@ class MessageTranslationsTests(TestCase):
         msgs = result.get_messages(locale='en')
 
         exp = [
-            'String is too long. Expected length is 10',
-            'String is too short. Expected length is 100',
+            'String is too long. Maximum is 100',
+            'String is too short. Minimum is 10',
             'String length not in range 10-100 characters'
+        ]
+        self.validate_messages(exp, msgs['property'])
+
+    def test_translatable_email(self):
+        """ Length validator is translatable """
+        result = self.result()
+        params = dict()
+        errors = [
+            Error(validator.Email.not_email, params),
+        ]
+
+        result.add_errors(errors, 'property')
+        msgs = result.get_messages(locale='en')
+
+        exp = [
+            'This is not a valid email',
         ]
         self.validate_messages(exp, msgs['property'])

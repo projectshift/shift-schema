@@ -2,6 +2,7 @@ from shiftschema.validators.abstract_validator import AbstractValidator
 from shiftschema.validators.choice import Choice
 from shiftschema.validators.digits import Digits
 from shiftschema.validators.length import Length
+from shiftschema.validators.email import Email
 
 
 
@@ -10,8 +11,6 @@ from shiftschema.validators.length import Length
 # credit_card.py
 # date_range.py
 # datetime.py
-# digits.py
-# email.py
 # equals.py
 # file_exists.py
 # file_size.py

@@ -15,7 +15,10 @@ translations = {
     '%digits_must_only_contain_digits%': "Must only consist of digits.",
 
     # length
-    '%length_too_long%': "String is too long. Expected length is {min}",
-    '%length_too_short%': "String is too short. Expected length is {max}",
+    '%length_too_long%': "String is too long. Maximum is {max}",
+    '%length_too_short%': "String is too short. Minimum is {min}",
     '%length_not_in_range%': "String length not in range {min}-{max} characters",
+
+    # email
+    '%email_invalid%': "This is not a valid email",
 }

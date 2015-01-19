@@ -13,5 +13,13 @@ translations = {
 
     # digits
     '%must_only_contain_digits%': "Значение должно состоять из цифр",
+
+    # length
+    '%length_too_long%': "Значение слишком длинное. Максимум {max}",
+    '%length_too_short%': "Значение слишком короткое. Минимум {min}",
+    '%length_not_in_range%': "Допустимая длина значения {min}-{max}",
+
+    # email
+    '%email_invalid%': "Укажите корректный Email",
 }
 
