@@ -40,5 +40,5 @@ config = dict(
 setup(**config)
 
 # register: ./setup.py register -r pypi
-# build: ./setup.py build
-# upload: ./setup.py sdist upload -r pypi
+# build: ./setup.py sdist
+# upload: ./setup.py upload -r pypi
