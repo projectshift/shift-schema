@@ -9,5 +9,6 @@ __pycache__
 
 # build ignores
 /build
+/dist
 shiftschema.egg-info
 
