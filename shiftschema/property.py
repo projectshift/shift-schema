@@ -12,7 +12,7 @@ class SimpleProperty:
     """
     def __init__(self):
         self._required = False
-        self._required_message = "Property is required and can't be empty"
+        self._required_message = "%property_required%"
         self.filters = []
         self.validators = []
 
@@ -104,7 +104,7 @@ class EntityProperty:
 
     def __init__(self):
         self._required = False
-        self._required_message = "Entity is required and can't be empty"
+        self._required_message = "%property_required%"
         self._schema = None
 
     @property
@@ -145,10 +145,13 @@ class EntityProperty:
 
     def validate(self, model=None, context=None):
         """ Perform model validation """
+
+        # validate required (regression: before skipping on no schema)
+        if model is None and self.required:
+            return [Error(self.required_message)]
+
         if self._schema is None or (model is None and not self.required):
             return
-        if model is None and self.required:  # validate required
-            return [Error(self.required_message)]
 
         result = self._schema.validate(model, context)
         return result

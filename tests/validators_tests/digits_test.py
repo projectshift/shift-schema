@@ -39,3 +39,4 @@ class DigitsTest(TestCase):
 
         self.assertFalse(error1)
         self.assertFalse(error2)
+

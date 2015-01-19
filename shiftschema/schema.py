@@ -2,6 +2,8 @@ from shiftschema.property import SimpleProperty, EntityProperty
 from shiftschema.result import Error, Result
 from shiftschema.validators import AbstractValidator
 from shiftschema.exceptions import InvalidValidator, PropertyExists
+from shiftschema.translator import Translator
+
 
 class Schema:
     """
@@ -9,7 +11,11 @@ class Schema:
     Contains rules for filtering and validation of an entity. Can be
     instantiated from spec, configured manually or by extending.
     """
-    def __init__(self, spec=None):
+
+    locale = 'en'
+    translator = Translator()
+
+    def __init__(self, spec=None, locale=None, translator=None):
         self.state = []
         self.properties = {}
         self.entities = {}
@@ -17,6 +23,11 @@ class Schema:
         # create from spec
         if spec:
             self.factory(spec)
+
+        if locale:
+            self.locale = locale
+        if translator:
+            self.translator = translator
 
         # or by subclassing
         self.schema()
@@ -218,18 +229,16 @@ class Schema:
                 model=entity,
                 context=entity_ctx
             )
-            # self.set(model, property_name, entity)
 
-    def validate(self, model=None, context=None):
+    def validate(self, model=None, context=None):  # todo: teach me json
         """
         Validate model and return validation result object
         :param model:  object or dict
         :param context: object, dict or None
         :return: shiftschema.result.Result
         """
-        locale = None
-        translator=None
-        result = Result(translator=translator, locale=locale)
+        # inject with settings
+        result = Result(translator=self.translator, locale=self.locale)
 
         # validate state
         for state_validator in self.state:

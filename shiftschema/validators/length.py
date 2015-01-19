@@ -3,9 +3,9 @@ from shiftschema.result import Error
 
 class Length(AbstractValidator):
 
-    too_long = 'String is too long. Expected length is %s'
-    too_short = 'String is too short. Expected length is %s'
-    not_in_range = 'String length not in range of min = %s and max = %s'
+    too_long = '%length_too_long%'
+    too_short = '%length_too_short%'
+    not_in_range = '%length_not_in_range%'
 
 
     def __init__(self, min=None, max=None, message=None):
@@ -39,21 +39,22 @@ class Length(AbstractValidator):
         """
 
         length = len(str(value))
+        params = dict(min=self.min, max=self.max)
 
         # too short?
         if self.min and self.max is None:
             if length < self.min:
-                return Error(self.too_short, (self.min,))
+                return Error(self.too_short, params)
 
         # too long?
         if self.max and self.min is None:
             if length > self.max:
-                return Error(self.too_long, (self.max,))
+                return Error(self.too_long, params)
 
         # within range?
         if self.min and self.max:
             if length < self.min or length > self.max:
-                return Error(self.not_in_range, (self.min, self.max))
+                return Error(self.not_in_range, params)
 
         # success otherwise
         return Error()

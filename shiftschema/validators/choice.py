@@ -9,7 +9,7 @@ class Choice(AbstractValidator):
     at construction time
     """
 
-    invalid_choice = 'Provided value is not a valid choice'
+    invalid_choice = '%choice_not_valid%'
 
 
     def __init__(self, valid_choices=None, message=None):

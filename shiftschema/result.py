@@ -108,7 +108,7 @@ class Result:
             def translate(error):
                 return self.translator.translate(error, locale)
         else:
-            def translate(error, locale):
+            def translate(error):
                 return error
 
         errors = deepcopy(self.errors)

@@ -43,3 +43,5 @@ class ChoiceTest(TestCase):
         validator = Choice('spam')
         error = validator.run('s')
         self.assertFalse(error)
+
+

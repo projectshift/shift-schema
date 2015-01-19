@@ -5,6 +5,7 @@ from shiftschema.schema import Schema
 from shiftschema.result import Result
 from shiftschema.property import SimpleProperty, EntityProperty
 from shiftschema.exceptions import PropertyExists, InvalidValidator
+from shiftschema.translator import Translator
 from tests import helpers
 
 @attr('schema')
@@ -260,6 +261,45 @@ class ErrorTest(TestCase):
 
         self.assertTrue('last_name' in result.errors) # required
         self.assertTrue('last_name' in result.errors['spouse'])
+
+    def test_results_injected_with_translations(self):
+        """ Schema-generated results are injected with translation settings """
+        schema = Schema()
+        result = schema.validate(mock.Mock())
+        self.assertEqual('en', result.locale)
+        self.assertIsInstance(result.translator, Translator)
+
+        Schema.locale='ru'
+        Schema.translator.add_location('/tmp')
+
+        schema = Schema()
+        result = schema.validate(mock.Mock())
+        self.assertEqual('ru', result.locale)
+        self.assertIsInstance(result.translator, Translator)
+        self.assertTrue('/tmp' in result.translator.dirs)
+
+    @attr('fixme')
+    def test_do_not_skip_entity_validation_if_no_nested_schema(self):
+        """
+        Do not require nested schema to validate  nested entity
+        for being required.
+        """
+        schema = Schema()
+        schema.add_property('name')
+        schema.add_entity('spouse')
+        schema.name.required=True
+        schema.spouse.required=True
+        schema.spouse.schema = Schema()
+
+
+        class Model:
+            def __init__(self):
+                self.name=None
+                self.spouse=None
+
+        p = Model()
+        res=schema.validate(p)
+        self.assertTrue('spouse' in res.errors)
 
 
 
