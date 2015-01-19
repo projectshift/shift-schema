@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 import os
 from setuptools import setup, find_packages
 
@@ -37,3 +38,7 @@ config = dict(
 
 # finally run the setup
 setup(**config)
+
+# register: ./setup.py register -r pypi
+# build: ./setup.py build
+# upload: ./setup.py sdist upload -r pypi
