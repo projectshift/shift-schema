@@ -49,6 +49,7 @@ class Email(AbstractValidator):
         Originally written by Cal Henderson
         c.f. http://iamcal.com/publish/articles/php/parsing_email/
         Translated to Python by Tim Fletcher with changes suggested by Dan Kubb
+        http://tfletcher.com/lib/rfc822.py
         Licensed under a Creative Commons Attribution-ShareAlike 2.5 License
         http://creativecommons.org/licenses/by-sa/2.5/
 
