@@ -98,6 +98,17 @@ class SimplePropertyTests(TestCase):
         self.assertTrue(type(result) is list)
         self.assertEqual(1, len(result))
 
+    def test_empty_strings_detected_by_required(self):
+        """ Required checks must detect empty strings """
+        prop = SimpleProperty()
+        prop.required = True
+
+        errors = prop.validate_value()  # detect None
+        self.assertTrue(errors)
+        errors = prop.validate_value('')  # detect empty string
+        self.assertTrue(errors)
+
+
 
 @attr('property', 'entity')
 class EntityPropertyTests(TestCase):
