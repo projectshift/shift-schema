@@ -82,7 +82,9 @@ class SimpleProperty:
         :param context: validation context, usually parent entity
         :return: list of errors (if any)
         """
-        if value is None and self.required:
+
+        # value='' is False...
+        if not value and self.required:
             return [Error(self.required_message)]
 
         errors = []
