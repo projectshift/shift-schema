@@ -212,11 +212,12 @@ class Schema:
                 continue
 
             property_context = model # simple properties context
-            value = self.properties[property_name].filter_value(
+            filtered_value = self.properties[property_name].filter_value(
                 value=value,
                 context=property_context
             )
-            self.set(model, property_name, value)
+            if value != filtered_value:  # unless changed!
+                self.set(model, property_name, filtered_value)
 
         # entities
         for property_name in self.entities:
