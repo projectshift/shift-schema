@@ -159,13 +159,17 @@ class Schema:
         :param property_name: str, name on the model
         :return: mixed
         """
-        if type(model) is dict and property_name in model:
-            return model[property_name]
+        if type(model) is dict:
+            if property_name not in model:
+                return None
+            else:
+                return model[property_name]
         elif hasattr(model, 'get_' + property_name):
             getter = getattr(model, 'get_' + property_name)
             return getter()
         else:
             return getattr(model, property_name)
+
 
     def set(self, model, property_name, value):
         """

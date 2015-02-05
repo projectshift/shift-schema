@@ -9,7 +9,7 @@ from shiftschema.translator import Translator
 from tests import helpers
 
 @attr('schema')
-class ErrorTest(TestCase):
+class SchemaTest(TestCase):
 
     def test_create_schema(self):
         """ Creating a schema """
@@ -78,6 +78,13 @@ class ErrorTest(TestCase):
         model = dict(someproperty='some value')
         schema = Schema()
         self.assertEqual('some value', schema.get(model, 'someproperty'))
+
+    def test_model_getter_on_dict_returns_none_for_missing_keys(self):
+        """ BUGFIX: do not explode on fetching value for missing dict key """
+        model = dict(someproperty='some value')
+        schema = Schema()
+        self.assertIsNone(schema.get(model, 'me-is-missing'))
+
 
     def test_model_getter_method(self):
         """ Model getter calls getter on model if present """
@@ -278,7 +285,6 @@ class ErrorTest(TestCase):
         self.assertIsInstance(result.translator, Translator)
         self.assertTrue('/tmp' in result.translator.dirs)
 
-    @attr('fixme')
     def test_do_not_skip_entity_validation_if_no_nested_schema(self):
         """
         Do not require nested schema to validate  nested entity
