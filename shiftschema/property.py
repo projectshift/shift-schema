@@ -10,8 +10,8 @@ class SimpleProperty:
     A single value property on the schema and holds a number of filters and
     validators for this value
     """
-    def __init__(self):
-        self._required = False
+    def __init__(self, *, required=False):
+        self._required = required
         self._required_message = "%property_required%"
         self.filters = []
         self.validators = []
@@ -104,8 +104,8 @@ class EntityProperty:
     nesting o schemas.
     """
 
-    def __init__(self):
-        self._required = False
+    def __init__(self, *, required=False):
+        self._required = required
         self._required_message = "%property_required%"
         self._schema = None
 

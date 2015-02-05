@@ -130,18 +130,20 @@ class Schema:
         if validator not in self.state:
             self.state.append(validator)
 
-    def add_property(self, property_name):
+    def add_property(self, property_name, required=False):
         """
         Add simple property to schema
         :param property_name: str, property name
+        :param required: bool, is it a required property?
         :return: None
         """
         if self.has_property(property_name):
             err = 'Property "{}" already exists'
             raise PropertyExists(err.format(property_name))
-        self.properties[property_name] = SimpleProperty()
 
-    def add_entity(self, property_name):
+        self.properties[property_name] = SimpleProperty(required=required)
+
+    def add_entity(self, property_name, required=False):
         """
         Add entity property to schema
         :param property_name: str, property name
@@ -150,7 +152,7 @@ class Schema:
         if self.has_property(property_name):
             err = 'Property "{}" already exists'
             raise PropertyExists(err.format(property_name))
-        self.entities[property_name] = EntityProperty()
+        self.entities[property_name] = EntityProperty(required=required)
 
     def get(self, model, property_name):
         """
