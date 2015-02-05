@@ -3,7 +3,7 @@ import os
 from setuptools import setup, find_packages
 
 
-version = '0.0.5'
+version = '0.0.6'
 
 
 # monkey patch os for vagrant hardlinks
@@ -18,7 +18,7 @@ config = dict(
     author_email='dmitrybelyakov@gmail.com',
 
     # project meta
-    name = 'shiftschema',
+    name='shiftschema',
     version=version,
     url = 'https://github.com/projectshift/shift-schema',
     download_url='https://github.com/projectshift/shift-schema/tarball/'+version,
@@ -26,13 +26,13 @@ config = dict(
     keywords=['python3', 'validation', 'filtering', 'schema'],
 
     # license
-    license = 'MIT',
+    license='MIT',
 
     # packages
-    packages = find_packages(exclude=['tests']),
+    packages=find_packages(exclude=['tests']),
 
     # dependencies
-    install_requires = []
+    install_requires=[]
 
 )
 
