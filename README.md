@@ -29,8 +29,7 @@ from shiftschema import validators as validator
 
 class MySchema(Schema):
     def schema(self):
-        self.add_property('name')
-        self.name.required=True
+        self.add_property('name', required=True)
         self.name.add_validator(validator.Length(min=3, max=100))
         
         self.add_property('email')
@@ -104,9 +103,8 @@ Validation on a model gets you a `Result` objects that evaluates to boolean
 `True` or `False` depending on if it was valid or not:
 
 ```python
-valid = schema.validate(model)
-valid # shiftschema.result.Result
-bool(valid) # False, if has errors
+valid = schema.validate(model) # return shiftschema.result.Result
+bool(valid) # True if valid, False otherwise
 ```
 
 All the errors the result contains are `Error` objects that 
@@ -172,19 +170,16 @@ class UserForm(Form):
 class UserSchema(Schema):
     """ User model filtering and validation schema"""
     def schema(self):
-        self.add_property('username')
-        self.username.required = True
+        self.add_property('username', required=True)
         self.username.add_filter(filters.Strip())
         self.username.add_validator(validators.Length(min=3, max=200))
 
-        self.add_property('email')
-        self.email.required = True
+        self.add_property('email', required=True)
         self.email.add_filter(filters.Strip())
         self.email.add_validator(validators.Length(min=3, max=200))
         self.email.add_validator(validators.Email())
 
-        self.add_property('password')
-		self.password.required = True
+        self.add_property('password', required=True)
         self.password.add_validator(validators.Length(min=3, max=200))		
 ```
 
