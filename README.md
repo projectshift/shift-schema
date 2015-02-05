@@ -1,5 +1,5 @@
 [![Build Status](https://api.travis-ci.org/projectshift/shift-schema.svg)](https://travis-ci.org/projectshift/shift-schema)
-[![Coverage Status](https://coveralls.io/repos/projectshift/shift-schema/badge.svg)](https://coveralls.io/r/projectshift/shift-schema)
+[![Coverage Status](https://coveralls.io/repos/projectshift/shift-schema/badge.svg?branch=master)](https://coveralls.io/r/projectshift/shift-schema?branch=master)
 # shift-schema
 
 
