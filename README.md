@@ -7,7 +7,7 @@ Filtering and validation library for Python3. Can filter and validate data in
 model objects and simple dictionaries with flexible schemas. 
 
 Main idea: decouple filtering and validation rules from web forms into
-flexible schemas, then reuse those schemas in forms as well as apis and cli.
+flexible schemas, then reuse those schemas in forms as well as apis and cli. Model validation and filtering rules should be part of the model and your domain logic, not your views or forms logic.
 
 ## model:
 
@@ -151,3 +151,66 @@ if not valid:
 ```
 
 ## flask wtforms extension:
+
+Extension allows you to use schemas to validate wftforms in flask applications. Forms can represent full model data or just a smaller subset of your model. Both filtering and validation will be applied to form data according to rules defined in schema.
+And you can mix wtf validation with schema validation. Here is a usage typical pattern:
+
+```python
+from shiftschema.ext.flask_wtf import Form
+from shiftschema.schema import Schema
+from shiftschema import validators, filters
+from wtforms import StringField, PasswordField
+
+# extend your form from provided misin
+class UserForm(Form):
+    """ User form used for creating new users """
+    username = StringField('username')
+    email = StringField('email')
+    password = PasswordField('password')
+    
+# define a schema
+class UserSchema(Schema):
+    """ User model filtering and validation schema"""
+    def schema(self):
+        self.add_property('username')
+        self.username.required = True
+        self.username.add_filter(filters.Strip())
+        self.username.add_validator(validators.Length(min=3, max=200))
+
+        self.add_property('email')
+        self.email.required = True
+        self.email.add_filter(filters.Strip())
+        self.email.add_validator(validators.Length(min=3, max=200))
+        self.email.add_validator(validators.Email())
+
+        self.add_property('password')
+		self.password.required = True
+        self.password.add_validator(validators.Length(min=3, max=200))		
+```
+
+You can now use chema to validate and filter form data in your views. The usage is similar to regular forms and workflow:
+
+```python
+@app.route('/register/', methods=['GET', 'POST'])
+def register_view(self):
+    # just remember to tell the form what schema to use
+    form = UserForm(schema=UserSchema())
+    if form.validate_on_submit():
+        user = User(
+            username=form.username.data, 
+            email=form.email.data, 
+            password=form.password.data
+        )
+        user_service.save(user)
+        return redirect(url_for('thank.you'))
+        
+    return render_template('user/register.html')
+```
+
+
+
+
+
+
+
+
