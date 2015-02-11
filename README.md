@@ -148,6 +148,38 @@ if not valid:
     valid.get_messages(locale='en') # or whatever you specify
 ```
 
+## provided filters:
+
+There is a number of implemented filters already and we are constantly adding more. You also can implement your own by extending from `AbstractFilter` class. Currently the follwing filters are provided:
+
+#### Digits
+Removes everything from the string leaving just the digits and optionally converts result to integer.
+
+#### Lowercase
+Converts incoming string to lowercase. If incoming data is not a string it will be converted to one implicitly.
+
+#### Strip
+Removes spaces, newlines or any specified characters either from fron, back or both sides of a string.
+
+#### Uppercase
+Converts incoming string to uppercase. If incoming data is not a string it will be converted to one implicitly.
+
+
+## provided validators:
+
+#### Choice
+Checks if provided value exists in an iterable of valid choices provided to constructor.
+
+#### Digits
+Validates that passed value consists only of digits.
+
+#### Email
+Validates that passed in value is a valid email. The check is regex only so we don't do any deep MX checks here
+
+#### Length
+Validates an input for being proper length. You can check for minimum length, maximum length or both.
+
+
 ## flask wtforms extension:
 
 Extension allows you to use schemas to validate wftforms in flask applications. Forms can represent full model data or just a smaller subset of your model. Both filtering and validation will be applied to form data according to rules defined in schema.
