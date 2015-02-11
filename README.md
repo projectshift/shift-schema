@@ -191,7 +191,7 @@ from shiftschema.schema import Schema
 from shiftschema import validators, filters
 from wtforms import StringField, PasswordField
 
-# extend your form from provided misin
+# extend your form from provided mixin
 class UserForm(Form):
     """ User form used for creating new users """
     username = StringField('username')
