@@ -152,31 +152,31 @@ if not valid:
 
 There is a number of implemented filters already and we are constantly adding more. You also can implement your own by extending from `AbstractFilter` class. Currently the follwing filters are provided:
 
-#### Digits
+##### Digits
 Removes everything from the string leaving just the digits and optionally converts result to integer.
 
-#### Lowercase
+##### Lowercase
 Converts incoming string to lowercase. If incoming data is not a string it will be converted to one implicitly.
 
-#### Strip
+##### Strip
 Removes spaces, newlines or any specified characters either from fron, back or both sides of a string.
 
-#### Uppercase
+##### Uppercase
 Converts incoming string to uppercase. If incoming data is not a string it will be converted to one implicitly.
 
 
 ## provided validators:
 
-#### Choice
+##### Choice
 Checks if provided value exists in an iterable of valid choices provided to constructor.
 
-#### Digits
+##### Digits
 Validates that passed value consists only of digits.
 
-#### Email
+##### Email
 Validates that passed in value is a valid email. The check is regex only so we don't do any deep MX checks here
 
-#### Length
+##### Length
 Validates an input for being proper length. You can check for minimum length, maximum length or both.
 
 
