@@ -2,6 +2,11 @@ from shiftschema.validators.abstract_validator import AbstractValidator
 from shiftschema.result import Error
 
 class Length(AbstractValidator):
+    """
+    Length validator
+    Validates an input for being proper length. You can check for minimum
+    length, maximum length or both.
+    """
 
     too_long = '%length_too_long%'
     too_short = '%length_too_short%'
