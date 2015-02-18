@@ -2,6 +2,7 @@ from flask.ext.wtf import Form as FlaskWtf
 
 class WtfSchemaMixin(FlaskWtf):
     _schema = None
+    _force_context = None
 
     @property
     def schema(self): return self._schema
@@ -24,7 +25,7 @@ class WtfSchemaMixin(FlaskWtf):
         for field in self._fields:
             data[field] = self._fields[field].data
 
-        result = self.schema.process(data)
+        result = self.schema.process(data, context=self._force_context)
         self.set_errors(result)
 
         # set filtered data back to form
@@ -61,6 +62,7 @@ class Form(WtfSchemaMixin, FlaskWtf):
     Form
     Extends flask wtf form to allow setting schema on form
     """
-    def __init__(self, *args, schema=None, **kwargs):
+    def __init__(self, *args, schema=None, context=None, **kwargs):
         self._schema = schema
+        self._force_context = context
         FlaskWtf.__init__(self, *args, **kwargs)
