@@ -217,7 +217,11 @@ class Schema:
             if value is None:
                 continue
 
-            property_context = model # simple properties context
+            if context:
+                property_context = context
+            else:
+                property_context = model
+
             filtered_value = self.properties[property_name].filter_value(
                 value=value,
                 context=property_context
@@ -231,7 +235,11 @@ class Schema:
             if entity is None:
                 continue
 
-            entity_ctx = model # nested entities get parent for context
+            if context:
+                entity_ctx = context
+            else:
+                entity_ctx = model
+
             self.entities[property_name].filter(
                 model=entity,
                 context=entity_ctx
@@ -261,7 +269,11 @@ class Schema:
             if value is None and not required:
                 continue
 
-            property_ctx = model # model for simple properties
+            if context:
+                property_ctx = context  # got context?
+            else:
+                property_ctx = model    # user model if not
+
             errors = self.properties[property_name].validate_value(
                 value=value,
                 context=property_ctx
@@ -277,7 +289,11 @@ class Schema:
             if entity is None and not required:
                 continue
 
-            entity_ctx = model # model for nested entities
+            if context:
+                entity_ctx = context  # got context?
+            else:
+                entity_ctx = model    # user model if not
+
             nested_valid = self.entities[property_name].validate(
                 model=entity,
                 context=entity_ctx
