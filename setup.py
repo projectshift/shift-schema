@@ -34,7 +34,7 @@ dev_status = '4 - Beta'
 # dev_status = '7 - Inactive'
 
 # github repository url
-repo = 'https://github.com/projectshift/shift-schema',
+repo = 'https://github.com/projectshift/shift-schema'
 license_type = 'MIT License'
 
 # monkey patch os for vagrant hardlinks
