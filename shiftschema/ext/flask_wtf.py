@@ -1,4 +1,4 @@
-from flask_wtf import Form as FlaskWtf
+from flask_wtf import FlaskForm as FlaskWtf
 
 class WtfSchemaMixin(FlaskWtf):
     _schema = None
