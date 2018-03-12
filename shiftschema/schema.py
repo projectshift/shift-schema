@@ -164,7 +164,6 @@ class Schema:
         else:
             return getattr(model, property_name)
 
-
     def set(self, model, property_name, value):
         """
         Set model property to value. Use setter if possible.
@@ -237,7 +236,7 @@ class Schema:
                 context=entity_ctx
             )
 
-    def validate(self, model=None, context=None):  # todo: teach me json
+    def validate(self, model=None, context=None):
         """
         Validate model and return validation result object
         :param model:  object or dict
@@ -273,11 +272,7 @@ class Schema:
             if entity is None and not required:
                 continue
 
-            if context:
-                entity_ctx = context  # got context?
-            else:
-                entity_ctx = model    # user model if not
-
+            entity_ctx = context if context else model
             nested_valid = self.entities[property_name].validate(
                 model=entity,
                 context=entity_ctx
@@ -293,6 +288,10 @@ class Schema:
                     property_name=property_name,
                     errors=nested_valid.errors
                 )
+
+
+            # validate list collections
+            # validate dict collections
 
         return result
 

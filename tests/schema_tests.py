@@ -254,7 +254,6 @@ class SchemaTest(TestCase):
         self.assertTrue('first_name' in result.errors) # too short
         self.assertTrue('first_name' in result.errors['spouse'])
 
-
     def test_results_injected_with_translations(self):
         """ Schema-generated results are injected with translation settings """
         schema = Schema()
