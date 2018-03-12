@@ -6,7 +6,7 @@ translations = {
     '__meta__': 'Default translations for English',
 
     # required
-    '%property_required%': "Value required, can't be empty.",
+    '%value_required%': "Value required, can't be empty.",
 
     # choice
     '%choice_not_valid%': "Provided value is not a valid choice",
