@@ -23,7 +23,6 @@ class Email(AbstractValidator):
         if message is not None:
             self.not_email = message
 
-
     def validate(self, value, context=None):
         """
         Validate
@@ -41,7 +40,6 @@ class Email(AbstractValidator):
 
         # success otherwise
         return Error()
-
 
     def regex(self):
         """

@@ -1,7 +1,5 @@
 from shiftschema.validators.abstract_validator import AbstractValidator
 from shiftschema.result import Error
-from shiftschema.exceptions import InvalidOption
-
 
 
 class Digits(AbstractValidator):
@@ -22,7 +20,6 @@ class Digits(AbstractValidator):
         """
         if message is not None:
             self.not_digital = message
-
 
     def validate(self, value, context=None):
         """

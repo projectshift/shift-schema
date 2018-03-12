@@ -2,6 +2,7 @@ from shiftschema.validators.abstract_validator import AbstractValidator
 from shiftschema.result import Error
 from shiftschema.exceptions import InvalidOption
 
+
 class Choice(AbstractValidator):
     """
     Choice validator
@@ -10,7 +11,6 @@ class Choice(AbstractValidator):
     """
 
     invalid_choice = '%choice_not_valid%'
-
 
     def __init__(self, valid_choices=None, message=None):
         """
@@ -31,7 +31,6 @@ class Choice(AbstractValidator):
             raise InvalidOption('Choices must be an iterable')
 
         self.choices = valid_choices
-
 
     def validate(self, value, context=None):
         """

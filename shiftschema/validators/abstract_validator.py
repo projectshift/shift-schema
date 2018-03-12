@@ -2,6 +2,7 @@ from abc import ABCMeta, abstractmethod
 from shiftschema.result import Error
 from shiftschema.exceptions import InvalidErrorType
 
+
 class AbstractValidator(metaclass=ABCMeta):
     """
     Abstract validator

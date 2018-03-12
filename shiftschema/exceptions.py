@@ -33,12 +33,14 @@ class InvalidFilter(ShiftValidateException, TypeError):
     """
     pass
 
+
 class InvalidErrorType(ShiftValidateException, TypeError):
     """
     Invalid error
     Raised when using strings instead of Error objects
     """
     pass
+
 
 class InvalidResultType(ShiftValidateException, TypeError):
     """
@@ -47,12 +49,14 @@ class InvalidResultType(ShiftValidateException, TypeError):
     """
     pass
 
+
 class InvalidSchemaType(ShiftValidateException, TypeError):
     """
     Invalid schema
     Raised when trying to nest schema of bad type in property
     """
     pass
+
 
 class InvalidOption(ShiftValidateException, ValueError):
     """
@@ -62,7 +66,6 @@ class InvalidOption(ShiftValidateException, ValueError):
     pass
 
 
-
 class UnsupportedValueType(ShiftValidateException, TypeError):
     """
     UnsupportedValueType
@@ -70,6 +73,7 @@ class UnsupportedValueType(ShiftValidateException, TypeError):
     by filter and validators.
     """
     pass
+
 
 class NoTranslations(ShiftValidateException, ValueError):
     """

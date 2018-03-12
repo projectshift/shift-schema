@@ -1,6 +1,7 @@
 from shiftschema.validators.abstract_validator import AbstractValidator
 from shiftschema.result import Error
 
+
 class Length(AbstractValidator):
     """
     Length validator
@@ -11,7 +12,6 @@ class Length(AbstractValidator):
     too_long = '%length_too_long%'
     too_short = '%length_too_short%'
     not_in_range = '%length_not_in_range%'
-
 
     def __init__(self, min=None, max=None, message=None):
         """
@@ -30,7 +30,6 @@ class Length(AbstractValidator):
             self.too_long = message
             self.too_short = message
             self.not_in_range = message
-
 
     def validate(self, value, context=None):
         """
