@@ -142,12 +142,10 @@ class SchemaTest(TestCase):
         self.assertIsInstance(schema.first_name, SimpleProperty)
         self.assertEqual(1, len(schema.first_name.filters))
         self.assertEqual(1, len(schema.first_name.validators))
-        self.assertTrue(schema.first_name.required)
 
         self.assertIsInstance(schema.last_name, SimpleProperty)
         self.assertEqual(1, len(schema.last_name.filters))
         self.assertEqual(1, len(schema.last_name.validators))
-        self.assertTrue(schema.last_name.required)
 
 
     def test_create_by_subclassing(self):
@@ -199,24 +197,14 @@ class SchemaTest(TestCase):
         self.assertTrue('last_name' in result.errors)
         self.assertTrue('salutation' in result.errors)
 
-    def test_require_simple_properties(self):
-        """ Validate required simple properties """
-        class Model:
-            def __init__(self):
-                self.property=None
-
-        model = Model()
+    def test_require_simple_properties_vi_required_validator(self):
+        """ Validate simple properties required via validator"""
+        from shiftschema.validators import Required
         schema = Schema()
         schema.add_property('property')
-        schema.property.required=True
-        schema.property.required_message='Property required!'
-        result = schema.validate(model)
+        schema.property.add_validator(Required())
+        result = schema.validate(dict())
         self.assertFalse(result)
-        self.assertTrue('property' in result.errors)
-        self.assertEqual(
-            schema.property.required_message,
-            result.errors['property'][0].message
-        )
 
     def test_validate_entity_property(self):
         """ Validated linked entity properties with nested schemas """
@@ -266,8 +254,6 @@ class SchemaTest(TestCase):
         self.assertTrue('first_name' in result.errors) # too short
         self.assertTrue('first_name' in result.errors['spouse'])
 
-        self.assertTrue('last_name' in result.errors) # required
-        self.assertTrue('last_name' in result.errors['spouse'])
 
     def test_results_injected_with_translations(self):
         """ Schema-generated results are injected with translation settings """
@@ -276,7 +262,7 @@ class SchemaTest(TestCase):
         self.assertEqual('en', result.locale)
         self.assertIsInstance(result.translator, Translator)
 
-        Schema.locale='ru'
+        Schema.locale = 'ru'
         Schema.translator.add_location('/tmp')
 
         schema = Schema()

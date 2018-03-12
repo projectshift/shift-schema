@@ -4,33 +4,16 @@ from shiftschema.exceptions import InvalidFilter, InvalidValidator
 from shiftschema.exceptions import InvalidSchemaType
 from shiftschema.result import Result, Error
 
+
 class SimpleProperty:
     """
     Simple property
     A single value property on the schema and holds a number of filters and
     validators for this value
     """
-    def __init__(self, *, required=False):
-        self._required = required
-        self._required_message = "%property_required%"
+    def __init__(self):
         self.filters = []
         self.validators = []
-
-    @property
-    def required(self):
-        return self._required
-
-    @required.setter
-    def required(self, value):
-        self._required = bool(value)
-
-    @property
-    def required_message(self):
-        return self._required_message
-
-    @required_message.setter
-    def required_message(self, msg):
-        self._required_message = msg
 
     def add_filter(self, filter):
         """
@@ -82,11 +65,6 @@ class SimpleProperty:
         :param context: validation context, usually parent entity
         :return: list of errors (if any)
         """
-
-        # value='' is False...
-        if not value and self.required:
-            return [Error(self.required_message)]
-
         errors = []
         for validator in self.validators:
             error = validator.run(value, context)

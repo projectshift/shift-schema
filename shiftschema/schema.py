@@ -73,14 +73,6 @@ class Schema:
                 prop = self.properties[property_name]
                 prop_spec = spec['properties'][property_name]
 
-                required = bool(prop_spec.get('required', False))
-                if required:
-                    prop.required = required
-
-                msg = prop_spec.get('required_message')
-                if msg:
-                    prop.required_message = msg
-
                 prop_filters = prop_spec.get('filters')
                 if prop_filters:
                     for filter in prop_filters:
@@ -130,7 +122,7 @@ class Schema:
         if validator not in self.state:
             self.state.append(validator)
 
-    def add_property(self, property_name, required=False):
+    def add_property(self, property_name):
         """
         Add simple property to schema
         :param property_name: str, property name
@@ -141,7 +133,7 @@ class Schema:
             err = 'Property "{}" already exists'
             raise PropertyExists(err.format(property_name))
 
-        self.properties[property_name] = SimpleProperty(required=required)
+        self.properties[property_name] = SimpleProperty()
 
     def add_entity(self, property_name, required=False):
         """
@@ -265,15 +257,7 @@ class Schema:
         # validate properties
         for property_name in self.properties:
             value = self.get(model, property_name)
-            required = self.properties[property_name].required
-            if value is None and not required:
-                continue
-
-            if context:
-                property_ctx = context  # got context?
-            else:
-                property_ctx = model    # user model if not
-
+            property_ctx = context if context else model
             errors = self.properties[property_name].validate_value(
                 value=value,
                 context=property_ctx

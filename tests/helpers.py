@@ -8,9 +8,11 @@ from shiftschema.schema import Schema
 # Test helpers
 # -----------------------------------------------------------------------------
 
+
 class StateValidator(AbstractValidator):
     def validate(self, value=None, context=None):
         return Error() # always valid
+
 
 class StateValidatorInvalid(AbstractValidator):
     def validate(self, value=None, context=None):
@@ -21,14 +23,10 @@ person_spec = {
     'state': [StateValidator()],
     'properties': {
         'first_name': dict(
-            required=True,
-            required_message='ZZZ',
             filters=[Strip()],
             validators=[Length(min=2, max=10)],
         ),
         'last_name': dict(
-            required=True,
-            required_message='ZZZ',
             filters=[Strip()],
             validators=[Length(min=2, max=10)],
         ),
@@ -47,14 +45,10 @@ person_spec_aggregate = {
     'state': [StateValidator()],
     'properties': {
         'first_name': dict(
-            required=True,
-            required_message='ZZZ',
             filters=[Strip()],
             validators=[Length(min=2, max=10)],
         ),
         'last_name': dict(
-            required=True,
-            required_message='ZZZ',
             filters=[Strip()],
             validators=[Length(min=2, max=10)],
         ),
@@ -66,7 +60,7 @@ person_spec_aggregate = {
             filters=[Strip(), Digits(to_int=True)]
         ),
     },
-    'entities' : {
+    'entities': {
         'spouse': dict(
             required=True,
             required_message='XXX',

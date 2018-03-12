@@ -19,13 +19,6 @@ class SimplePropertyTests(TestCase):
         prop = SimpleProperty()
         self.assertIsInstance(prop, SimpleProperty)
 
-    def test_access_simple_property_required_status(self):
-        """ Access required status through property descriptors """
-        prop = SimpleProperty()
-        self.assertFalse(prop.required)
-        prop.required = True
-        self.assertTrue(prop.required)
-
     def test_adding_filter(self):
         """ Add filter to property """
         prop = SimpleProperty()
@@ -89,25 +82,6 @@ class SimplePropertyTests(TestCase):
         property.add_validator(DigitsValidator())
         result = property.validate_value('shorter than thirty')
         self.assertTrue(len(result) == 2)
-
-    def test_validate_required_property(self):
-        """ Validating required simple properties """
-        prop = SimpleProperty()
-        prop.required = True
-        result = prop.validate_value()
-        self.assertTrue(type(result) is list)
-        self.assertEqual(1, len(result))
-
-    def test_empty_strings_detected_by_required(self):
-        """ Required checks must detect empty strings """
-        prop = SimpleProperty()
-        prop.required = True
-
-        errors = prop.validate_value()  # detect None
-        self.assertTrue(errors)
-        errors = prop.validate_value('')  # detect empty string
-        self.assertTrue(errors)
-
 
 
 @attr('property', 'entity')
