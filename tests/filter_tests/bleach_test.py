@@ -21,7 +21,7 @@ class BleachTest(TestCase):
         )
 
     def test_create(self):
-        """ Can create  bleach filter """
+        """ Can create bleach filter """
         filter = Bleach()
         self.assertIsInstance(filter, Bleach)
 

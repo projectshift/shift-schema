@@ -4,6 +4,7 @@ from shiftschema.filters.strip import Strip
 from shiftschema.filters.lowercase import Lowercase
 from shiftschema.filters.uppercase import Uppercase
 from shiftschema.filters.bleach import Bleach
+from shiftschema.filters.linkify import Linkify
 
 
 # todo implement these filters:

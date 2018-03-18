@@ -1,6 +1,7 @@
 from shiftschema.filters import AbstractFilter
 import bleach
 
+
 class Bleach(AbstractFilter):
     """
     Bleach filter
@@ -51,7 +52,7 @@ class Bleach(AbstractFilter):
         strip_comments=True
     ):
         """
-        Initialize the fileter and set bleach config options
+        Initialize the filter and set bleach config options
 
         :param tags: allowed tag list
         :param attributes: allowed attributes list, dict or callable
