@@ -3,6 +3,7 @@ from shiftschema.filters.digits import Digits
 from shiftschema.filters.strip import Strip
 from shiftschema.filters.lowercase import Lowercase
 from shiftschema.filters.uppercase import Uppercase
+from shiftschema.filters.bleach import Bleach
 
 
 # todo implement these filters:
@@ -13,6 +14,5 @@ from shiftschema.filters.uppercase import Uppercase
 # regex_replace.py
 # separator_to_camel_case.py
 # string.py
-# strip_html.py
 # strip_newlines.py
 # url_normalize.py

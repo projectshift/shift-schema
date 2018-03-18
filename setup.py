@@ -92,7 +92,9 @@ setup(**dict(
     include_package_data=True,
 
     # project dependencies
-    install_requires=[],
+    install_requires=[
+        'bleach==2.1.3'
+    ],
 
 
     # project license
