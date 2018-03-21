@@ -146,12 +146,22 @@ class EntityProperty:
         self.validators.append(validator)
         return self
 
-    def filter(self, model=None, context=None):
-        """ Perform model filtering """
-        if model is None or (self._schema is None and not self.filters):
+    def filter(self, value=None, context=None, third=None):
+        """ Perform model filtering with filters attached directly """
+        if value is None:
             return
 
-        self._schema.filter(model, context)
+        for filter in self.filters:
+            value = filter.filter(value, context)
+
+        return value
+
+    def filter_with_schema(self, value=None, context=None):
+        """ Perform model filtering with schema """
+        if value is None or self.schema is None:
+            return
+
+        self._schema.filter(value, context)
 
     def validate(self, model=None, context=None):
         """ Perform model validation """
@@ -166,8 +176,4 @@ class EntityProperty:
         result = self._schema.validate(model, context)
         return result
 
-    def process(self, model=None, context=None):
-        """ Filter and validate model in one operation """
-        self.filter(model, context)
-        return self.validate(model, context)
 

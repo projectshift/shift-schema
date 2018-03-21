@@ -23,7 +23,7 @@ class StateValidatorInvalid(AbstractValidator):
 
 class EntityFilter(AbstractFilter):
     """ A simple filter that can be used on entity properties """
-    def filter(self, value):
+    def filter(self, value, context=None):
         return [value]
 
 

@@ -8,13 +8,14 @@ class AbstractFilter(metaclass=ABCMeta):
     """
 
     @abstractmethod
-    def filter(self, value):
+    def filter(self, value, context=None):
         """
         Filter
         Abstract filtering method: implement this in your concrete
         filters. Accepts a value and returns filtered value.
 
         :param value:               a value to filter
+        :param context:             context, usually contains parent model
         :return:                    filtered value
         """
         return

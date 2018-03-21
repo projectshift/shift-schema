@@ -62,26 +62,26 @@ class SimplePropertyTests(TestCase):
 
     def test_filter_value(self):
         """ Filtering property value with attached filters """
-        property = SimpleProperty()
-        property.add_filter(Strip(mode='both'))
-        property.add_filter(Digits())
+        prop = SimpleProperty()
+        prop.add_filter(Strip(mode='both'))
+        prop.add_filter(Digits())
         value = '  Good luck in 2024 to you and your robots!'
-        self.assertEqual('2024', property.filter(value))
+        self.assertEqual('2024', prop.filter(value))
 
     def test_validate_value_and_pass(self):
         """ Validate simple property and pass """
-        property = SimpleProperty()
-        property.add_validator(Length(min=3))
-        result = property.validate('me is longer than three')
+        prop = SimpleProperty()
+        prop.add_validator(Length(min=3))
+        result = prop.validate('me is longer than three')
         self.assertTrue(type(result) is list)
         self.assertTrue(len(result) == 0)
 
     def test_validate_property_and_fail(self):
         """ Validate simple property and fail (return errors) """
-        property = SimpleProperty()
-        property.add_validator(Length(min=30))
-        property.add_validator(DigitsValidator())
-        result = property.validate('shorter than thirty')
+        prop = SimpleProperty()
+        prop.add_validator(Length(min=30))
+        prop.add_validator(DigitsValidator())
+        result = prop.validate('shorter than thirty')
         self.assertTrue(len(result) == 2)
 
 
@@ -107,6 +107,32 @@ class EntityPropertyTests(TestCase):
         with self.assertRaises(InvalidSchemaType):
             prop.schema = dict()
 
+    def test_attaching_filter(self):
+        """ Attaching filter to entity property"""
+        prop = EntityProperty()
+        filter = Strip()
+        prop.add_filter(filter)
+        self.assertIn(filter, prop.filters)
+
+    def test_raise_on_attaching_invalid_filter(self):
+        """ Raise if attaching invalid filter to entity property"""
+        prop = EntityProperty()
+        with self.assertRaises(InvalidFilter):
+            prop.add_filter(mock.Mock())
+
+    def test_attaching_validator(self):
+        """ Attaching validator to entity property"""
+        prop = EntityProperty()
+        validator = Required()
+        prop.add_validator(validator)
+        self.assertIn(validator, prop.validators)
+
+    def test_raise_on_attaching_invalid_validator(self):
+        """ Raise if attaching invalid validator to entity property"""
+        prop = EntityProperty()
+        with self.assertRaises(InvalidValidator):
+            prop.add_validator(mock.Mock())
+
     # todo: replace with required validator
     def test_access_entity_property_required_status(self):
         """ Access required status through property descriptors """
@@ -125,17 +151,25 @@ class EntityPropertyTests(TestCase):
         self.assertTrue(type(result) is list)
         self.assertEqual(1, len(result))
 
-    def test_filtering_model(self):
-        """ Filtering nested entity """
+    def test_filtering_entity_with_schema(self):
+        """ Filtering nested entity with schema """
         model = helpers.Person(
             first_name='   Willy    ',
             last_name='   Wonka    ',
         )
         prop = EntityProperty()
         prop.schema = Schema(helpers.person_spec)
-        prop.filter(model)
+        prop.filter_with_schema(model)
         self.assertEqual('Willy', model.first_name)
         self.assertEqual('Wonka', model.last_name)
+
+    def test_filtering_entity_with_filter_directly(self):
+        """ Using filter on entity property"""
+        model = dict(something='nested')
+        prop = EntityProperty()
+        prop.add_filter(helpers.EntityFilter())
+        filtered = prop.filter(model)
+        self.assertEquals([model], filtered)
 
     def test_validating_model(self):
         """ Validated nested entity """
@@ -182,44 +216,7 @@ class EntityPropertyTests(TestCase):
         self.assertTrue('first_name' in result.errors['nested'])
         self.assertTrue('last_name' in result.errors['nested'])
 
-    def test_attaching_filter(self):
-        """ Attaching filter to entity property"""
-        prop = EntityProperty()
-        filter = Strip()
-        prop.add_filter(filter)
-        self.assertIn(filter, prop.filters)
 
-    def test_raise_on_attaching_invalid_filter(self):
-        """ Raise if attaching invalid filter to entity property"""
-        prop = EntityProperty()
-        with self.assertRaises(InvalidFilter):
-            prop.add_filter(mock.Mock())
-
-    def test_attaching_validator(self):
-        """ Attaching validator to entity property"""
-        prop = EntityProperty()
-        validator = Required()
-        prop.add_validator(validator)
-        self.assertIn(validator, prop.validators)
-
-    def test_raise_on_attaching_invalid_validator(self):
-        """ Raise if attaching invalid validator to entity property"""
-        prop = EntityProperty()
-        with self.assertRaises(InvalidValidator):
-            prop.add_validator(mock.Mock())
-
-    # @attr('zzzz')
-    # def test_use_filter_on_entity(self):
-    #     """ Using filter on entity property"""
-    #     model = dict(example='entity')
-    #     prop = EntityProperty()
-    #     prop.add_filter(helpers.EntityFilter())
-    #
-    #
-    # @attr('zzzz')
-    # def test_use_validator_on_entity(self):
-    #     """ Using validator on entity property"""
-    #     self.fail('Not implemented')
 
 
 

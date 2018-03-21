@@ -204,30 +204,27 @@ class Schema:
 
         # properties
         for property_name in self.properties:
+            prop = self.properties[property_name]
             value = self.get(model, property_name)
             if value is None:
                 continue
 
-            property_context = context if context else model
-            filtered_value = self.properties[property_name].filter(
-                value=value,
-                context=property_context
-            )
+            property_ctx = context if context else model
+            filtered_value = prop.filter(value, property_ctx)
             if value != filtered_value:  # unless changed!
                 self.set(model, property_name, filtered_value)
 
-        # todo: rewrite me
         # entities
         for property_name in self.entities:
-            entity = self.get(model, property_name)
-            if entity is None:
-                continue
-
+            prop = self.entities[property_name]
+            value = self.get(model, property_name)
             entity_ctx = context if context else model
-            self.entities[property_name].filter(
-                model=entity,
-                context=entity_ctx
-            )
+
+            filtered_value = prop.filter(value, entity_ctx)
+            if value != filtered_value:  # unless changed!
+                self.set(model, property_name, filtered_value)
+
+            prop.filter_with_schema(value, entity_ctx)
 
     def validate(self, model=None, context=None):
         """
@@ -283,9 +280,6 @@ class Schema:
                     errors=nested_valid.errors
                 )
 
-
-            # validate list collections
-            # validate dict collections
 
         return result
 
