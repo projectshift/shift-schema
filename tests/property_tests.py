@@ -7,9 +7,10 @@ from shiftschema.property import SimpleProperty, EntityProperty
 from shiftschema.exceptions import InvalidFilter, InvalidValidator
 from shiftschema.exceptions import InvalidSchemaType
 from shiftschema.filters import Strip, Digits
-from shiftschema.validators import Length, Digits as DigitsValidator
+from shiftschema.validators import Length, Required, Digits as DigitsValidator
 
 from tests import helpers
+
 
 @attr('property', 'simple')
 class SimplePropertyTests(TestCase):
@@ -24,7 +25,7 @@ class SimplePropertyTests(TestCase):
         prop = SimpleProperty()
         filter = Strip()
         prop.add_filter(filter)
-        self.assertTrue(filter in prop.filters)
+        self.assertIn(filter, prop.filters)
 
     def test_raise_on_adding_bad_filter(self):
         """ Raise if adding filter of bad type """
@@ -37,7 +38,7 @@ class SimplePropertyTests(TestCase):
         prop = SimpleProperty()
         validator = Length(min=10)
         prop.add_validator(validator)
-        self.assertTrue(validator in prop.validators)
+        self.assertIn(validator, prop.validators)
 
     def test_raise_on_adding_bad_validator(self):
         """ Raise if adding validator of bad type """
@@ -92,13 +93,6 @@ class EntityPropertyTests(TestCase):
         prop = EntityProperty()
         self.assertIsInstance(prop, EntityProperty)
 
-    def test_access_entity_property_required_status(self):
-        """ Access required status through property descriptors """
-        prop = EntityProperty()
-        self.assertFalse(prop.required)
-        prop.required = True
-        self.assertTrue(prop.required)
-
     def test_accessing_schema(self):
         """ Accessing nested schema with property descriptors """
         schema = Schema()
@@ -112,6 +106,24 @@ class EntityPropertyTests(TestCase):
         prop = EntityProperty()
         with self.assertRaises(InvalidSchemaType):
             prop.schema = dict()
+
+    # todo: replace with required validator
+    def test_access_entity_property_required_status(self):
+        """ Access required status through property descriptors """
+        prop = EntityProperty()
+        self.assertFalse(prop.required)
+        prop.required = True
+        self.assertTrue(prop.required)
+
+    # todo: replace with required validator
+    def test_validate_required_entity(self):
+        """ Validating required entity properties """
+        prop = EntityProperty()
+        prop.required = True
+        prop.schema = Schema()
+        result = prop.validate()
+        self.assertTrue(type(result) is list)
+        self.assertEqual(1, len(result))
 
     def test_filtering_model(self):
         """ Filtering nested entity """
@@ -170,11 +182,34 @@ class EntityPropertyTests(TestCase):
         self.assertTrue('first_name' in result.errors['nested'])
         self.assertTrue('last_name' in result.errors['nested'])
 
-    def test_validate_required_entity(self):
-        """ Validating required entity properties """
+    def test_attaching_filter(self):
+        """ Attaching filter to entity property"""
         prop = EntityProperty()
-        prop.required = True
-        prop.schema = Schema()
-        result = prop.validate()
-        self.assertTrue(type(result) is list)
-        self.assertEqual(1, len(result))
+        filter = Strip()
+        prop.add_filter(filter)
+        self.assertIn(filter, prop.filters)
+
+    def test_raise_on_attaching_invalid_filter(self):
+        """ Raise if attaching invalid filter to entity property"""
+        prop = EntityProperty()
+        with self.assertRaises(InvalidFilter):
+            prop.add_filter(mock.Mock())
+
+    def test_attaching_validator(self):
+        """ Attaching validator to entity property"""
+        prop = EntityProperty()
+        validator = Required()
+        prop.add_validator(validator)
+        self.assertIn(validator, prop.validators)
+
+    def test_raise_on_attaching_invalid_validator(self):
+        """ Raise if attaching invalid validator to entity property"""
+        prop = EntityProperty()
+        with self.assertRaises(InvalidValidator):
+            prop.add_validator(mock.Mock())
+
+
+
+
+
+

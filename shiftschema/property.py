@@ -77,12 +77,13 @@ class SimpleProperty:
 class EntityProperty:
     """
     Entity property
-    Contains nested schema existing on a property of another schema. Used
-    for validation of nested models in aggregates and allows arbitrary
-    nesting o schemas.
+    Used to process linked entities existing on a property. Can have
+    filters and validators attached as well as an empty schema.
     """
 
     def __init__(self, *, required=False):
+        self.filters = []
+        self.validators = []
         self._required = required
         self._required_message = "%property_required%"
         self._schema = None
@@ -116,6 +117,34 @@ class EntityProperty:
 
         err = 'Nested schema must be of type "{}" got "{}"'
         raise InvalidSchemaType(err.format(Schema, schema))
+
+    def add_filter(self, filter):
+        """
+        Add filter to property
+        :param filter: object, extending from AbstractFilter
+        :return: None
+        """
+        if not isinstance(filter, AbstractFilter):
+            err = 'Filters must be of type {}'.format(AbstractFilter)
+            raise InvalidFilter(err)
+
+        if filter not in self.filters:
+            self.filters.append(filter)
+        return self
+
+    def add_validator(self, validator):
+        """
+        Add validator to property
+
+        :param validator: object, extending from AbstractValidator
+        :return: None
+        """
+        if not isinstance(validator, AbstractValidator):
+            err = 'Validator must be of type {}'.format(AbstractValidator)
+            raise InvalidValidator(err)
+
+        self.validators.append(validator)
+        return self
 
     def filter(self, model=None, context=None):
         """ Perform model filtering """

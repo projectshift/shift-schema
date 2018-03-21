@@ -10,13 +10,16 @@ from shiftschema.schema import Schema
 
 
 class StateValidator(AbstractValidator):
+    """ Test validator that is always valid"""
     def validate(self, value=None, context=None):
         return Error() # always valid
 
 
 class StateValidatorInvalid(AbstractValidator):
+    """ Test validator that is always invalid"""
     def validate(self, value=None, context=None):
-        return Error('always invalid') # always invalid
+        return Error('always invalid')
+
 
 # simple person spec
 person_spec = {
