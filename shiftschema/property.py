@@ -43,7 +43,7 @@ class SimpleProperty:
         self.validators.append(validator)
         return self
 
-    def filter_value(self, value=None, context=None):
+    def filter(self, value=None, context=None):
         """
         Sequentially applies all the filters to provided value
 
@@ -57,7 +57,7 @@ class SimpleProperty:
             value = filter_obj.filter(value, context=context)
         return value
 
-    def validate_value(self, value=None, context=None):
+    def validate(self, value=None, context=None):
         """
         Sequentially apply each validator to value and collect errors.
 
@@ -146,28 +146,28 @@ class EntityProperty:
         self.validators.append(validator)
         return self
 
-    # def filter(self, model=None, context=None):
-    #     """ Perform model filtering """
-    #     if model is None or (self._schema is None and not self.filters):
-    #         return
-    #
-    #     self._schema.filter(model, context)
-    #
-    # def validate(self, model=None, context=None):
-    #     """ Perform model validation """
-    #
-    #     # validate required (regression: before skipping on no schema)
-    #     if model is None and self.required:
-    #         return [Error(self.required_message)]
-    #
-    #     if self._schema is None or (model is None and not self.required):
-    #         return
-    #
-    #     result = self._schema.validate(model, context)
-    #     return result
-    #
-    # def process(self, model=None, context=None):
-    #     """ Filter and validate model in one operation """
-    #     self.filter(model, context)
-    #     return self.validate(model, context)
+    def filter(self, model=None, context=None):
+        """ Perform model filtering """
+        if model is None or (self._schema is None and not self.filters):
+            return
+
+        self._schema.filter(model, context)
+
+    def validate(self, model=None, context=None):
+        """ Perform model validation """
+
+        # validate required (regression: before skipping on no schema)
+        if model is None and self.required:
+            return [Error(self.required_message)]
+
+        if self._schema is None or (model is None and not self.required):
+            return
+
+        result = self._schema.validate(model, context)
+        return result
+
+    def process(self, model=None, context=None):
+        """ Filter and validate model in one operation """
+        self.filter(model, context)
+        return self.validate(model, context)
 

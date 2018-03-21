@@ -208,29 +208,26 @@ class Schema:
             if value is None:
                 continue
 
-            if context:
-                property_context = context if context else model
-            else:
-                property_context = model
-
-            filtered_value = self.properties[property_name].filter_value(
+            property_context = context if context else model
+            filtered_value = self.properties[property_name].filter(
                 value=value,
                 context=property_context
             )
             if value != filtered_value:  # unless changed!
                 self.set(model, property_name, filtered_value)
 
-        # # entities
-        # for property_name in self.entities:
-        #     entity = self.get(model, property_name)
-        #     if entity is None:
-        #         continue
-        #
-        #     entity_ctx = context if context else model
-        #     self.entities[property_name].filter(
-        #         model=entity,
-        #         context=entity_ctx
-        #     )
+        # todo: rewrite me
+        # entities
+        for property_name in self.entities:
+            entity = self.get(model, property_name)
+            if entity is None:
+                continue
+
+            entity_ctx = context if context else model
+            self.entities[property_name].filter(
+                model=entity,
+                context=entity_ctx
+            )
 
     def validate(self, model=None, context=None):
         """
@@ -253,7 +250,7 @@ class Schema:
         for property_name in self.properties:
             value = self.get(model, property_name)
             property_ctx = context if context else model
-            errors = self.properties[property_name].validate_value(
+            errors = self.properties[property_name].validate(
                 value=value,
                 context=property_ctx
             )
@@ -261,29 +258,30 @@ class Schema:
             if errors:
                 result.add_errors(errors, property_name)
 
+        # todo: rewrite me
         # validate linked entities
-        # for property_name in self.entities:
-        #     entity = self.get(model, property_name)
-        #     required = self.entities[property_name].required
-        #     if entity is None and not required:
-        #         continue
-        #
-        #     entity_ctx = context if context else model
-        #     nested_valid = self.entities[property_name].validate(
-        #         model=entity,
-        #         context=entity_ctx
-        #     )
-        #
-        #     # required and missing?
-        #     if type(nested_valid) is list:
-        #         result.add_errors(nested_valid, property_name)
-        #
-        #     # or is a nested result?
-        #     elif isinstance(nested_valid, Result) and not nested_valid:
-        #         result.add_nested_errors(
-        #             property_name=property_name,
-        #             errors=nested_valid.errors
-        #         )
+        for property_name in self.entities:
+            entity = self.get(model, property_name)
+            required = self.entities[property_name].required
+            if entity is None and not required:
+                continue
+
+            entity_ctx = context if context else model
+            nested_valid = self.entities[property_name].validate(
+                model=entity,
+                context=entity_ctx
+            )
+
+            # required and missing?
+            if type(nested_valid) is list:
+                result.add_errors(nested_valid, property_name)
+
+            # or is a nested result?
+            elif isinstance(nested_valid, Result) and not nested_valid:
+                result.add_nested_errors(
+                    property_name=property_name,
+                    errors=nested_valid.errors
+                )
 
 
             # validate list collections
