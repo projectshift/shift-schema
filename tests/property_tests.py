@@ -208,6 +208,19 @@ class EntityPropertyTests(TestCase):
         with self.assertRaises(InvalidValidator):
             prop.add_validator(mock.Mock())
 
+    @attr('zzzz')
+    def test_use_filter_on_entity(self):
+        """ Using filter on entity property"""
+        model = dict(example='entity')
+        prop = EntityProperty()
+        prop.add_filter(helpers.EntityFilter())
+
+
+    @attr('zzzz')
+    def test_use_validator_on_entity(self):
+        """ Using validator on entity property"""
+        self.fail('Not implemented')
+
 
 
 

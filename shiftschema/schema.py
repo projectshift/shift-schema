@@ -209,7 +209,7 @@ class Schema:
                 continue
 
             if context:
-                property_context = context
+                property_context = context if context else model
             else:
                 property_context = model
 
@@ -220,21 +220,17 @@ class Schema:
             if value != filtered_value:  # unless changed!
                 self.set(model, property_name, filtered_value)
 
-        # entities
-        for property_name in self.entities:
-            entity = self.get(model, property_name)
-            if entity is None:
-                continue
-
-            if context:
-                entity_ctx = context
-            else:
-                entity_ctx = model
-
-            self.entities[property_name].filter(
-                model=entity,
-                context=entity_ctx
-            )
+        # # entities
+        # for property_name in self.entities:
+        #     entity = self.get(model, property_name)
+        #     if entity is None:
+        #         continue
+        #
+        #     entity_ctx = context if context else model
+        #     self.entities[property_name].filter(
+        #         model=entity,
+        #         context=entity_ctx
+        #     )
 
     def validate(self, model=None, context=None):
         """
@@ -266,28 +262,28 @@ class Schema:
                 result.add_errors(errors, property_name)
 
         # validate linked entities
-        for property_name in self.entities:
-            entity = self.get(model, property_name)
-            required = self.entities[property_name].required
-            if entity is None and not required:
-                continue
-
-            entity_ctx = context if context else model
-            nested_valid = self.entities[property_name].validate(
-                model=entity,
-                context=entity_ctx
-            )
-
-            # required and missing?
-            if type(nested_valid) is list:
-                result.add_errors(nested_valid, property_name)
-
-            # or is a nested result?
-            elif isinstance(nested_valid, Result) and not nested_valid:
-                result.add_nested_errors(
-                    property_name=property_name,
-                    errors=nested_valid.errors
-                )
+        # for property_name in self.entities:
+        #     entity = self.get(model, property_name)
+        #     required = self.entities[property_name].required
+        #     if entity is None and not required:
+        #         continue
+        #
+        #     entity_ctx = context if context else model
+        #     nested_valid = self.entities[property_name].validate(
+        #         model=entity,
+        #         context=entity_ctx
+        #     )
+        #
+        #     # required and missing?
+        #     if type(nested_valid) is list:
+        #         result.add_errors(nested_valid, property_name)
+        #
+        #     # or is a nested result?
+        #     elif isinstance(nested_valid, Result) and not nested_valid:
+        #         result.add_nested_errors(
+        #             property_name=property_name,
+        #             errors=nested_valid.errors
+        #         )
 
 
             # validate list collections
