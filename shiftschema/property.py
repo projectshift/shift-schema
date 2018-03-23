@@ -163,8 +163,8 @@ class EntityProperty:
 
         self._schema.filter(value, context)
 
-    def validate(self, model=None, context=None):
-        """ Perform model validation """
+    def validate_with_schema(self, model=None, context=None):
+        """ Perform model validation with schema"""
 
         # validate required (regression: before skipping on no schema)
         if model is None and self.required:

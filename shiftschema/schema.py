@@ -264,7 +264,7 @@ class Schema:
                 continue
 
             entity_ctx = context if context else model
-            nested_valid = self.entities[property_name].validate(
+            nested_valid = self.entities[property_name].validate_with_schema(
                 model=entity,
                 context=entity_ctx
             )
@@ -279,7 +279,6 @@ class Schema:
                     property_name=property_name,
                     errors=nested_valid.errors
                 )
-
 
         return result
 

@@ -147,7 +147,7 @@ class EntityPropertyTests(TestCase):
         prop = EntityProperty()
         prop.required = True
         prop.schema = Schema()
-        result = prop.validate()
+        result = prop.validate_with_schema()
         self.assertTrue(type(result) is list)
         self.assertEqual(1, len(result))
 
@@ -190,7 +190,7 @@ class EntityPropertyTests(TestCase):
 
         prop = EntityProperty()
         prop.schema = schema
-        result = prop.validate(model)
+        result = prop.validate_with_schema(model)
         self.assertFalse(result)
         self.assertEqual(1, len(result.errors['nested']['__state__']))
 
