@@ -133,24 +133,6 @@ class EntityPropertyTests(TestCase):
         with self.assertRaises(InvalidValidator):
             prop.add_validator(mock.Mock())
 
-    # todo: replace with required validator
-    # def test_access_entity_property_required_status(self):
-    #     """ Access required status through property descriptors """
-    #     prop = EntityProperty()
-    #     self.assertFalse(prop.required)
-    #     prop.required = True
-    #     self.assertTrue(prop.required)
-
-    # todo: replace with required validator
-    # def test_validate_required_entity(self):
-    #     """ Validating required entity properties """
-    #     prop = EntityProperty()
-    #     prop.required = True
-    #     prop.schema = Schema()
-    #     result = prop.validate_with_schema()
-    #     self.assertTrue(type(result) is list)
-    #     self.assertEqual(1, len(result))
-
     def test_filtering_entity_with_schema(self):
         """ Filtering nested entity with schema """
         model = helpers.Person(
@@ -177,6 +159,13 @@ class EntityPropertyTests(TestCase):
         prop.add_validator(helpers.ValidatorInvalid())
         result = prop.validate('Something')
         self.assertTrue(type(result) is list)
+        self.assertEquals(1, len(result))
+
+    def test_required_nested_entity_via_validator_attached_directly(self):
+        """ Require nested entity via validator attached directly """
+        prop = EntityProperty()
+        prop.add_validator(Required())
+        result = prop.validate(value=None)
         self.assertEquals(1, len(result))
 
     def test_validating_nested_entity_with_schema(self):

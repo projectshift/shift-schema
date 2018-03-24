@@ -1,5 +1,5 @@
 
-from shiftschema.validators import AbstractValidator, Length, Choice
+from shiftschema.validators import AbstractValidator, Length, Choice, Required
 from shiftschema.filters import AbstractFilter, Strip, Digits
 from shiftschema.result import Error
 from shiftschema.schema import Schema
@@ -71,8 +71,7 @@ person_spec_aggregate = {
     },
     'entities': {
         'spouse': dict(
-            required=True,
-            required_message='XXX',
+            validators=[Required()],
             schema=Schema(person_spec)
         )
     }

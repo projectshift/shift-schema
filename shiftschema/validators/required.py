@@ -35,11 +35,17 @@ class Required(AbstractValidator):
         :return:                shiftschema.results.SimpleResult
         """
 
-        # non-empty
-        if value and value.strip() != '':
+        # ok if non-empty string
+        if type(value) is str:
+            value = value.strip()
+            if value != '':
+                return Error()
+
+        # ok if has value
+        if value:
             return Error()
 
-        # false, which is allowed
+        # ok if false, but false is allowed
         if value is False and self.allow_false:
             return Error()
 

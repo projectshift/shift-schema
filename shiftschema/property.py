@@ -82,28 +82,10 @@ class EntityProperty:
     filters and validators attached as well as a nested schema.
     """
 
-    def __init__(self, *, required=False):
+    def __init__(self):
         self.filters = []
         self.validators = []
-        self._required = required
-        self._required_message = "%property_required%"
         self._schema = None
-
-    @property
-    def required(self):
-        return self._required
-
-    @required.setter
-    def required(self, value):
-        self._required = bool(value)
-
-    @property
-    def required_message(self):
-        return self._required_message
-
-    @required_message.setter
-    def required_message(self, msg):
-        self._required_message = msg
 
     @property
     def schema(self):

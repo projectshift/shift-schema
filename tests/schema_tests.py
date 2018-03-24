@@ -6,6 +6,8 @@ from shiftschema.result import Result
 from shiftschema.property import SimpleProperty, EntityProperty
 from shiftschema.exceptions import PropertyExists, InvalidValidator
 from shiftschema.translator import Translator
+from shiftschema import validators
+from shiftschema import filters
 from tests import helpers
 
 
@@ -220,27 +222,17 @@ class SchemaTest(TestCase):
         self.assertTrue('first_name' in result.errors['spouse'])
         self.assertTrue('last_name' in result.errors['spouse'])
 
-    # todo: replace with required validator
-    # def test_require_linked_entities(self):
-    #     """ Validate required linked entities"""
-    #     class Model:
-    #         def __init__(self):
-    #             self.entity=None
-    #
-    #     model = Model()
-    #     schema = Schema()
-    #     schema.add_entity('entity')
-    #     schema.entity.schema=Schema()
-    #     schema.entity.required=True
-    #     schema.entity.required_message='Entity required!'
-    #     result = schema.validate(model)
-    #
-    #     self.assertFalse(result)
-    #     self.assertTrue('entity' in result.errors)
-    #     self.assertEqual(
-    #         schema.entity.required_message,
-    #         result.errors['entity'][0].message
-    #     )
+    def test_require_linked_entities_with_validator_attached_directly(self):
+        """ Require linked entities with validator attached directly """
+        class Person:
+            def __init__(self):
+                self.spouse = None
+
+        schema = Schema()
+        schema.add_entity('spouse').add_validator(validators.Required())
+        result = schema.validate(Person())
+        self.assertFalse(result)
+        self.assertIn('spouse', result.get_messages())
 
     def test_validate_and_filter(self):
         """ Process: validation and filtering as single operation"""
