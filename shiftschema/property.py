@@ -79,7 +79,7 @@ class EntityProperty:
     Entity property
     Contains nested schema existing on a property of another schema. Used
     for validation of nested models in aggregates and allows arbitrary
-    nesting o schemas.
+    nesting of schemas.
     """
 
     def __init__(self, *, required=False):
@@ -141,3 +141,13 @@ class EntityProperty:
         self.filter(model, context)
         return self.validate(model, context)
 
+
+class ListCollectionProperty:
+    """
+    List collection property
+
+    Contains nested schema existing on a property of another schema. Used
+    for validation of nested models in aggregates and allows arbitrary
+    nesting of schemas.
+    """
+    pass

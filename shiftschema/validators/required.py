@@ -1,6 +1,5 @@
 from shiftschema.validators.abstract_validator import AbstractValidator
 from shiftschema.result import Error
-import re
 
 
 class Required(AbstractValidator):
