@@ -1,6 +1,6 @@
 
 from shiftschema.validators import AbstractValidator, Length, Choice
-from shiftschema.filters import Strip, Digits
+from shiftschema.filters import AbstractFilter, Strip, Digits
 from shiftschema.result import Error
 from shiftschema.schema import Schema
 
@@ -10,13 +10,22 @@ from shiftschema.schema import Schema
 
 
 class StateValidator(AbstractValidator):
+    """ Test validator that is always valid"""
     def validate(self, value=None, context=None):
         return Error() # always valid
 
 
 class StateValidatorInvalid(AbstractValidator):
+    """ Test validator that is always invalid"""
     def validate(self, value=None, context=None):
-        return Error('always invalid') # always invalid
+        return Error('always invalid')
+
+
+class EntityFilter(AbstractFilter):
+    """ A simple filter that can be used on entity properties """
+    def filter(self, value, context=None):
+        return [value]
+
 
 # simple person spec
 person_spec = {

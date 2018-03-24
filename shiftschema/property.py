@@ -43,7 +43,7 @@ class SimpleProperty:
         self.validators.append(validator)
         return self
 
-    def filter_value(self, value=None, context=None):
+    def filter(self, value=None, context=None):
         """
         Sequentially applies all the filters to provided value
 
@@ -57,7 +57,7 @@ class SimpleProperty:
             value = filter_obj.filter(value, context=context)
         return value
 
-    def validate_value(self, value=None, context=None):
+    def validate(self, value=None, context=None):
         """
         Sequentially apply each validator to value and collect errors.
 
@@ -77,12 +77,13 @@ class SimpleProperty:
 class EntityProperty:
     """
     Entity property
-    Contains nested schema existing on a property of another schema. Used
-    for validation of nested models in aggregates and allows arbitrary
-    nesting of schemas.
+    Used to process linked entities existing on a property. Can have
+    filters and validators attached as well as a nested schema.
     """
 
     def __init__(self, *, required=False):
+        self.filters = []
+        self.validators = []
         self._required = required
         self._required_message = "%property_required%"
         self._schema = None
@@ -117,14 +118,53 @@ class EntityProperty:
         err = 'Nested schema must be of type "{}" got "{}"'
         raise InvalidSchemaType(err.format(Schema, schema))
 
-    def filter(self, model=None, context=None):
-        """ Perform model filtering """
-        if self._schema is None or model is None:
-            return
-        self._schema.filter(model, context)
+    def add_filter(self, filter):
+        """
+        Add filter to property
+        :param filter: object, extending from AbstractFilter
+        :return: None
+        """
+        if not isinstance(filter, AbstractFilter):
+            err = 'Filters must be of type {}'.format(AbstractFilter)
+            raise InvalidFilter(err)
 
-    def validate(self, model=None, context=None):
-        """ Perform model validation """
+        if filter not in self.filters:
+            self.filters.append(filter)
+        return self
+
+    def add_validator(self, validator):
+        """
+        Add validator to property
+
+        :param validator: object, extending from AbstractValidator
+        :return: None
+        """
+        if not isinstance(validator, AbstractValidator):
+            err = 'Validator must be of type {}'.format(AbstractValidator)
+            raise InvalidValidator(err)
+
+        self.validators.append(validator)
+        return self
+
+    def filter(self, value=None, context=None, third=None):
+        """ Perform model filtering with filters attached directly """
+        if value is None:
+            return
+
+        for filter in self.filters:
+            value = filter.filter(value, context)
+
+        return value
+
+    def filter_with_schema(self, value=None, context=None):
+        """ Perform model filtering with schema """
+        if value is None or self.schema is None:
+            return
+
+        self._schema.filter(value, context)
+
+    def validate_with_schema(self, model=None, context=None):
+        """ Perform model validation with schema"""
 
         # validate required (regression: before skipping on no schema)
         if model is None and self.required:
@@ -136,10 +176,6 @@ class EntityProperty:
         result = self._schema.validate(model, context)
         return result
 
-    def process(self, model=None, context=None):
-        """ Filter and validate model in one operation """
-        self.filter(model, context)
-        return self.validate(model, context)
 
 
 class ListCollectionProperty:

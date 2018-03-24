@@ -204,37 +204,27 @@ class Schema:
 
         # properties
         for property_name in self.properties:
+            prop = self.properties[property_name]
             value = self.get(model, property_name)
             if value is None:
                 continue
 
-            if context:
-                property_context = context
-            else:
-                property_context = model
-
-            filtered_value = self.properties[property_name].filter_value(
-                value=value,
-                context=property_context
-            )
+            property_ctx = context if context else model
+            filtered_value = prop.filter(value, property_ctx)
             if value != filtered_value:  # unless changed!
                 self.set(model, property_name, filtered_value)
 
         # entities
         for property_name in self.entities:
-            entity = self.get(model, property_name)
-            if entity is None:
-                continue
+            prop = self.entities[property_name]
+            value = self.get(model, property_name)
+            entity_ctx = context if context else model
 
-            if context:
-                entity_ctx = context
-            else:
-                entity_ctx = model
+            filtered_value = prop.filter(value, entity_ctx)
+            if value != filtered_value:  # unless changed!
+                self.set(model, property_name, filtered_value)
 
-            self.entities[property_name].filter(
-                model=entity,
-                context=entity_ctx
-            )
+            prop.filter_with_schema(value, entity_ctx)
 
     def validate(self, model=None, context=None):
         """
@@ -257,7 +247,7 @@ class Schema:
         for property_name in self.properties:
             value = self.get(model, property_name)
             property_ctx = context if context else model
-            errors = self.properties[property_name].validate_value(
+            errors = self.properties[property_name].validate(
                 value=value,
                 context=property_ctx
             )
@@ -265,6 +255,7 @@ class Schema:
             if errors:
                 result.add_errors(errors, property_name)
 
+        # todo: rewrite me
         # validate linked entities
         for property_name in self.entities:
             entity = self.get(model, property_name)
@@ -273,7 +264,7 @@ class Schema:
                 continue
 
             entity_ctx = context if context else model
-            nested_valid = self.entities[property_name].validate(
+            nested_valid = self.entities[property_name].validate_with_schema(
                 model=entity,
                 context=entity_ctx
             )
@@ -288,10 +279,6 @@ class Schema:
                     property_name=property_name,
                     errors=nested_valid.errors
                 )
-
-
-            # validate list collections
-            # validate dict collections
 
         return result
 
