@@ -243,7 +243,7 @@ class Schema:
             if error:
                 result.add_errors(property_name=None, errors=error)
 
-        # validate properties
+        # validate simple properties
         for property_name in self.properties:
             value = self.get(model, property_name)
             property_ctx = context if context else model
@@ -256,7 +256,7 @@ class Schema:
                 result.add_errors(errors, property_name)
 
         # todo: rewrite me
-        # validate linked entities
+        # validate nested entity properties
         for property_name in self.entities:
             entity = self.get(model, property_name)
             required = self.entities[property_name].required

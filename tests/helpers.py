@@ -9,13 +9,13 @@ from shiftschema.schema import Schema
 # -----------------------------------------------------------------------------
 
 
-class StateValidator(AbstractValidator):
+class ValidatorValid(AbstractValidator):
     """ Test validator that is always valid"""
     def validate(self, value=None, context=None):
         return Error() # always valid
 
 
-class StateValidatorInvalid(AbstractValidator):
+class ValidatorInvalid(AbstractValidator):
     """ Test validator that is always invalid"""
     def validate(self, value=None, context=None):
         return Error('always invalid')
@@ -29,7 +29,7 @@ class EntityFilter(AbstractFilter):
 
 # simple person spec
 person_spec = {
-    'state': [StateValidator()],
+    'state': [ValidatorValid()],
     'properties': {
         'first_name': dict(
             filters=[Strip()],
@@ -51,7 +51,7 @@ person_spec = {
 
 # aggregate person spec (contains nested schema)
 person_spec_aggregate = {
-    'state': [StateValidator()],
+    'state': [ValidatorValid()],
     'properties': {
         'first_name': dict(
             filters=[Strip()],

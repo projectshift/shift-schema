@@ -134,22 +134,22 @@ class EntityPropertyTests(TestCase):
             prop.add_validator(mock.Mock())
 
     # todo: replace with required validator
-    def test_access_entity_property_required_status(self):
-        """ Access required status through property descriptors """
-        prop = EntityProperty()
-        self.assertFalse(prop.required)
-        prop.required = True
-        self.assertTrue(prop.required)
+    # def test_access_entity_property_required_status(self):
+    #     """ Access required status through property descriptors """
+    #     prop = EntityProperty()
+    #     self.assertFalse(prop.required)
+    #     prop.required = True
+    #     self.assertTrue(prop.required)
 
     # todo: replace with required validator
-    def test_validate_required_entity(self):
-        """ Validating required entity properties """
-        prop = EntityProperty()
-        prop.required = True
-        prop.schema = Schema()
-        result = prop.validate_with_schema()
-        self.assertTrue(type(result) is list)
-        self.assertEqual(1, len(result))
+    # def test_validate_required_entity(self):
+    #     """ Validating required entity properties """
+    #     prop = EntityProperty()
+    #     prop.required = True
+    #     prop.schema = Schema()
+    #     result = prop.validate_with_schema()
+    #     self.assertTrue(type(result) is list)
+    #     self.assertEqual(1, len(result))
 
     def test_filtering_entity_with_schema(self):
         """ Filtering nested entity with schema """
@@ -164,15 +164,23 @@ class EntityPropertyTests(TestCase):
         self.assertEqual('Wonka', model.last_name)
 
     def test_filtering_entity_with_filter_directly(self):
-        """ Using filter on entity property"""
+        """ Using filter on entity property """
         model = dict(something='nested')
         prop = EntityProperty()
         prop.add_filter(helpers.EntityFilter())
         filtered = prop.filter(model)
         self.assertEquals([model], filtered)
 
-    def test_validating_model(self):
-        """ Validated nested entity """
+    def test_validate_nested_entity_with_validators_attached_directly(self):
+        """ Validate nested entity with validators attached dierctly"""
+        prop = EntityProperty()
+        prop.add_validator(helpers.ValidatorInvalid())
+        result = prop.validate('Something')
+        self.assertTrue(type(result) is list)
+        self.assertEquals(1, len(result))
+
+    def test_validating_nested_entity_with_schema(self):
+        """ Validated nested entity with schema"""
         class Model: pass
         class Nested: pass
         nested = Nested()
@@ -180,9 +188,8 @@ class EntityPropertyTests(TestCase):
         model.nested = nested
 
         class NestedSchema(Schema): pass
-
         nested_schema = NestedSchema()
-        nested_schema.add_state_validator(helpers.StateValidatorInvalid())
+        nested_schema.add_state_validator(helpers.ValidatorInvalid())
 
         schema = Schema()
         schema.add_entity('nested')

@@ -74,6 +74,7 @@ class SimpleProperty:
         return errors
 
 
+# todo extend from SimpleProperty
 class EntityProperty:
     """
     Entity property
@@ -146,7 +147,7 @@ class EntityProperty:
         self.validators.append(validator)
         return self
 
-    def filter(self, value=None, context=None, third=None):
+    def filter(self, value=None, context=None):
         """ Perform model filtering with filters attached directly """
         if value is None:
             return
@@ -163,19 +164,30 @@ class EntityProperty:
 
         self._schema.filter(value, context)
 
+    def validate(self, value=None, context=None):
+        """
+        Validate entity property with validators attached directly
+        Sequentially apply each validator to value and collect errors.
+
+        :param value: a value to validate
+        :param context: validation context, usually parent entity
+        :return: list of errors (if any)
+        """
+        errors = []
+        for validator in self.validators:
+            error = validator.run(value, context)
+            if error:
+                errors.append(error)
+
+        return errors
+
     def validate_with_schema(self, model=None, context=None):
         """ Perform model validation with schema"""
-
-        # validate required (regression: before skipping on no schema)
-        if model is None and self.required:
-            return [Error(self.required_message)]
-
-        if self._schema is None or (model is None and not self.required):
+        if self._schema is None or model is None:
             return
 
         result = self._schema.validate(model, context)
         return result
-
 
 
 class ListCollectionProperty:

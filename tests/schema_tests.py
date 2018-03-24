@@ -8,6 +8,7 @@ from shiftschema.exceptions import PropertyExists, InvalidValidator
 from shiftschema.translator import Translator
 from tests import helpers
 
+
 @attr('schema')
 class SchemaTest(TestCase):
 
@@ -36,7 +37,7 @@ class SchemaTest(TestCase):
 
     def test_add_state_validator(self):
         """ Adding entity state validator to schema """
-        validator = helpers.StateValidator()
+        validator = helpers.ValidatorValid()
         schema = Schema()
         schema.add_state_validator(validator)
         self.assertTrue(validator in schema.state)
@@ -147,7 +148,6 @@ class SchemaTest(TestCase):
         self.assertEqual(1, len(schema.last_name.filters))
         self.assertEqual(1, len(schema.last_name.validators))
 
-
     def test_create_by_subclassing(self):
         """ Creating schema in subclass """
         class MySchema(Schema):
@@ -163,10 +163,10 @@ class SchemaTest(TestCase):
         """ Filtering entity with schema """
         schema = Schema(helpers.person_spec)
         person = helpers.Person(
-            first_name = '  Willy  ',
-            last_name = '  Wonka  ',
-            salutation = ' mr ',
-            birth_year = 'I was born in 1964'
+            first_name='  Willy  ',
+            last_name='  Wonka  ',
+            salutation=' mr ',
+            birth_year='I was born in 1964'
         )
         schema.filter(person)
         self.assertEqual('Willy', person.first_name)
@@ -178,7 +178,7 @@ class SchemaTest(TestCase):
         """ Validating entity state """
         model = helpers.Person()
         schema = Schema()
-        schema.add_state_validator(helpers.StateValidatorInvalid())
+        schema.add_state_validator(helpers.ValidatorInvalid())
         result = schema.validate(model)
         self.assertIsInstance(result, Result)
         self.assertFalse(result)
@@ -197,7 +197,7 @@ class SchemaTest(TestCase):
         self.assertTrue('last_name' in result.errors)
         self.assertTrue('salutation' in result.errors)
 
-    def test_require_simple_properties_vi_required_validator(self):
+    def test_require_simple_properties_via_required_validator(self):
         """ Validate simple properties required via validator"""
         from shiftschema.validators import Required
         schema = Schema()
@@ -220,26 +220,27 @@ class SchemaTest(TestCase):
         self.assertTrue('first_name' in result.errors['spouse'])
         self.assertTrue('last_name' in result.errors['spouse'])
 
-    def test_require_linked_entities(self):
-        """ Validate required linked entities"""
-        class Model:
-            def __init__(self):
-                self.entity=None
-
-        model = Model()
-        schema = Schema()
-        schema.add_entity('entity')
-        schema.entity.schema=Schema()
-        schema.entity.required=True
-        schema.entity.required_message='Entity required!'
-        result = schema.validate(model)
-
-        self.assertFalse(result)
-        self.assertTrue('entity' in result.errors)
-        self.assertEqual(
-            schema.entity.required_message,
-            result.errors['entity'][0].message
-        )
+    # todo: replace with required validator
+    # def test_require_linked_entities(self):
+    #     """ Validate required linked entities"""
+    #     class Model:
+    #         def __init__(self):
+    #             self.entity=None
+    #
+    #     model = Model()
+    #     schema = Schema()
+    #     schema.add_entity('entity')
+    #     schema.entity.schema=Schema()
+    #     schema.entity.required=True
+    #     schema.entity.required_message='Entity required!'
+    #     result = schema.validate(model)
+    #
+    #     self.assertFalse(result)
+    #     self.assertTrue('entity' in result.errors)
+    #     self.assertEqual(
+    #         schema.entity.required_message,
+    #         result.errors['entity'][0].message
+    #     )
 
     def test_validate_and_filter(self):
         """ Process: validation and filtering as single operation"""
@@ -270,27 +271,6 @@ class SchemaTest(TestCase):
         self.assertIsInstance(result.translator, Translator)
         self.assertTrue('/tmp' in result.translator.dirs)
 
-    def test_do_not_skip_entity_validation_if_no_nested_schema(self):
-        """
-        Do not require nested schema to validate  nested entity
-        for being required.
-        """
-        schema = Schema()
-        schema.add_property('name')
-        schema.add_entity('spouse')
-        schema.name.required=True
-        schema.spouse.required=True
-        schema.spouse.schema = Schema()
-
-
-        class Model:
-            def __init__(self):
-                self.name=None
-                self.spouse=None
-
-        p = Model()
-        res=schema.validate(p)
-        self.assertTrue('spouse' in res.errors)
 
 
 
