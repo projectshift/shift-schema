@@ -3,11 +3,14 @@ from unittest import TestCase, mock
 from nose.plugins.attrib import attr
 
 from shiftschema.schema import Schema
-from shiftschema.property import SimpleProperty, EntityProperty
-from shiftschema.exceptions import InvalidFilter, InvalidValidator
+from shiftschema.property import SimpleProperty
+from shiftschema.property import EntityProperty
+from shiftschema.property import CollectionProperty
+from shiftschema.exceptions import InvalidFilter
+from shiftschema.exceptions import InvalidValidator
 from shiftschema.exceptions import InvalidSchemaType
-from shiftschema.filters import Strip, Digits
-from shiftschema.validators import Length, Required, Digits as DigitsValidator
+from shiftschema import filters
+from shiftschema import validators
 
 from tests import helpers
 
@@ -23,7 +26,7 @@ class SimplePropertyTests(TestCase):
     def test_adding_filter(self):
         """ Add filter to property """
         prop = SimpleProperty()
-        filter = Strip()
+        filter = filters.Strip()
         prop.add_filter(filter)
         self.assertIn(filter, prop.filters)
 
@@ -36,7 +39,7 @@ class SimplePropertyTests(TestCase):
     def test_adding_validator(self):
         """ Add validator to property """
         prop = SimpleProperty()
-        validator = Length(min=10)
+        validator = validators.Length(min=10)
         prop.add_validator(validator)
         self.assertIn(validator, prop.validators)
 
@@ -50,8 +53,8 @@ class SimplePropertyTests(TestCase):
         """ Added filters and validators are not shared """
         property1 = SimpleProperty()
         property2 = SimpleProperty()
-        property1.add_filter(Strip())
-        property1.add_validator(Length())
+        property1.add_filter(filters.Strip())
+        property1.add_validator(validators.Length())
 
         self.assertTrue(len(property2.filters) == 0)
         self.assertTrue(len(property2.validators) == 0)
@@ -63,15 +66,15 @@ class SimplePropertyTests(TestCase):
     def test_filter_value(self):
         """ Filtering property value with attached filters """
         prop = SimpleProperty()
-        prop.add_filter(Strip(mode='both'))
-        prop.add_filter(Digits())
+        prop.add_filter(filters.Strip(mode='both'))
+        prop.add_filter(filters.Digits())
         value = '  Good luck in 2024 to you and your robots!'
         self.assertEqual('2024', prop.filter(value))
 
     def test_validate_value_and_pass(self):
         """ Validate simple property and pass """
         prop = SimpleProperty()
-        prop.add_validator(Length(min=3))
+        prop.add_validator(validators.Length(min=3))
         result = prop.validate('me is longer than three')
         self.assertTrue(type(result) is list)
         self.assertTrue(len(result) == 0)
@@ -79,8 +82,8 @@ class SimplePropertyTests(TestCase):
     def test_validate_property_and_fail(self):
         """ Validate simple property and fail (return errors) """
         prop = SimpleProperty()
-        prop.add_validator(Length(min=30))
-        prop.add_validator(DigitsValidator())
+        prop.add_validator(validators.Length(min=30))
+        prop.add_validator(validators.Digits())
         result = prop.validate('shorter than thirty')
         self.assertTrue(len(result) == 2)
 
@@ -110,7 +113,7 @@ class EntityPropertyTests(TestCase):
     def test_attaching_filter(self):
         """ Attaching filter to entity property"""
         prop = EntityProperty()
-        filter = Strip()
+        filter = filters.Strip()
         prop.add_filter(filter)
         self.assertIn(filter, prop.filters)
 
@@ -123,7 +126,7 @@ class EntityPropertyTests(TestCase):
     def test_attaching_validator(self):
         """ Attaching validator to entity property"""
         prop = EntityProperty()
-        validator = Required()
+        validator = validators.Required()
         prop.add_validator(validator)
         self.assertIn(validator, prop.validators)
 
@@ -164,7 +167,7 @@ class EntityPropertyTests(TestCase):
     def test_required_nested_entity_via_validator_attached_directly(self):
         """ Require nested entity via validator attached directly """
         prop = EntityProperty()
-        prop.add_validator(Required())
+        prop.add_validator(validators.Required())
         result = prop.validate(value=None)
         self.assertEquals(1, len(result))
 
@@ -212,6 +215,14 @@ class EntityPropertyTests(TestCase):
         self.assertTrue('first_name' in result.errors['nested'])
         self.assertTrue('last_name' in result.errors['nested'])
 
+
+@attr('property', 'collection', 'list')
+class CollectionPropertyTests(TestCase):
+
+    def test_create_collection_property(self):
+        """ Creating collection property """
+        prop = CollectionProperty()
+        self.assertIsInstance(prop, CollectionProperty)
 
 
 

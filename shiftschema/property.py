@@ -74,8 +74,7 @@ class SimpleProperty:
         return errors
 
 
-# todo extend from SimpleProperty
-class EntityProperty:
+class EntityProperty(SimpleProperty):
     """
     Entity property
     Used to process linked entities existing on a property. Can have
@@ -101,67 +100,12 @@ class EntityProperty:
         err = 'Nested schema must be of type "{}" got "{}"'
         raise InvalidSchemaType(err.format(Schema, schema))
 
-    def add_filter(self, filter):
-        """
-        Add filter to property
-        :param filter: object, extending from AbstractFilter
-        :return: None
-        """
-        if not isinstance(filter, AbstractFilter):
-            err = 'Filters must be of type {}'.format(AbstractFilter)
-            raise InvalidFilter(err)
-
-        if filter not in self.filters:
-            self.filters.append(filter)
-        return self
-
-    def add_validator(self, validator):
-        """
-        Add validator to property
-
-        :param validator: object, extending from AbstractValidator
-        :return: None
-        """
-        if not isinstance(validator, AbstractValidator):
-            err = 'Validator must be of type {}'.format(AbstractValidator)
-            raise InvalidValidator(err)
-
-        self.validators.append(validator)
-        return self
-
-    def filter(self, value=None, context=None):
-        """ Perform model filtering with filters attached directly """
-        if value is None:
-            return
-
-        for filter in self.filters:
-            value = filter.filter(value, context)
-
-        return value
-
     def filter_with_schema(self, value=None, context=None):
         """ Perform model filtering with schema """
         if value is None or self.schema is None:
             return
 
         self._schema.filter(value, context)
-
-    def validate(self, value=None, context=None):
-        """
-        Validate entity property with validators attached directly
-        Sequentially apply each validator to value and collect errors.
-
-        :param value: a value to validate
-        :param context: validation context, usually parent entity
-        :return: list of errors (if any)
-        """
-        errors = []
-        for validator in self.validators:
-            error = validator.run(value, context)
-            if error:
-                errors.append(error)
-
-        return errors
 
     def validate_with_schema(self, model=None, context=None):
         """ Perform model validation with schema"""
@@ -172,12 +116,11 @@ class EntityProperty:
         return result
 
 
-class ListCollectionProperty:
+class CollectionProperty:
     """
-    List collection property
-
-    Contains nested schema existing on a property of another schema. Used
-    for validation of nested models in aggregates and allows arbitrary
-    nesting of schemas.
+    Collection property
+    Allows to validate nested collection of entities that exist on a property
+    of another entity. Every filter, validator or nested schema will be
+    applied to every item in the collection.
     """
     pass
