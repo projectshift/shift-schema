@@ -21,5 +21,9 @@ translations = {
 
     # email
     '%email_invalid%': "Укажите корректный Email",
+
+    # not empty
+    '%not_iterable%': 'Не итерируемое значение',
+    '%cant_be_empty%': 'Не может быть пустым, необходим хотя бы один элемент',
 }
 

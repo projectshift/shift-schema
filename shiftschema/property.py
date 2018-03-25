@@ -2,7 +2,6 @@ from shiftschema.filters import AbstractFilter
 from shiftschema.validators import AbstractValidator
 from shiftschema.exceptions import InvalidFilter, InvalidValidator
 from shiftschema.exceptions import InvalidSchemaType
-from shiftschema.result import Result, Error
 
 
 class SimpleProperty:
@@ -116,11 +115,12 @@ class EntityProperty(SimpleProperty):
         return result
 
 
-class CollectionProperty:
+class CollectionProperty(EntityProperty):
     """
     Collection property
     Allows to validate nested collection of entities that exist on a property
-    of another entity. Every filter, validator or nested schema will be
-    applied to every item in the collection.
+    of another entity. Filters and validators will be applied to collection as
+    whole, when schema will be applied to each item in the collection.
     """
-    pass
+
+

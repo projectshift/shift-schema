@@ -5,8 +5,8 @@ from shiftschema.result import Error
 class Required(AbstractValidator):
     """
     Required validator
-    Checks that provided value is not empty. Typically operates on strings,
-    but has an option to consider False as a valid value.
+    Checks that value was provided. Can operate on strings or entities with an
+    option to allow False to be a valid value.
     """
 
     value_required = '%value_required%'

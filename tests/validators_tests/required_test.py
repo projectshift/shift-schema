@@ -9,7 +9,7 @@ class RequiredTest(TestCase):
     """ Required validator test"""
 
     def test_create(self):
-        """ Can instantiate email validator """
+        """ Can instantiate required validator """
         validator = Required(message='Custom error')
         self.assertIsInstance(validator, Required)
 

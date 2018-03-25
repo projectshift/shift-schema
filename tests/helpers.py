@@ -27,6 +27,13 @@ class EntityFilter(AbstractFilter):
         return [value]
 
 
+class CollectionFilter(AbstractFilter):
+    """ Test filter to apply to collection properties """
+    def filter(self, value, context=None):
+        filtered = filter(lambda x: x['value'] % 2 == 0, value)
+        return list(filtered)
+
+
 # simple person spec
 person_spec = {
     'state': [ValidatorValid()],
@@ -73,6 +80,13 @@ person_spec_aggregate = {
         'spouse': dict(
             validators=[Required()],
             schema=Schema(person_spec)
+        )
+    },
+    'collections': {
+        'addresses': dict(
+            filters=[],
+            validators=[],
+            schema=Schema()
         )
     }
 }

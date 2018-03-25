@@ -21,4 +21,8 @@ translations = {
 
     # email
     '%email_invalid%': "This is not a valid email",
+
+    # not empty
+    '%not_iterable%': 'This is not an iterable',
+    '%cant_be_empty%': 'Can\t be empty, at least one item required',
 }

@@ -110,32 +110,6 @@ class EntityPropertyTests(TestCase):
         with self.assertRaises(InvalidSchemaType):
             prop.schema = dict()
 
-    def test_attaching_filter(self):
-        """ Attaching filter to entity property"""
-        prop = EntityProperty()
-        filter = filters.Strip()
-        prop.add_filter(filter)
-        self.assertIn(filter, prop.filters)
-
-    def test_raise_on_attaching_invalid_filter(self):
-        """ Raise if attaching invalid filter to entity property"""
-        prop = EntityProperty()
-        with self.assertRaises(InvalidFilter):
-            prop.add_filter(mock.Mock())
-
-    def test_attaching_validator(self):
-        """ Attaching validator to entity property"""
-        prop = EntityProperty()
-        validator = validators.Required()
-        prop.add_validator(validator)
-        self.assertIn(validator, prop.validators)
-
-    def test_raise_on_attaching_invalid_validator(self):
-        """ Raise if attaching invalid validator to entity property"""
-        prop = EntityProperty()
-        with self.assertRaises(InvalidValidator):
-            prop.add_validator(mock.Mock())
-
     def test_filtering_entity_with_schema(self):
         """ Filtering nested entity with schema """
         model = helpers.Person(
@@ -157,7 +131,7 @@ class EntityPropertyTests(TestCase):
         self.assertEquals([model], filtered)
 
     def test_validate_nested_entity_with_validators_attached_directly(self):
-        """ Validate nested entity with validators attached dierctly"""
+        """ Validate nested entity with validators attached directly"""
         prop = EntityProperty()
         prop.add_validator(helpers.ValidatorInvalid())
         result = prop.validate('Something')
@@ -224,6 +198,20 @@ class CollectionPropertyTests(TestCase):
         prop = CollectionProperty()
         self.assertIsInstance(prop, CollectionProperty)
 
+    def test_filtering_a_collection(self):
+        """ Filtering a collection """
+        collection = [
+            dict(value=1),
+            dict(value=2),
+            dict(value=3),
+            dict(value=4),
+        ]
+
+        prop = CollectionProperty()
+        prop.add_filter(helpers.CollectionFilter())
+        filtered = prop.filter(collection)
+        self.assertEquals(2, filtered[0]['value'])
+        self.assertEquals(4, filtered[1]['value'])
 
 
 

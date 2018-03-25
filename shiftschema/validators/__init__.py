@@ -4,6 +4,7 @@ from shiftschema.validators.digits import Digits
 from shiftschema.validators.length import Length
 from shiftschema.validators.email import Email
 from shiftschema.validators.required import Required
+from shiftschema.validators.not_empty import NotEmpty
 
 
 
@@ -21,7 +22,6 @@ from shiftschema.validators.required import Required
 # is_image.py
 # is_instance.py
 # isbn.py
-# not_none.py
 # range.py
 # regex.py
 # url.py
