@@ -293,9 +293,53 @@ class SchemaTest(TestCase):
     #     """ Filtering collection items with schema """
     #     self.fail('Implement me')
     #
-    # def test_validate_collection_items_with_schemas(self):
-    #     """ Validating collection items with schema """
-    #     self.fail('Implement me')
+
+    @attr('zzz')
+    def test_validate_collection_items_with_schemas(self):
+        """ Validating collection items with schema """
+        # address1 = helpers.Address(
+        #     address='  2 Hollin Croft  ',
+        #     city='  Barnsley  ',
+        #     country='  UK  ',
+        #     postcode='  S75 3TF  ',
+        # )
+
+        address2 = helpers.Address(
+            address='Newspaper House, 40 Churchgate',
+            city='  Bolton  ',
+            country='  UK  ',
+        )
+
+        # address3 = helpers.Address(
+        #     address='  446 Meadow Drive  ',
+        #     city='  Billings, MT  ',
+        #     country='US',
+        #     postcode='  59101  ',
+        # )
+
+        person = helpers.Person(
+            first_name='Matthew',
+            last_name='Rankin',
+            salutation='mr',
+            email='matrankin@gmail.com',
+            birth_year='1964',
+        )
+
+        # person.addresses.append(address1)
+        person.addresses.append(address2)
+        # person.addresses.append(address3)
+
+
+        schema = Schema(helpers.person_spec_collection_aggregate)
+
+        s = Schema(helpers.address_spec)
+
+        print(s.properties)
+
+
+        # result = schema.validate(person)
+        # print('VALIDATED:', result)
+
 
 
 

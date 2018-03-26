@@ -1,5 +1,6 @@
 from abc import ABCMeta, abstractmethod
 
+
 class AbstractFilter(metaclass=ABCMeta):
     """
     Abstract filter
