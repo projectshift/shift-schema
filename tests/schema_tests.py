@@ -3,7 +3,9 @@ from nose.plugins.attrib import attr
 
 from shiftschema.schema import Schema
 from shiftschema.result import Result
-from shiftschema.property import SimpleProperty, EntityProperty
+from shiftschema.property import SimpleProperty
+from shiftschema.property import EntityProperty
+from shiftschema.property import CollectionProperty
 from shiftschema.exceptions import PropertyExists, InvalidValidator
 from shiftschema.translator import Translator
 from shiftschema import validators
@@ -22,18 +24,22 @@ class SchemaTest(TestCase):
     def test_can_check_property_existence(self):
         """ Checking property existence on schema """
         schema = Schema()
-        schema.properties['simple_property'] = 'property processor object'
-        schema.entities['entity_property'] = 'entity processor object'
+        schema.properties['simple_property'] = 'property processor'
+        schema.entities['entity_property'] = 'entity processor'
+        schema.collections['collection_property'] = 'collection processor'
         self.assertTrue(schema.has_property('simple_property'))
         self.assertTrue(schema.has_property('entity_property'))
+        self.assertTrue(schema.has_property('collection_property'))
 
     def test_access_properties_through_overloading(self):
         """ Overload access to schema properties """
         schema = Schema()
         schema.add_property('first_name')
         schema.add_entity('spouse')
+        schema.add_collection('addresses')
         self.assertIsInstance(schema.first_name, SimpleProperty)
         self.assertIsInstance(schema.spouse, EntityProperty)
+        self.assertIsInstance(schema.addresses, CollectionProperty)
         with self.assertRaises(AttributeError):
             self.assertIsInstance(schema.nothinghere, EntityProperty)
 
@@ -54,7 +60,7 @@ class SchemaTest(TestCase):
         """ Adding simple property to schema """
         schema = Schema()
         schema.add_property('simple')
-        self.assertTrue('simple' in schema.properties)
+        self.assertIn('simple', schema.properties)
 
     def test_raise_on_adding_existing_simple_property(self):
         """ Raise on adding simple property with existing name to schema"""
@@ -67,7 +73,7 @@ class SchemaTest(TestCase):
         """ Adding linked entity property to schema """
         schema = Schema()
         schema.add_entity('entity')
-        self.assertTrue('entity' in schema.entities)
+        self.assertIn('entity', schema.entities)
 
     def test_raise_on_adding_existing_entity_property(self):
         """ Raise on adding entity property with existing name to schema """
@@ -75,6 +81,19 @@ class SchemaTest(TestCase):
         schema.add_entity('entity')
         with self.assertRaises(PropertyExists):
             schema.add_entity('entity')
+
+    def test_add_collection_property(self):
+        """ Adding collection property to schema"""
+        schema = Schema()
+        schema.add_collection('collection_prop')
+        self.assertIn('collection_prop', schema.collections)
+
+    def test_raise_on_adding_existing_collection_property(self):
+        """ Raise on adding collection property with existing name to schema """
+        schema = Schema()
+        schema.add_collection('collection_prop')
+        with self.assertRaises(PropertyExists):
+            schema.add_collection('collection_prop')
 
     def test_model_getter_on_dict(self):
         """ Using model-getter for dictionary-models """
@@ -87,7 +106,6 @@ class SchemaTest(TestCase):
         model = dict(someproperty='some value')
         schema = Schema()
         self.assertIsNone(schema.get(model, 'me-is-missing'))
-
 
     def test_model_getter_method(self):
         """ Model getter calls getter on model if present """

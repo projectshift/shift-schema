@@ -1,4 +1,6 @@
-from shiftschema.property import SimpleProperty, EntityProperty
+from shiftschema.property import SimpleProperty
+from shiftschema.property import EntityProperty
+from shiftschema.property import CollectionProperty
 from shiftschema.result import Error, Result
 from shiftschema.validators import AbstractValidator
 from shiftschema.exceptions import InvalidValidator, PropertyExists
@@ -19,6 +21,7 @@ class Schema:
         self.state = []
         self.properties = {}
         self.entities = {}
+        self.collections = {}
 
         # create from spec
         if spec:
@@ -85,6 +88,26 @@ class Schema:
                 if schema:
                     prop.schema = schema
 
+        if 'collections' in spec:
+            for property_name in spec['collections']:
+                self.add_collection(property_name)
+                prop = self.collections[property_name]
+                prop_spec = spec['collections'][property_name]
+
+                prop_filters = prop_spec.get('filters')
+                if prop_filters:
+                    for filter in prop_filters:
+                        prop.add_filter(filter)
+
+                prop_validators = prop_spec.get('validators')
+                if prop_validators:
+                    for validator in prop_validators:
+                        prop.add_validator(validator)
+
+                schema = prop_spec.get('schema')
+                if schema:
+                    prop.schema = schema
+
     def has_property(self, property_name):
         """
         Check if schema has property
@@ -94,6 +117,8 @@ class Schema:
         if property_name in self.properties:
             return True
         elif property_name in self.entities:
+            return True
+        elif property_name in self.collections:
             return True
         else:
             return False
@@ -108,6 +133,8 @@ class Schema:
             return self.properties[property_name]
         elif property_name in self.entities:
             return self.entities[property_name]
+        elif property_name in self.collections:
+            return self.collections[property_name]
         else:
             return object.__getattribute__(self, property_name)
 
@@ -149,6 +176,20 @@ class Schema:
             raise PropertyExists(err.format(property_name))
         prop = EntityProperty()
         self.entities[property_name] = prop
+        return prop
+
+    def add_collection(self, property_name):
+        """
+        Add collection property to schema
+        :param property_name: str, property name
+        :return: shiftschema.property.CollectionProperty
+        """
+        if self.has_property(property_name):
+            err = 'Property "{}" already exists'
+            raise PropertyExists(err.format(property_name))
+
+        prop = CollectionProperty()
+        self.collections[property_name] = prop
         return prop
 
     def get(self, model, property_name):
