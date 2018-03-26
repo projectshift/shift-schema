@@ -281,6 +281,23 @@ class SchemaTest(TestCase):
         self.assertIsInstance(result.translator, Translator)
         self.assertTrue('/tmp' in result.translator.dirs)
 
+    # def test_can_filter_out_collections_directly(self):
+    #     """ Filter out collection properties with filters attached directly """
+    #     self.fail('Implement me')
+    #
+    # def test_can_validate_collections_directly(self):
+    #     """ Validating collection with validators attached directly """
+    #     self.fail('Implement me')
+    #
+    # def test_filter_collection_items_with_schemas(self):
+    #     """ Filtering collection items with schema """
+    #     self.fail('Implement me')
+    #
+    # def test_validate_collection_items_with_schemas(self):
+    #     """ Validating collection items with schema """
+    #     self.fail('Implement me')
+
+
 
 
 
