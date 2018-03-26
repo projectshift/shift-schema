@@ -85,7 +85,6 @@ class Schema:
                 if schema:
                     prop.schema = schema
 
-
     def has_property(self, property_name):
         """
         Check if schema has property

@@ -213,6 +213,53 @@ class CollectionPropertyTests(TestCase):
         self.assertEquals(2, filtered[0]['value'])
         self.assertEquals(4, filtered[1]['value'])
 
+    def test_validating_a_collection(self):
+        """ Validating a collection"""
+        prop = CollectionProperty()
+        prop.add_validator(validators.NotEmpty())
+        result = prop.validate([])
+        self.assertTrue(type(result) is list)
+        self.assertEquals(1, len(result))
+
+    def test_filter_collection_items_with_schema(self):
+        """ Filter collection items with schema"""
+        prop = CollectionProperty()
+        prop.schema = Schema()
+        prop.schema.add_property('name').add_filter(filters.Strip())
+
+        collection = [
+            dict(name='    Kady   '),
+            dict(name='    Jeff   '),
+        ]
+
+        prop.filter_with(collection)
+        self.assertEquals('Kady', collection[0]['name'])
+        self.assertEquals('Jeff', collection[1]['name'])
+
+    def test_validate_collection_items_with_schema(self):
+        """ Validate collection items with schema """
+        prop = CollectionProperty()
+        prop.schema = Schema()
+        prop.schema.add_property('last_name')
+        prop.schema.last_name.add_validator(validators.Required())
+
+        collection = [
+            dict(name='Kady', last_name=None),
+            dict(name='Geoff', last_name='Petersen'),
+            dict(name='Geoff', last_name=None),
+            dict(name='Aneesa', last_name='Reyna'),
+        ]
+
+        result = prop.validate_with_schema(collection)
+        self.assertTrue(type(result) is list)
+        self.assertFalse(result[0])
+        self.assertTrue(result[1])
+        self.assertFalse(result[2])
+        self.assertTrue(result[3])
+
+
+
+
 
 
 

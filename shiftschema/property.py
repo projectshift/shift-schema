@@ -2,7 +2,7 @@ from shiftschema.filters import AbstractFilter
 from shiftschema.validators import AbstractValidator
 from shiftschema.exceptions import InvalidFilter, InvalidValidator
 from shiftschema.exceptions import InvalidSchemaType
-
+from copy import deepcopy, copy
 
 class SimpleProperty:
     """
@@ -99,12 +99,12 @@ class EntityProperty(SimpleProperty):
         err = 'Nested schema must be of type "{}" got "{}"'
         raise InvalidSchemaType(err.format(Schema, schema))
 
-    def filter_with_schema(self, value=None, context=None):
+    def filter_with_schema(self, model=None, context=None):
         """ Perform model filtering with schema """
-        if value is None or self.schema is None:
+        if model is None or self.schema is None:
             return
 
-        self._schema.filter(value, context)
+        self._schema.filter(model, context)
 
     def validate_with_schema(self, model=None, context=None):
         """ Perform model validation with schema"""
@@ -122,5 +122,26 @@ class CollectionProperty(EntityProperty):
     of another entity. Filters and validators will be applied to collection as
     whole, when schema will be applied to each item in the collection.
     """
+
+    def filter_with(self, collection=None, context=None):
+        """ Perform collection items filtering with schema """
+        if collection is None or self.schema is None:
+            return
+        for item in collection:
+            self._schema.filter(item, context)
+
+    def validate_with_schema(self, collection=None, context=None):
+        """ Validate each item in collection with our schema"""
+        if self._schema is None:
+            return
+
+        result = []
+        for index, item in enumerate(collection):
+            result.append(self._schema.validate(item, context))
+
+        return result
+
+
+
 
 
