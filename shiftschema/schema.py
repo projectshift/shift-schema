@@ -285,8 +285,6 @@ class Schema:
         :return: shiftschema.result.Result
         """
 
-        print('VALIDATE SCHEMA')
-
         # inject with settings
         result = Result(translator=self.translator, locale=self.locale)
 
@@ -300,9 +298,6 @@ class Schema:
         # validate simple properties
         for property_name in self.properties:
             value = self.get(model, property_name)
-            print('VALIDATE PROP:', property_name, value)
-
-
             property_ctx = context if context else model
             errors = self.properties[property_name].validate(
                 value=value,
@@ -335,9 +330,14 @@ class Schema:
             prop = self.collections[property_name]
             value = self.get(model, property_name)
             collection_ctx = context if context else model
-            results = prop.validate_with_schema(value)
-            print(results)
 
+            collection_errors = prop.validate(value, collection_ctx)
+            if len(collection_errors):
+                result.add_errors(collection_errors, property_name)
+
+
+            # results = prop.validate_with_schema(value, collection_ctx)
+            # print('COLLECTION RESULT:', results)
 
 
         return result

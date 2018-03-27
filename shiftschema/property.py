@@ -64,9 +64,6 @@ class SimpleProperty:
         :param context: validation context, usually parent entity
         :return: list of errors (if any)
         """
-
-        print('VALIDATING:', value)
-
         errors = []
         for validator in self.validators:
             error = validator.run(value, context)
@@ -138,14 +135,10 @@ class CollectionProperty(EntityProperty):
         if self._schema is None:
             return
 
-        # print('VALIDATING COLLECTION:', collection)
-
         result = []
         for index, item in enumerate(collection):
-            r = self._schema.validate(item, context)
-            print('PROPS', self._schema, self._schema.properties)
-            print('VALIDATING ITEM:', item, r)
-            result.append(r)
+            item_result = self._schema.validate(item, context)
+            result.append(item_result)
 
         return result
 
