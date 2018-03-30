@@ -283,7 +283,6 @@ class Schema:
 
             prop.filter_with_schema(collection, collection_ctx)
 
-
     def validate(self, model=None, context=None):
         """
         Validate model and return validation result object
@@ -331,7 +330,6 @@ class Schema:
             if not schema_valid:
                 result.add_nested_errors(schema_valid.errors, property_name)
 
-        # todo: validate collection items with schemas
         # validate collection properties
         for property_name in self.collections:
             prop = self.collections[property_name]

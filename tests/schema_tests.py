@@ -350,12 +350,20 @@ class SchemaTest(TestCase):
         self.assertEquals('UK', person.addresses[0].country)
         self.assertEquals('S75 3TF', person.addresses[0].postcode)
 
-    #
+    def test_can_validate_collections_directly(self):
+        """ Validating collection with validators attached directly """
+        person = helpers.Person(
+            first_name='Matthew',
+            last_name='Rankin',
+            salutation='mr',
+            email='matrankin@gmail.com',
+            birth_year='1964',
+        )
 
-    # @attr('xxx')
-    # def test_can_validate_collections_directly(self):
-    #     """ Validating collection with validators attached directly """
-    #     self.fail('Implement me')
+        schema = Schema(helpers.person_spec_collection_aggregate)
+        result = schema.validate(person)
+        self.assertFalse(result)
+        self.assertIn('addresses', result.errors)
 
     @attr('zzz')
     def test_validate_collection_items_with_schemas(self):
