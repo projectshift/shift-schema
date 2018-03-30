@@ -252,6 +252,7 @@ class SchemaTest(TestCase):
         self.assertFalse(result)
         self.assertIn('spouse', result.get_messages())
 
+    # todo: move me down
     def test_validate_and_filter(self):
         """ Process: validation and filtering as single operation"""
         person = helpers.Person(first_name='   W   ')
@@ -265,6 +266,7 @@ class SchemaTest(TestCase):
         self.assertTrue('first_name' in result.errors) # too short
         self.assertTrue('first_name' in result.errors['spouse'])
 
+    # todo: move me down
     def test_results_injected_with_translations(self):
         """ Schema-generated results are injected with translation settings """
         schema = Schema()
@@ -281,18 +283,58 @@ class SchemaTest(TestCase):
         self.assertIsInstance(result.translator, Translator)
         self.assertTrue('/tmp' in result.translator.dirs)
 
-    # def test_can_filter_out_collections_directly(self):
-    #     """ Filter out collection properties with filters attached directly """
-    #     self.fail('Implement me')
-    #
-    # def test_can_validate_collections_directly(self):
-    #     """ Validating collection with validators attached directly """
-    #     self.fail('Implement me')
-    #
+    def test_can_filter_out_collections_directly(self):
+        """ Filter out collection properties with filters attached directly """
+        address1 = helpers.Address(
+            address='  2 Hollin Croft  ',
+            city='  Barnsley  ',
+            country='  UK  ',
+            postcode='  S75 3TF  ',
+        )
+
+        address2 = helpers.Address(
+            address='Newspaper House, 40 Churchgate',
+            city='  Bolton  ',
+            country='  UK  ',
+        )
+
+        address3 = helpers.Address(
+            address='  446 Meadow Drive  ',
+            city='  Billings, MT  ',
+            country='US',
+            postcode='  59101  ',
+        )
+
+        person = helpers.Person(
+            first_name='Matthew',
+            last_name='Rankin',
+            salutation='mr',
+            email='matrankin@gmail.com',
+            birth_year='1964',
+        )
+
+        person.addresses.append(address1)
+        person.addresses.append(address2)
+        person.addresses.append(address3)
+
+        schema = Schema(helpers.person_spec_collection_aggregate)
+        schema.filter(person)
+        self.assertEquals(2, len(person.addresses))
+        for address in person.addresses:
+            if address.country == 'US':
+                self.fail('US address was not filtered out')
+
+
+    # @attr('xxx')
     # def test_filter_collection_items_with_schemas(self):
     #     """ Filtering collection items with schema """
     #     self.fail('Implement me')
     #
+
+    #
+    # def test_can_validate_collections_directly(self):
+    #     """ Validating collection with validators attached directly """
+    #     self.fail('Implement me')
 
     @attr('zzz')
     def test_validate_collection_items_with_schemas(self):

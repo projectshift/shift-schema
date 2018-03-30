@@ -272,10 +272,15 @@ class Schema:
 
             prop.filter_with_schema(value, entity_ctx)
 
-        # todo: filter collection items with schemas
         # collections
-        for property_name in self.entities:
-            pass
+        for property_name in self.collections:
+            prop = self.collections[property_name]
+            value = self.get(model, property_name)
+            collection_ctx = context if context else model
+
+            filtered_value = prop.filter(value, collection_ctx)
+            self.set(model, property_name, filtered_value)
+
 
     def validate(self, model=None, context=None):
         """

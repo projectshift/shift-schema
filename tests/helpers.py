@@ -37,7 +37,7 @@ class CollectionFilter(filters.AbstractFilter):
 class DropUSAddressesCollectionFilter(filters.AbstractFilter):
     """ Goes through a collection of addresses and drops US ones """
     def filter(self, value, context=None):
-        return [a for a in value if a['country'].strip() != 'US']
+        return [a for a in value if a.country.strip() != 'US']
 
 
 # simple person spec
