@@ -324,14 +324,35 @@ class SchemaTest(TestCase):
             if address.country == 'US':
                 self.fail('US address was not filtered out')
 
+    def test_filter_collection_items_with_schemas(self):
+        """ Filtering collection items with schema """
+        address1 = helpers.Address(
+            address='  2 Hollin Croft  ',
+            city='  Barnsley  ',
+            country='  UK  ',
+            postcode='  S75 3TF  ',
+        )
+
+        person = helpers.Person(
+            first_name='Matthew',
+            last_name='Rankin',
+            salutation='mr',
+            email='matrankin@gmail.com',
+            birth_year='1964',
+        )
+
+        person.addresses.append(address1)
+
+        schema = Schema(helpers.person_spec_collection_aggregate)
+        schema.filter(person)
+        self.assertEquals('2 Hollin Croft', person.addresses[0].address)
+        self.assertEquals('Barnsley', person.addresses[0].city)
+        self.assertEquals('UK', person.addresses[0].country)
+        self.assertEquals('S75 3TF', person.addresses[0].postcode)
+
+    #
 
     # @attr('xxx')
-    # def test_filter_collection_items_with_schemas(self):
-    #     """ Filtering collection items with schema """
-    #     self.fail('Implement me')
-    #
-
-    #
     # def test_can_validate_collections_directly(self):
     #     """ Validating collection with validators attached directly """
     #     self.fail('Implement me')

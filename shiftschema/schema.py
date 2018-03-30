@@ -275,11 +275,13 @@ class Schema:
         # collections
         for property_name in self.collections:
             prop = self.collections[property_name]
-            value = self.get(model, property_name)
+            collection = self.get(model, property_name)
             collection_ctx = context if context else model
 
-            filtered_value = prop.filter(value, collection_ctx)
+            filtered_value = prop.filter(collection, collection_ctx)
             self.set(model, property_name, filtered_value)
+
+            prop.filter_with_schema(collection, collection_ctx)
 
 
     def validate(self, model=None, context=None):

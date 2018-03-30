@@ -123,7 +123,7 @@ class CollectionProperty(EntityProperty):
     whole, when schema will be applied to each item in the collection.
     """
 
-    def filter_with(self, collection=None, context=None):
+    def filter_with_schema(self, collection=None, context=None):
         """ Perform collection items filtering with schema """
         if collection is None or self.schema is None:
             return

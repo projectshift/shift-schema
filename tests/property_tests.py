@@ -232,7 +232,7 @@ class CollectionPropertyTests(TestCase):
             dict(name='    Jeff   '),
         ]
 
-        prop.filter_with(collection)
+        prop.filter_with_schema(collection)
         self.assertEquals('Kady', collection[0]['name'])
         self.assertEquals('Jeff', collection[1]['name'])
 
