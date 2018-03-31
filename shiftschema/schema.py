@@ -328,17 +328,30 @@ class Schema:
 
             schema_valid = prop.validate_with_schema(value, entity_ctx)
             if not schema_valid:
-                result.add_nested_errors(schema_valid.errors, property_name)
+                result.add_entity_errors(schema_valid.errors, property_name)
 
         # validate collection properties
         for property_name in self.collections:
             prop = self.collections[property_name]
-            value = self.get(model, property_name)
+            collection = self.get(model, property_name)
             collection_ctx = context if context else model
 
-            collection_errors = prop.validate(value, collection_ctx)
-            if len(collection_errors):
-                result.add_errors(collection_errors, property_name)
+            errors = prop.validate(collection, collection_ctx)
+            if len(errors):
+                result.add_errors(errors, property_name)
+
+            collection_errors = prop.validate_with_schema(
+                collection,
+                collection_ctx
+            )
+
+
+
+
+            print(collection_errors)
+
+            # if len(collection_errors):
+            #     result.add_errors(collection_errors, property_name)
 
 
             # results = prop.validate_with_schema(value, collection_ctx)

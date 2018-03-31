@@ -4,6 +4,7 @@ from nose.plugins.attrib import attr
 from shiftschema.result import Error, Result
 from shiftschema.exceptions import InvalidErrorType, InvalidResultType
 
+
 @attr('result', 'error')
 class ErrorTest(TestCase):
 
@@ -25,6 +26,7 @@ class ErrorTest(TestCase):
         self.assertFalse(err)
         self.assertFalse(err == True)
         self.assertFalse(err != False)
+
 
 @attr('result', 'result')
 class ResultTest(TestCase):
@@ -85,7 +87,7 @@ class ResultTest(TestCase):
         nested.add_errors(Error('message'))
         nested.add_errors(Error('message'), 'property')
         result = Result()
-        result.add_nested_errors(nested, 'entity')
+        result.add_entity_errors(nested, 'entity')
         self.assertTrue('entity' in result.errors)
         self.assertEqual(1, len(result.errors['entity']['__state__']))
         self.assertEqual(1, len(result.errors['entity']['property']))
@@ -182,7 +184,7 @@ class ResultTest(TestCase):
         result2.add_errors(p22, 'property2')
         result2.add_errors(p3, 'property3')
         result2.add_errors(s2)
-        result1.add_nested_errors(result2, 'result2')
+        result1.add_entity_errors(result2, 'result2')
 
         def translator(input):
             return 'ZZZ' + input

@@ -368,6 +368,8 @@ class SchemaTest(TestCase):
     @attr('zzz')
     def test_validate_collection_items_with_schemas(self):
         """ Validating collection items with schema """
+
+        # valid
         address1 = helpers.Address(
             address='  2 Hollin Croft  ',
             city='  Barnsley  ',
@@ -375,17 +377,26 @@ class SchemaTest(TestCase):
             postcode='  S75 3TF  ',
         )
 
+        # postcode required
         address2 = helpers.Address(
             address='Newspaper House, 40 Churchgate',
             city='  Bolton  ',
             country='  UK  ',
         )
 
+        # filtered out
         address3 = helpers.Address(
             address='  446 Meadow Drive  ',
             city='  Billings, MT  ',
             country='US',
             postcode='  59101  ',
+        )
+
+        # address required
+        address4 = helpers.Address(
+            city='  Barnsley  ',
+            country='  UK  ',
+            postcode='  S75 3TF  ',
         )
 
         person = helpers.Person(
@@ -396,9 +407,10 @@ class SchemaTest(TestCase):
             birth_year='1964',
         )
 
-        # person.addresses.append(address1)
-        # person.addresses.append(address2)
-        # person.addresses.append(address3)
+        person.addresses.append(address1)
+        person.addresses.append(address2)
+        person.addresses.append(address3)
+        person.addresses.append(address4)
 
 
         schema = Schema(helpers.person_spec_collection_aggregate)

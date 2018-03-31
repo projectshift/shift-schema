@@ -2,6 +2,7 @@ from pprint import pformat
 from copy import deepcopy
 from shiftschema.exceptions import InvalidErrorType, InvalidResultType
 
+
 class Error:
     """
     Error
@@ -35,6 +36,7 @@ class Error:
         r = '<{} object message="{}">'
         return r.format(self.__class__.__qualname__, self.message)
 
+
 class Result:
     """
     Result
@@ -49,6 +51,7 @@ class Result:
         self.locale=locale
 
     def __bool__(self):
+        # todo: check for collection errors to evaluate
         return not self.errors
 
     def __eq__(self, other):
@@ -80,8 +83,8 @@ class Result:
             else:
                 self.errors['__state__'] = errors
 
-    def add_nested_errors(self, errors, property_name):
-        """ Attach aggregate of errors to a property"""
+    def add_entity_errors(self, errors, property_name):
+        """ Attach nested entity errors """
         if isinstance(errors, Result):
             errors = errors.errors
         self.errors[property_name] = errors
