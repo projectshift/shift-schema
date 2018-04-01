@@ -63,8 +63,39 @@ class Result:
     def __repr__(self):
         return pformat(self.errors)
 
-    def add_errors(self, property_name=None, errors=[]):
-        """ Add one or several errors """
+    def add_state_errors(self, errors):
+        """
+        Add state errors
+        Accepts a list of errors (or a single Error) coming from validators
+        applied to entity as whole that are used for entity state validation
+        The errors will exist on a  __state__ property of the errors object.
+
+        :param errors: list or Error, list of entity state validation errors
+        :return: shiftschema.result.Result
+        """
+        if not self.errors:
+            self.errors = dict()
+        if '__state__' not in self.errors:
+            self.errors['__state__'] = []
+
+        if type(errors) is not list:
+            errors = [errors]
+        for error in errors:
+            if not isinstance(error, Error):
+                err = 'Error must be of type {}'
+                raise InvalidErrorType(err.format(Error))
+
+            self.errors['__state__'].append(error)
+
+        return self
+
+    def add_errors(self, property_name, errors=[]):
+        """
+        Add one or several errors to properties.
+        :param property_name: str, property name
+        :param errors: list or Error, error object(s)
+        :return: shiftschema.result.Result
+        """
         if not errors:
             return
 
@@ -75,16 +106,12 @@ class Result:
                 err = 'Error must be of type {}'
                 raise InvalidErrorType(err.format(Error))
 
-        if property_name:
-            if property_name in self.errors:
-                self.errors[property_name].extend(errors)
-            else:
-                self.errors[property_name] = errors
+        if property_name in self.errors:
+            self.errors[property_name].extend(errors)
         else:
-            if '__state__' in self.errors:
-                self.errors['__state__'].extend(errors)
-            else:
-                self.errors['__state__'] = errors
+            self.errors[property_name] = errors
+
+        return self
 
     def add_entity_errors(self, errors, property_name):
         """

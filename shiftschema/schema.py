@@ -299,7 +299,7 @@ class Schema:
             state_ctx = context  # none or parent model (for nested schemas)
             error = state_validator.run(model, state_ctx)
             if error:
-                result.add_errors(property_name=None, errors=error)
+                result.add_state_errors(error)
 
         # validate simple properties
         for property_name in self.properties:

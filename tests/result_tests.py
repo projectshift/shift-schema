@@ -56,9 +56,9 @@ class ResultTest(TestCase):
         """ Errors are type-checked before adding to result """
         result = Result()
         with self.assertRaises(InvalidErrorType):
-            result.add_errors(errors='Err')
+            result.add_errors(errors='Err', property_name='prop')
         with self.assertRaises(InvalidErrorType):
-            result.add_errors(errors=['Err', 'Err'])
+            result.add_errors(errors=['Err', 'Err'], property_name='prop')
 
     def test_add_single_error(self):
         """ Adding single error to Result """
@@ -73,17 +73,33 @@ class ResultTest(TestCase):
         result.add_errors('property', errors)
         self.assertEqual(2, len(result.errors['property']))
 
-    def test_add_state_errors(self):
+    def test_raise_on_adding_bad_state_errors(self):
+        """ Raise on adding bad state errors """
+        result = Result()
+        with self.assertRaises(InvalidErrorType):
+            result.add_state_errors('Err')
+        with self.assertRaises(InvalidErrorType):
+            result.add_state_errors(['Err', 'Err'])
+
+    def test_add_single_state_error(self):
         """ Adding state errors to result """
+        error = Error('error1')
+        result = Result()
+        result.add_state_errors(error)
+        self.assertEqual(1, len(result.errors['__state__']))
+        self.assertIn(error, result.errors['__state__'])
+
+    def test_add_multiple_state_errors(self):
+        """ Adding multiple state errors to result """
         errors = [Error('error1'), Error('error2')]
         result = Result()
-        result.add_errors(errors=errors)
+        result.add_state_errors(errors)
         self.assertEqual(2, len(result.errors['__state__']))
 
     def test_add_nested_entity_results(self):
         """ Adding nested entity schema result on property """
         nested = Result()
-        nested.add_errors(errors=Error('message'))
+        nested.add_state_errors(Error('message'))
         nested.add_errors(errors=Error('message'), property_name='property')
         result = Result()
         result.add_entity_errors(nested, 'entity')
@@ -112,8 +128,8 @@ class ResultTest(TestCase):
         result3 = Result({'error': 'value'}) # state
         errors5 = [Error('state1'), Error('state2')]
         errors6 = [Error('state3'), Error('stat3')]
-        result3.add_errors(None, errors5)
-        result3.add_errors(None, errors6)
+        result3.add_state_errors(errors5)
+        result3.add_state_errors(errors6)
         for e in errors5 + errors6:
             self.assertTrue(e in result3.errors['__state__'])
 
@@ -137,12 +153,12 @@ class ResultTest(TestCase):
         result1 = Result()
         result1.add_errors('property1', p1)
         result1.add_errors('property2', p2)
-        result1.add_errors(None, s1)
+        result1.add_state_errors(s1)
 
         result2 = Result()
         result2.add_errors('property2', p22)
         result2.add_errors('property3', p3)
-        result2.add_errors(None, s2)
+        result2.add_state_errors(s2)
 
         result1.merge(result2)
 
@@ -176,18 +192,18 @@ class ResultTest(TestCase):
         result1 = Result()
         result1.add_errors('property1', p1)
         result1.add_errors('property2', p2)
-        result1.add_errors(None, s1)
+        result1.add_state_errors(s1)
 
         result2 = Result()
         result2.add_errors('property2', p22)
         result2.add_errors('property3', p3)
-        result2.add_errors(None, s2)
+        result2.add_state_errors(s2)
         result1.add_entity_errors(result2, 'result2')
 
         def translator(input):
             return 'ZZZ' + input
 
-        translated = result1._translate_errors(result1.errors, translator)
+        result1._translate_errors(result1.errors, translator)
 
         # assert root translated
         self.assertEqual('ZZZprop1_error1', result1.errors['property1'][0])
