@@ -226,7 +226,6 @@ class SchemaTest(TestCase):
         result = schema.validate(dict())
         self.assertFalse(result)
 
-    @attr('fff')
     def test_validate_entity_property(self):
         """ Validated linked entity properties with nested schemas """
         model = helpers.Person()
@@ -237,13 +236,9 @@ class SchemaTest(TestCase):
         schema.spouse.schema = Schema(helpers.person_spec)
         result = schema.validate(model)
 
-        print()
-        print(result)
-        return
-
         self.assertFalse(result)
-        self.assertTrue('first_name' in result.errors['spouse'])
-        self.assertTrue('last_name' in result.errors['spouse'])
+        self.assertTrue('first_name' in result.errors['spouse']['schema'])
+        self.assertTrue('last_name' in result.errors['spouse']['schema'])
 
     @attr('fixme')
     def test_entity_props_can_have_both_direct_and_schema_errors(self):
@@ -287,7 +282,7 @@ class SchemaTest(TestCase):
         self.assertEqual('X', person.spouse.first_name)
 
         self.assertTrue('first_name' in result.errors) # too short
-        self.assertTrue('first_name' in result.errors['spouse'])
+        self.assertTrue('first_name' in result.errors['spouse']['schema'])
 
     # todo: move me down
     def test_results_injected_with_translations(self):

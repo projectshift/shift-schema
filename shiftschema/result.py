@@ -143,6 +143,7 @@ class Result:
             for error in direct_errors:
                 if not isinstance(error, Error):
                     err = 'Error must be of type {}'
+                    print('GOT', error)
                     raise x.InvalidErrorType(err.format(Error))
                 self.errors[property_name]['direct'].append(error)
 
@@ -158,28 +159,29 @@ class Result:
 
         return self
 
-
-
-
-
-
-
+    # todo: implement me
     def add_collection_errors(self):
         pass
 
-    def merge2(self, another):
-        if isinstance(another, Result):
-            another = another.errors
+    def merge_errors(self, errors_local, errors_remote):
+        """
+        Merge errors
+        Recursively traverses error graph to merge remote errors into local
+        errors to return a new joined graph.
 
-        for prop in another:
+        :param errors_local: dict, local errors, will be updated
+        :param errors_remote: dict, remote errors, provides updates
+        :return: dict
+        """
+        for prop in errors_remote:
 
             # create if doesn't exist
-            if prop not in self.errors:
-                self.errors[prop] = another[prop]
+            if prop not in errors_local:
+                errors_local[prop] = errors_remote[prop]
                 continue
 
-            local = self.errors[prop]
-            remote = another[prop]
+            local = errors_local[prop]
+            remote = errors_remote[prop]
 
             # check compatibility
             if not isinstance(local, type(remote)):
@@ -187,44 +189,49 @@ class Result:
                 msg += 'Unable to merge [{}] into [{}]'
                 raise x.UnableToMergeResultsType(msg.format(
                     prop,
-                    type(another[prop]),
+                    type(errors_remote[prop]),
                     type(self.errors[prop])
                 ))
 
-            for what in ['schema', 'collection']:
-                if what in local and what not in remote:
-                    msg = 'Unable to merge nested entity errors with nested '
-                    msg += 'collection errors on property [{}]'
-                    raise x.UnableToMergeResultsType(msg.format(prop))
+            mismatch = 'Unable to merge nested entity errors with nested '
+            mismatch += 'collection errors on property [{}]'
+            if 'schema' in local and 'collection' in remote:
+                raise x.UnableToMergeResultsType(mismatch.format(prop))
+            if 'collection' in local and 'schema' in remote:
+                raise x.UnableToMergeResultsType(mismatch.format(prop))
 
-            # merge simple
+            # merge simple & state
             if type(remote) is list:
-                self.errors[prop].extend(remote)
+                errors_local[prop].extend(remote)
+                continue
 
+            # merge direct errors on nested entities and collection
+            if 'direct' in remote and 'direct' not in local:
+                errors_local[prop]['direct'] = remote['direct']
+            if 'direct' in remote and 'direct' in local:
+                errors_local[prop]['direct'].extend(remote['direct'])
 
+            # merge nested schema errors
+            if 'schema' in remote and not 'schema' in local:
+                errors_local[prop]['schema'] = remote['schema']
+            if 'schema' in remote and 'schema' in local:
+                errors_local[prop]['schema'] = self.merge_errors(
+                    errors_local[prop]['schema'],
+                    remote['schema']
+                )
 
+            # todo: merge nested collection
+            # merge nested collections errors
 
-        print()
-        print('MERGING:')
-        print(self)
+        # and return
+        return errors_local
 
-
-
-
-    # todo: refactor to support entity and collection errors
     def merge(self, another):
-        """ Merge another result into itself """
-        if not isinstance(another, Result):
-            err = 'Unable to merge: must be "{}", got "{}"'
-            raise x.InvalidResultType(err.format(Result, another))
+        """ Merges another validation result graph into itself"""
+        if isinstance(another, Result):
+            another = another.errors
+        self.errors = self.merge_errors(self.errors, another)
 
-        errors = another.errors
-        for property_name in errors:
-            if property_name in self.errors:
-                self.errors[property_name].extend(errors[property_name])
-            else:
-                self.errors[property_name] = errors[property_name]
-                
     def get_messages(self, locale=None):
         """ Get a dictionary of translated messages """
         if locale is None:
