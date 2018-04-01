@@ -63,8 +63,11 @@ class Result:
     def __repr__(self):
         return pformat(self.errors)
 
-    def add_errors(self, errors, property_name=None):
+    def add_errors(self, property_name=None, errors=[]):
         """ Add one or several errors """
+        if not errors:
+            return
+
         if type(errors) is not list:
             errors = [errors]
         for error in errors:
@@ -84,10 +87,45 @@ class Result:
                 self.errors['__state__'] = errors
 
     def add_entity_errors(self, errors, property_name):
-        """ Attach nested entity errors """
+        """
+        Attach nested entity errors
+        Accepts a list direct errors coming from validators attached directly,
+        or a dict of errors produced by a nested schema.
+
+        :param direct_errors: list, errors from validators attached directly
+        :param schema_errors: dict, errors from nested schema
+        :param property_name: str, property name
+        :return:
+        """
         if isinstance(errors, Result):
             errors = errors.errors
+
+        # TODO: BOTH DIRECT AND SCHEMA ERRORS - HOW?
+        # TODO: DIRECT = LIST
+        # TODO: SCHEMA = DICT
+        # TODO: MUST BE THE SAME WHETHER SCHEMA EXISTS OR NOT
+        # TODO: OPTION 1: DICT
+        # TODO: OPTION 2: TUPLE
+        # TODO: OPTION 3: LIST
+
+        """
+        What are the consequences of having entity errors as a mixed list?
+        Shall we instead distinguish direct vs schema errors just as we do
+        with state validators?
+        
+        
+        Nested errors are not suitable for usage with forms. We can nest
+        however we want here.
+        
+        This should be the same logic we use for collection properties 
+        validation.
+        """
+
+        # todo do not replace direct errors
         self.errors[property_name] = errors
+
+    def add_collection_errors(self):
+        pass
 
     def merge(self, another):
         """ Merge another result into itself"""

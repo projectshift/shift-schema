@@ -226,6 +226,7 @@ class SchemaTest(TestCase):
         result = schema.validate(dict())
         self.assertFalse(result)
 
+    @attr('fff')
     def test_validate_entity_property(self):
         """ Validated linked entity properties with nested schemas """
         model = helpers.Person()
@@ -236,9 +237,31 @@ class SchemaTest(TestCase):
         schema.spouse.schema = Schema(helpers.person_spec)
         result = schema.validate(model)
 
+        print()
+        print(result)
+        return
+
         self.assertFalse(result)
         self.assertTrue('first_name' in result.errors['spouse'])
         self.assertTrue('last_name' in result.errors['spouse'])
+
+    @attr('fixme')
+    def test_entity_props_can_have_both_direct_and_schema_errors(self):
+        """REGRESSION: Both direct and schema errors at the same time """
+        person = helpers.Person()
+        person.spouse = helpers.Person()
+
+        schema = Schema(helpers.person_spec)
+        schema.add_entity('spouse')
+        schema.spouse.add_validator(helpers.ValidatorInvalid())
+        schema.spouse.schema = Schema(helpers.person_spec)
+
+
+        result = schema.validate(person)
+        print(result)
+
+
+
 
     def test_require_linked_entities_with_validator_attached_directly(self):
         """ Require linked entities with validator attached directly """

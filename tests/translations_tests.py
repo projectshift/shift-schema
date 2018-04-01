@@ -5,6 +5,7 @@ from shiftschema.translator import Translator
 from shiftschema.result import Result,Error
 from shiftschema import validators as validator
 
+
 @attr('translations', 'messages')
 class MessageTranslationsTests(TestCase):
 
@@ -21,13 +22,12 @@ class MessageTranslationsTests(TestCase):
         result = Result(translator=Translator(), locale=self.locale)
         return result
 
-
     def test_translatable_digits(self):
         """ Digits validator is translatable """
         result = self.result()
         errors = [Error(validator.Digits.not_digital)]
 
-        result.add_errors(errors, 'property')
+        result.add_errors('property', errors)
         msgs = result.get_messages()
 
         exp = ['Must only consist of digits.']
@@ -38,7 +38,7 @@ class MessageTranslationsTests(TestCase):
         result = self.result()
         errors = [Error(validator.Choice.invalid_choice)]
 
-        result.add_errors(errors, 'property')
+        result.add_errors('property', errors)
         msgs = result.get_messages(locale='en')
 
         exp = ['Provided value is not a valid choice']
@@ -54,7 +54,7 @@ class MessageTranslationsTests(TestCase):
             Error(validator.Length.not_in_range, params),
         ]
 
-        result.add_errors(errors, 'property')
+        result.add_errors('property', errors)
         msgs = result.get_messages(locale='en')
 
         exp = [
@@ -72,10 +72,8 @@ class MessageTranslationsTests(TestCase):
             Error(validator.Email.not_email, params),
         ]
 
-        result.add_errors(errors, 'property')
+        result.add_errors('property', errors)
         msgs = result.get_messages(locale='en')
 
-        exp = [
-            'This is not a valid email',
-        ]
+        exp = ['This is not a valid email']
         self.validate_messages(exp, msgs['property'])

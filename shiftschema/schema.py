@@ -311,7 +311,7 @@ class Schema:
             )
 
             if errors:
-                result.add_errors(errors, property_name)
+                result.add_errors(errors=errors, property_name=property_name)
 
         # validate nested entity properties
         for property_name in self.entities:
@@ -321,13 +321,14 @@ class Schema:
 
             errors = prop.validate(value, entity_ctx)
             if len(errors):
-                result.add_errors(errors, property_name)
+                result.add_errors(errors=errors, property_name=property_name)
 
             if value is None:
                 continue
 
+            # todo: do direct errors overwrite schema errors in the result?
             schema_valid = prop.validate_with_schema(value, entity_ctx)
-            if not schema_valid:
+            if schema_valid == False:
                 result.add_entity_errors(schema_valid.errors, property_name)
 
         # validate collection properties
@@ -338,7 +339,7 @@ class Schema:
 
             errors = prop.validate(collection, collection_ctx)
             if len(errors):
-                result.add_errors(errors, property_name)
+                result.add_errors(errors=errors, property_name=property_name)
 
             collection_errors = prop.validate_with_schema(
                 collection,
@@ -348,7 +349,7 @@ class Schema:
 
 
 
-            print(collection_errors)
+            # print(collection_errors)
 
             # if len(collection_errors):
             #     result.add_errors(collection_errors, property_name)
