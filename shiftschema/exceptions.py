@@ -58,6 +58,15 @@ class InvalidSchemaType(ShiftValidateException, TypeError):
     pass
 
 
+class UnableToMergeResultsType(ShiftValidateException, TypeError):
+    """
+    Unable to merge results
+    Raised when merging to validation result objects into each other, when
+    both have the same property but property types do not match, e.g. trying to
+    merge simple errors onto nested schema errors
+    """
+    pass
+
 class InvalidOption(ShiftValidateException, ValueError):
     """
     Invalid exists

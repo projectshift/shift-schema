@@ -321,7 +321,7 @@ class Schema:
 
             errors = prop.validate(value, entity_ctx)
             if len(errors):
-                result.add_errors(errors=errors, property_name=property_name)
+                result.add_errors(property_name=property_name, errors=errors)
 
             if value is None:
                 continue
@@ -329,7 +329,7 @@ class Schema:
             # todo: do direct errors overwrite schema errors in the result?
             schema_valid = prop.validate_with_schema(value, entity_ctx)
             if schema_valid == False:
-                result.add_entity_errors(schema_valid.errors, property_name)
+                result.add_entity_errors(property_name, schema_valid.errors)
 
         # validate collection properties
         for property_name in self.collections:
@@ -339,7 +339,7 @@ class Schema:
 
             errors = prop.validate(collection, collection_ctx)
             if len(errors):
-                result.add_errors(errors=errors, property_name=property_name)
+                result.add_errors(property_name=property_name, errors=errors)
 
             collection_errors = prop.validate_with_schema(
                 collection,

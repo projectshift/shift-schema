@@ -3,6 +3,7 @@ from nose.plugins.attrib import attr
 
 from shiftschema.result import Error, Result
 from shiftschema.exceptions import InvalidErrorType, InvalidResultType
+from pprint import pprint as pp
 
 
 @attr('result', 'error')
@@ -96,17 +97,50 @@ class ResultTest(TestCase):
         result.add_state_errors(errors)
         self.assertEqual(2, len(result.errors['__state__']))
 
-    def test_add_nested_entity_results(self):
-        """ Adding nested entity schema result on property """
-        nested = Result()
-        nested.add_state_errors(Error('message'))
-        nested.add_errors(errors=Error('message'), property_name='property')
-        result = Result()
-        result.add_entity_errors(nested, 'entity')
-        self.assertTrue('entity' in result.errors)
-        self.assertEqual(1, len(result.errors['entity']['__state__']))
-        self.assertEqual(1, len(result.errors['entity']['property']))
 
+    # @attr('nested')
+    # def test_add_nested_entity_schema_results(self):
+    #     """ Adding nested entity schema result on property """
+    #     nested = Result()
+    #     nested.add_state_errors(Error('message'))
+    #     nested.add_errors(errors=Error('message'), property_name='property')
+    #     result = Result()
+    #     result.add_entity_errors('entity', nested)
+    #     self.assertTrue('entity' in result.errors)
+    #     self.assertEqual(1, len(result.errors['entity']['__state__']))
+    #     self.assertEqual(1, len(result.errors['entity']['property']))
+
+    def test_add_single_direct_error_to_nested_entity_result(self):
+        """ Adding single direct error to nested entity result """
+        error = Error('Direct entity error')
+        result = Result()
+        result.add_entity_errors('entity', error)
+        self.assertIn('entity', result.errors)
+        self.assertIn(error, result.errors['entity']['__direct__'])
+
+
+    def test_add_multiple_direct_errors_to_nested_entity(self):
+        """ Adding multiple direct errors to nested entity result"""
+        error1 = Error('Direct entity error 1')
+        error2 = Error('Direct entity error 2')
+        result = Result()
+        result.add_entity_errors('entity', [error1, error2])
+        self.assertIn('entity', result.errors)
+        self.assertIn(error1, result.errors['entity']['direct'])
+        self.assertIn(error2, result.errors['entity']['direct'])
+
+    def test_raise_on_adding_bad_direct_errors_to_nested_entity_result(self):
+        """ Typecheck direct entity errors """
+        result = Result()
+        with self.assertRaises(InvalidErrorType):
+            result.add_entity_errors('entity', 'Bad')
+        with self.assertRaises(InvalidErrorType):
+            result.add_entity_errors('entity', ['Bad'])
+
+
+
+
+    # todo: test separately for simple, state, entity and collection
     def test_append_error_to_property(self):
         """ Appending errors to property"""
         result1 = Result({'error': 'value'}) # simple
@@ -139,6 +173,7 @@ class ResultTest(TestCase):
         with self.assertRaises(InvalidResultType):
             result.merge(dict())
 
+    @attr('merge')
     def test_merge_results(self):
         """ Merging one result into another """
 
@@ -178,6 +213,115 @@ class ResultTest(TestCase):
         self.assertTrue(Error('state_error3') in result1.errors['__state__'])
         self.assertTrue(Error('state_error4') in result1.errors['__state__'])
 
+    @attr('merge2')
+    def test_merging_nested_results(self):
+        """ Merging nested results"""
+
+        """
+        Result 1
+        """
+
+        result1 = Result()
+
+        # simple
+        result1.add_errors('simple1', [
+            Error('Res1 Simple prop1 err 1'),
+            Error('Res1 Simple prop1 err 2'),
+        ])
+
+        # state
+        result1.add_state_errors([
+            Error('Res1 State 2'),
+            Error('Res1 State 1')
+        ])
+        #
+        # # entity direct
+        # result1.add_entity_errors('nested_entity1', direct_errors=[
+        #     Error('Res1 Entity prop1 direct err 1'),
+        #     Error('Res1 Entity prop1 direct err 2'),
+        # ])
+        #
+        # # entity nested schemas
+        # nested1_1 = Result()
+        # nested1_1.add_entity_errors('nested_simple_1', [
+        #     Error('Res1 Nested1 Simple1'),
+        #     Error('Res1 Nested1 Simple2'),
+        # ])
+        #
+        # nested1_2 = Result()
+        # nested1_2.add_entity_errors('nested_simple_2', [
+        #     Error('Res1 Nested1 Simple1'),
+        #     Error('Res1 Nested1 Simple2'),
+        # ])
+        #
+        # nested1_1.add_entity_errors('deeper', schema_errors=nested1_2)
+        # result1.add_entity_errors('nested_entity1', schema_errors=nested1_1)
+
+        """
+        Result 2
+        """
+
+        result2 = Result()
+
+        # simple
+        result2.add_errors('simple1', [
+            Error('Res2 Simple prop1 err 3'),
+            Error('Res2 Simple prop1 err 4'),
+        ])
+
+        result2.add_errors('simple2', [
+            Error('Res2 Simple prop2 err 1'),
+            Error('Res2 Simple prop2 err 2'),
+        ])
+
+        # state
+        result2.add_state_errors([
+            Error('Res2 State 1'),
+            Error('Res2 State 2')
+        ])
+        #
+        # # entity direct
+        # result2.add_entity_errors('nested_entity1', direct_errors=[
+        #     Error('Res2 Entity prop1 direct err 3'),
+        #     Error('Res2 Entity prop1 direct err 4'),
+        # ])
+        #
+        # result2.add_entity_errors('nested_entity2', direct_errors=[
+        #     Error('Res2 Entity prop2 direct err 1'),
+        #     Error('Res2 Entity prop2 direct err 2'),
+        # ])
+        #
+        # # entity nested schemas
+        # nested2_1 = Result()
+        # nested2_1.add_entity_errors('nested_simple_1', [
+        #     Error('Res1 Nested1 Simple1'),
+        #     Error('Res1 Nested1 Simple2'),
+        # ])
+        #
+        # nested2_2 = Result()
+        # nested2_2.add_entity_errors('nested_simple_2', [
+        #     Error('Res1 Nested1 Simple1'),
+        #     Error('Res1 Nested1 Simple2'),
+        # ])
+        #
+        # nested2_1.add_entity_errors('deeper2', schema_errors=nested2_2)
+        # result2.add_entity_errors('nested_entity1', schema_errors=nested2_1)
+
+        # now merge
+        result1.merge2(result2)
+
+        # assert simple merged
+        self.assertEqual(4, len(result1.errors['simple1']))
+        self.assertEqual(2, len(result1.errors['simple2']))
+
+        # assert state merged
+        self.assertEquals(4, len(result1.errors['__state__']))
+
+
+
+
+
+
     def test_translate_messages(self):
         """ Translating nested result with arbitrary translator"""
 
@@ -198,7 +342,7 @@ class ResultTest(TestCase):
         result2.add_errors('property2', p22)
         result2.add_errors('property3', p3)
         result2.add_state_errors(s2)
-        result1.add_entity_errors(result2, 'result2')
+        result1.add_entity_errors('result2', result2)
 
         def translator(input):
             return 'ZZZ' + input
