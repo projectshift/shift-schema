@@ -240,7 +240,6 @@ class SchemaTest(TestCase):
         self.assertTrue('first_name' in result.errors['spouse']['schema'])
         self.assertTrue('last_name' in result.errors['spouse']['schema'])
 
-    @attr('fixme')
     def test_entity_props_can_have_both_direct_and_schema_errors(self):
         """REGRESSION: Both direct and schema errors at the same time """
         person = helpers.Person()
@@ -251,12 +250,9 @@ class SchemaTest(TestCase):
         schema.spouse.add_validator(helpers.ValidatorInvalid())
         schema.spouse.schema = Schema(helpers.person_spec)
 
-
         result = schema.validate(person)
-        print(result)
-
-
-
+        self.assertTrue(len(result.errors['spouse']['direct']))
+        self.assertIn('salutation', result.errors['spouse']['schema'])
 
     def test_require_linked_entities_with_validator_attached_directly(self):
         """ Require linked entities with validator attached directly """
@@ -433,7 +429,6 @@ class SchemaTest(TestCase):
 
         schema = Schema(helpers.person_spec_collection_aggregate)
         result = schema.validate(person)
-        # print('FINAL RESULT:', result)
 
 
 

@@ -143,7 +143,6 @@ class Result:
             for error in direct_errors:
                 if not isinstance(error, Error):
                     err = 'Error must be of type {}'
-                    print('GOT', error)
                     raise x.InvalidErrorType(err.format(Error))
                 self.errors[property_name]['direct'].append(error)
 
@@ -185,7 +184,7 @@ class Result:
 
             # check compatibility
             if not isinstance(local, type(remote)):
-                msg = 'Type mismatch on property [] when merging errors.'
+                msg = 'Type mismatch on property [{}] when merging errors. '
                 msg += 'Unable to merge [{}] into [{}]'
                 raise x.UnableToMergeResultsType(msg.format(
                     prop,

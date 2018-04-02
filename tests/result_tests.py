@@ -2,7 +2,7 @@ from unittest import TestCase
 from nose.plugins.attrib import attr
 
 from shiftschema.result import Error, Result
-from shiftschema.exceptions import InvalidErrorType, InvalidResultType
+from shiftschema import exceptions as x
 from pprint import pprint as pp
 
 
@@ -56,9 +56,9 @@ class ResultTest(TestCase):
     def test_raise_on_adding_bad_errors(self):
         """ Errors are type-checked before adding to result """
         result = Result()
-        with self.assertRaises(InvalidErrorType):
+        with self.assertRaises(x.InvalidErrorType):
             result.add_errors(errors='Err', property_name='prop')
-        with self.assertRaises(InvalidErrorType):
+        with self.assertRaises(x.InvalidErrorType):
             result.add_errors(errors=['Err', 'Err'], property_name='prop')
 
     def test_add_single_error(self):
@@ -77,9 +77,9 @@ class ResultTest(TestCase):
     def test_raise_on_adding_bad_state_errors(self):
         """ Raise on adding bad state errors """
         result = Result()
-        with self.assertRaises(InvalidErrorType):
+        with self.assertRaises(x.InvalidErrorType):
             result.add_state_errors('Err')
-        with self.assertRaises(InvalidErrorType):
+        with self.assertRaises(x.InvalidErrorType):
             result.add_state_errors(['Err', 'Err'])
 
     def test_add_single_state_error(self):
@@ -98,6 +98,7 @@ class ResultTest(TestCase):
         self.assertEqual(2, len(result.errors['__state__']))
 
 
+    # todo: fixme
     # @attr('nested')
     # def test_add_nested_entity_schema_results(self):
     #     """ Adding nested entity schema result on property """
@@ -132,12 +133,10 @@ class ResultTest(TestCase):
     def test_raise_on_adding_bad_direct_errors_to_nested_entity_result(self):
         """ Typecheck direct entity errors """
         result = Result()
-        with self.assertRaises(InvalidErrorType):
+        with self.assertRaises(x.InvalidErrorType):
             result.add_entity_errors('entity', 'Bad')
-        with self.assertRaises(InvalidErrorType):
+        with self.assertRaises(x.InvalidErrorType):
             result.add_entity_errors('entity', ['Bad'])
-
-
 
 
     # todo: test separately for simple, state, entity and collection
@@ -167,8 +166,38 @@ class ResultTest(TestCase):
         for e in errors5 + errors6:
             self.assertTrue(e in result3.errors['__state__'])
 
-    # todo: test throwing exceptions on type mismatch when merging
+    def test_raise_on_merging_incompatible_results(self):
+        """ Raise on merging incompatible results """
+        result1 = Result()
+        result1.add_errors('property', [Error('Some Error')])
 
+        result2 = Result()
+        result2.add_entity_errors('property', direct_errors=[Error('Error')])
+
+        with self.assertRaises(x.UnableToMergeResultsType):
+            result1.merge(result2)
+
+    def test_raise_on_merging_collection_into_entity(self):
+        """ Raise on merging collection into entity"""
+        result1 = Result()
+        result1.errors = dict(prop=dict(schema=dict()))
+
+        result2 = Result()
+        result2.errors = dict(prop=dict(collection=dict()))
+
+        with self.assertRaises(x.UnableToMergeResultsType):
+            result1.merge(result2)
+
+    def test_raise_on_merging_entity_into_collection(self):
+        """ Raise on mergin entity into collection"""
+        result1 = Result()
+        result1.errors = dict(prop=dict(collection=dict()))
+
+        result2 = Result()
+        result2.errors = dict(prop=dict(schema=dict()))
+
+        with self.assertRaises(x.UnableToMergeResultsType):
+            result1.merge(result2)
 
     def test_merging_nested_results(self):
         """ Merging nested results"""
@@ -348,6 +377,7 @@ class ResultTest(TestCase):
         #     'ZZZstate_error3',
         #     result1.errors['result2']['__state__'][0]
         # )
+
 
     def test_formatting_messages(self):
         """ Error messages formatted with parameters (if any) """
