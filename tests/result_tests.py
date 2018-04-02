@@ -164,14 +164,36 @@ class ResultTest(TestCase):
         self.assertIn(e3, result.errors['entity_property']['direct'])
         self.assertIn(e4, result.errors['entity_property']['direct'])
 
-    # def test_add_schema_errors_to_nested_entity_property(self):
-    #     """ Adding schema results to nested entity property"""
-    #     self.fail('Implement me')
-    #
-    #
-    # def test_append_schema_errors_to_nested_entity_erors(self):
-    #     """ Appending schema erros to nested entity erorrs """
-    #     self.fail('Implement me')
+    def test_add_schema_errors_to_nested_entity_property(self):
+        """ Adding schema results to nested entity property"""
+        e1 = Error('error 1')
+        schema_errors = Result()
+        schema_errors.add_errors('simple_prop', e1)
+        result = Result()
+        result.add_entity_errors('entity_prop', schema_errors=schema_errors)
+        self.assertIn(e1, result.errors['entity_prop']['schema']['simple_prop'])
+
+    def test_append_schema_errors_to_nested_entity_erors(self):
+        """ Appending schema erros to nested entity erorrs """
+        e1 = Error('error 1')
+        e2 = Error('error 2')
+        e3 = Error('error 3')
+        e4 = Error('error 4')
+
+        schema_errors1 = Result()
+        schema_errors1.add_errors('simple_prop', [e1, e2])
+
+        schema_errors2 = Result()
+        schema_errors2.add_errors('simple_prop', [e3, e4])
+
+        result = Result()
+        result.add_entity_errors('entity_prop', schema_errors=schema_errors1)
+        result.add_entity_errors('entity_prop', schema_errors=schema_errors2)
+
+        self.assertIn(e1, result.errors['entity_prop']['schema']['simple_prop'])
+        self.assertIn(e2, result.errors['entity_prop']['schema']['simple_prop'])
+        self.assertIn(e3, result.errors['entity_prop']['schema']['simple_prop'])
+        self.assertIn(e4, result.errors['entity_prop']['schema']['simple_prop'])
 
     # --------------------------------------------------------------------------
     # collection property errors

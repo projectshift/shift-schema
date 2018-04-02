@@ -142,13 +142,16 @@ class Result:
 
         # schema errors
         if schema_errors is not None:
-            if 'schema' not in self.errors[property_name]:
-                self.errors[property_name]['schema'] = dict()
-
             if isinstance(schema_errors, Result):
                 schema_errors = schema_errors.errors
 
-            self.errors[property_name]['schema'] = schema_errors
+            if 'schema' not in self.errors[property_name]:
+                self.errors[property_name]['schema'] = schema_errors
+            else:
+                self.errors[property_name]['schema'] = self.merge_errors(
+                    self.errors[property_name]['schema'],
+                    schema_errors
+                )
 
         return self
 
