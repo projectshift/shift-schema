@@ -195,9 +195,17 @@ class ResultTest(TestCase):
         self.assertIn(e3, result.errors['entity_prop']['schema']['simple_prop'])
         self.assertIn(e4, result.errors['entity_prop']['schema']['simple_prop'])
 
+    def test_result_is_valid_when_nested_entity_valid(self):
+        """ If nested entity is valid, result also valid """
+        schema_errors = Result()
+        result = Result()
+        result.add_entity_errors('entity', schema_errors=schema_errors)
+        self.assertTrue(result)
+
     # --------------------------------------------------------------------------
     # collection property errors
     # --------------------------------------------------------------------------
+
 
     def test_add_single_direct_error_to_nested_collection_errors(self):
         """ Adding single direct error to nested collection errors"""
@@ -239,48 +247,40 @@ class ResultTest(TestCase):
         self.assertIn(e3, result.errors['collection_prop']['direct'])
         self.assertIn(e4, result.errors['collection_prop']['direct'])
 
-    # def test_add_collection_errors_to_nested_collection_errors(self):
-    #     """ Adding collection errors """
-    #     self.fail('Implement me')
-    #
-    #
+    def test_add_collection_errors_to_nested_collection_errors(self):
+        """ Adding collection errors """
+        e1 = Error('error 1')
+        e2 = Error('error 2')
+
+        collection_errors = [
+            Result(errors=dict(simple=[e1])),
+            Result(),
+            Result(errors=dict(simple=[e2])),
+            Result()
+        ]
+
+        result = Result()
+        result.add_collection_errors(
+            'collection_prop',
+            collection_errors=collection_errors
+        )
+
+        errors = result.errors['collection_prop']['collection']
+        self.assertIn(e1, errors[0].errors['simple'])
+        self.assertIn(e2, errors[2].errors['simple'])
+
     # def test_append_collection_errors_to_nested_collection_errors(self):
     #     """ Appending direct errors to nested collection errors """
     #     self.fail('Implement me')
 
-
-
-
-
-
-
-    # todo: test separately for simple, state, entity and collection
-
-    def test_append_error_to_property(self):
-        """ Appending errors to property"""
-        result1 = Result({'error': 'value'}) # simple
-        errors1 = Error('single1')
-        errors2 = Error('single2')
-        result1.add_errors('simple_property', errors1)
-        result1.add_errors('simple_property', errors2)
-        self.assertTrue(errors1 in result1.errors['simple_property'])
-        self.assertTrue(errors2 in result1.errors['simple_property'])
-
-        result2 = Result({'error': 'value'}) # multi
-        errors3 = [Error('multi1'), Error('multi2')]
-        errors4 = [Error('multi3'), Error('multi4')]
-        result2.add_errors('multi', errors3)
-        result2.add_errors('multi', errors4)
-        for e in errors3 + errors4:
-            self.assertTrue(e in result2.errors['multi'])
-
-        result3 = Result({'error': 'value'}) # state
-        errors5 = [Error('state1'), Error('state2')]
-        errors6 = [Error('state3'), Error('stat3')]
-        result3.add_state_errors(errors5)
-        result3.add_state_errors(errors6)
-        for e in errors5 + errors6:
-            self.assertTrue(e in result3.errors['__state__'])
+    def test_result_valid_when_nested_collection_valid(self):
+        """ Do not create collection property on result if collection valid"""
+        result = Result()
+        result.add_collection_errors(
+            'collection_prop',
+            collection_errors=[Result(), Result()]
+        )
+        self.assertTrue(result)
 
     # --------------------------------------------------------------------------
     # merging results

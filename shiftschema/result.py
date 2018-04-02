@@ -123,11 +123,11 @@ class Result:
         if direct_errors is None and schema_errors is None:
             return self
 
-        if property_name not in self.errors:
-            self.errors[property_name] = dict()
-
         # direct errors
         if direct_errors is not None:
+            if property_name not in self.errors:
+                self.errors[property_name] = dict()
+
             if 'direct' not in self.errors[property_name]:
                 self.errors[property_name]['direct'] = []
 
@@ -145,6 +145,12 @@ class Result:
             if isinstance(schema_errors, Result):
                 schema_errors = schema_errors.errors
 
+            if not schema_errors:
+                return self
+
+            if property_name not in self.errors:
+                self.errors[property_name] = dict()
+
             if 'schema' not in self.errors[property_name]:
                 self.errors[property_name]['schema'] = schema_errors
             else:
@@ -155,7 +161,6 @@ class Result:
 
         return self
 
-    # todo: implement me
     def add_collection_errors(
         self,
         property_name,
@@ -175,27 +180,38 @@ class Result:
         if direct_errors is None and collection_errors is None:
             return self
 
-        if property_name not in self.errors:
-            self.errors[property_name] = dict()
-
         # direct errors
         if direct_errors is not None:
-            if 'direct' not in self.errors[property_name]:
-                self.errors[property_name]['direct'] = []
-
             if type(direct_errors) is not list:
                 direct_errors = [direct_errors]
-
+            if property_name not in self.errors:
+                self.errors[property_name] = dict()
+            if 'direct' not in self.errors[property_name]:
+                self.errors[property_name]['direct'] = []
             for error in direct_errors:
                 if not isinstance(error, Error):
                     err = 'Error must be of type {}'
                     raise x.InvalidErrorType(err.format(Error))
                 self.errors[property_name]['direct'].append(error)
 
-        # todo: handle collection errors here
+        # collection errors
+        if collection_errors:
+            enum = enumerate(collection_errors)
+            errors_dict = {i: e for i, e in enum if not bool(e)}
+            if not errors_dict:
+                return self
+
+            if property_name not in self.errors:
+                self.errors[property_name] = dict()
+            if 'collection' not in self.errors[property_name]:
+                self.errors[property_name]['collection'] = errors_dict
+            else:
+                self.errors[property_name]['collection'] = self.merge_errors(
+                    self.errors[property_name]['collection'],
+                    errors_dict
+                )
 
         return self
-
 
     def merge_errors(self, errors_local, errors_remote):
         """
