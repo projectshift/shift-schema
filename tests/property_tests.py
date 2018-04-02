@@ -3,6 +3,7 @@ from unittest import TestCase, mock
 from nose.plugins.attrib import attr
 
 from shiftschema.schema import Schema
+from shiftschema.result import Result
 from shiftschema.property import SimpleProperty
 from shiftschema.property import EntityProperty
 from shiftschema.property import CollectionProperty
@@ -110,6 +111,14 @@ class EntityPropertyTests(TestCase):
         with self.assertRaises(InvalidSchemaType):
             prop.schema = dict()
 
+    def test_filtering_entity_with_filter_directly(self):
+        """ Using filter on entity property """
+        model = dict(something='nested')
+        prop = EntityProperty()
+        prop.add_filter(helpers.EntityFilter())
+        filtered = prop.filter(model)
+        self.assertEquals([model], filtered)
+
     def test_filtering_entity_with_schema(self):
         """ Filtering nested entity with schema """
         model = helpers.Person(
@@ -121,14 +130,6 @@ class EntityPropertyTests(TestCase):
         prop.filter_with_schema(model)
         self.assertEqual('Willy', model.first_name)
         self.assertEqual('Wonka', model.last_name)
-
-    def test_filtering_entity_with_filter_directly(self):
-        """ Using filter on entity property """
-        model = dict(something='nested')
-        prop = EntityProperty()
-        prop.add_filter(helpers.EntityFilter())
-        filtered = prop.filter(model)
-        self.assertEquals([model], filtered)
 
     def test_validate_nested_entity_with_validators_attached_directly(self):
         """ Validate nested entity with validators attached directly"""
@@ -147,27 +148,17 @@ class EntityPropertyTests(TestCase):
 
     def test_validating_nested_entity_with_schema(self):
         """ Validated nested entity with schema"""
-        class Model: pass
-        class Nested: pass
-        nested = Nested()
-        model = Model()
-        model.nested = nested
-
-        class NestedSchema(Schema): pass
-        nested_schema = NestedSchema()
-        nested_schema.add_state_validator(helpers.ValidatorInvalid())
-
-        schema = Schema()
-        schema.add_entity('nested')
-        schema.nested.schema = nested_schema
         prop = EntityProperty()
-        prop.schema = schema
-        result = prop.validate_with_schema(model)
+        prop.schema = Schema()
+        prop.schema.add_state_validator(helpers.ValidatorInvalid())
+        prop.schema.add_property('simple')
+        prop.schema.simple.add_validator(helpers.ValidatorInvalid())
+        result = prop.validate_with_schema(dict())
 
-        return
-
+        self.assertIsInstance(result, Result)
         self.assertFalse(result)
-        self.assertEqual(1, len(result.errors['nested']['__state__']))
+        self.assertIn('__state__', result.errors)
+        self.assertIn('simple', result.errors)
 
     def test_filter_and_validate(self):
         """ Process: filter and validate in single operation """
@@ -253,6 +244,7 @@ class CollectionPropertyTests(TestCase):
         ]
 
         result = prop.validate_with_schema(collection)
+
         self.assertTrue(type(result) is list)
         self.assertFalse(result[0])
         self.assertTrue(result[1])

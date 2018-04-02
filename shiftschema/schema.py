@@ -1,7 +1,7 @@
 from shiftschema.property import SimpleProperty
 from shiftschema.property import EntityProperty
 from shiftschema.property import CollectionProperty
-from shiftschema.result import Error, Result
+from shiftschema.result import Result
 from shiftschema.validators import AbstractValidator
 from shiftschema.exceptions import InvalidValidator, PropertyExists
 from shiftschema.translator import Translator
@@ -344,12 +344,17 @@ class Schema:
 
             errors = prop.validate(collection, collection_ctx)
             if len(errors):
-                result.add_errors(property_name=property_name, errors=errors)
+                result.add_collection_errors(
+                    property_name=property_name,
+                    direct_errors=errors
+                )
 
             collection_errors = prop.validate_with_schema(
                 collection,
                 collection_ctx
             )
+
+            print('COLLECTION ERRORS:', collection_errors)
 
 
 

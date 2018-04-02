@@ -26,12 +26,6 @@ class Error:
     def __bool__(self):
         return self.message is not None
 
-    def __eq__(self, other):
-        return self.__bool__() == other
-
-    def __ne__(self, other):
-        return self.__bool__() != other
-
     def __repr__(self):
         r = '<{} object message="{}">'
         return r.format(self.__class__.__qualname__, self.message)
@@ -134,7 +128,7 @@ class Result:
 
         # direct errors
         if direct_errors is not None:
-            if '__direct__' not in self.errors[property_name]:
+            if 'direct' not in self.errors[property_name]:
                 self.errors[property_name]['direct'] = []
 
             if type(direct_errors) is not list:
@@ -159,8 +153,46 @@ class Result:
         return self
 
     # todo: implement me
-    def add_collection_errors(self):
-        pass
+    def add_collection_errors(
+        self,
+        property_name,
+        direct_errors=None,
+        collection_errors=None
+    ):
+        """
+        Add collection errors
+        Accepts a list errors coming from validators attached directly,
+        or a list of schema results for each item in the collection.
+
+        :param property_name: str, property name
+        :param direct_errors: list, errors from validators attached directly
+        :param collection_errors: list, list of errors for collection members
+        :return: shiftschema.result.Result
+        """
+        if direct_errors is None and collection_errors is None:
+            return self
+
+        if property_name not in self.errors:
+            self.errors[property_name] = dict()
+
+        # direct errors
+        if direct_errors is not None:
+            if 'direct' not in self.errors[property_name]:
+                self.errors[property_name]['direct'] = []
+
+            if type(direct_errors) is not list:
+                direct_errors = [direct_errors]
+
+            for error in direct_errors:
+                if not isinstance(error, Error):
+                    err = 'Error must be of type {}'
+                    raise x.InvalidErrorType(err.format(Error))
+                self.errors[property_name]['direct'].append(error)
+
+        # todo: handle collection errors here
+
+        return self
+
 
     def merge_errors(self, errors_local, errors_remote):
         """

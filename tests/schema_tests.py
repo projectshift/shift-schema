@@ -426,9 +426,11 @@ class SchemaTest(TestCase):
         person.addresses.append(address3)
         person.addresses.append(address4)
 
-
         schema = Schema(helpers.person_spec_collection_aggregate)
         result = schema.validate(person)
+
+        # todo: finish this
+        # print(result)
 
 
 

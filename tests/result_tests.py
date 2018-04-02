@@ -6,33 +6,14 @@ from shiftschema import exceptions as x
 from pprint import pprint as pp
 
 
-@attr('result', 'error')
-class ErrorTest(TestCase):
-
-    def test_create_error(self):
-        """ Creating an error object """
-        err = Error('message')
-        self.assertIsInstance(err, Error)
-
-    def test_error_evaluates_to_true(self):
-        """ Error with a message evaluates to true"""
-        err = Error('message')
-        self.assertTrue(err)
-        self.assertTrue(err == True)
-        self.assertTrue(err != False)
-
-    def test_empty_error_evaluates_to_false(self):
-        """ Empty error object evaluates to false """
-        err = Error()
-        self.assertFalse(err)
-        self.assertFalse(err == True)
-        self.assertFalse(err != False)
-
-
 @attr('result', 'result')
 class ResultTest(TestCase):
 
-    def test_create_error(self):
+    # --------------------------------------------------------------------------
+    # basics
+    # --------------------------------------------------------------------------
+
+    def test_create_result(self):
         """ Creating result object """
         msgs = {'what?': 'error'}
         result = Result(msgs)
@@ -53,26 +34,9 @@ class ResultTest(TestCase):
         self.assertTrue(result == False)
         self.assertTrue(result != True)
 
-    def test_raise_on_adding_bad_errors(self):
-        """ Errors are type-checked before adding to result """
-        result = Result()
-        with self.assertRaises(x.InvalidErrorType):
-            result.add_errors(errors='Err', property_name='prop')
-        with self.assertRaises(x.InvalidErrorType):
-            result.add_errors(errors=['Err', 'Err'], property_name='prop')
-
-    def test_add_single_error(self):
-        """ Adding single error to Result """
-        result = Result()
-        result.add_errors(errors=Error('message'), property_name='property')
-        self.assertTrue('property' in result.errors)
-
-    def test_add_multiple_errors(self):
-        """ Adding multiple errors to result """
-        errors = [Error('error1'), Error('error2')]
-        result = Result()
-        result.add_errors('property', errors)
-        self.assertEqual(2, len(result.errors['property']))
+    # --------------------------------------------------------------------------
+    # state validation errors errors
+    # --------------------------------------------------------------------------
 
     def test_raise_on_adding_bad_state_errors(self):
         """ Raise on adding bad state errors """
@@ -97,49 +61,179 @@ class ResultTest(TestCase):
         result.add_state_errors(errors)
         self.assertEqual(2, len(result.errors['__state__']))
 
+    def test_append_state_errors(self):
+        """ Appending state errors """
+        e1 = Error('error 1')
+        e2 = Error('error 2')
+        e3 = Error('error 3')
+        e4 = Error('error 4')
 
-    # todo: fixme
-    # @attr('nested')
-    # def test_add_nested_entity_schema_results(self):
-    #     """ Adding nested entity schema result on property """
-    #     nested = Result()
-    #     nested.add_state_errors(Error('message'))
-    #     nested.add_errors(errors=Error('message'), property_name='property')
-    #     result = Result()
-    #     result.add_entity_errors('entity', nested)
-    #     self.assertTrue('entity' in result.errors)
-    #     self.assertEqual(1, len(result.errors['entity']['__state__']))
-    #     self.assertEqual(1, len(result.errors['entity']['property']))
+        result = Result()
+        result.add_state_errors([e1, e2])
+        result.add_state_errors([e3, e4])
 
-    def test_add_single_direct_error_to_nested_entity_result(self):
-        """ Adding single direct error to nested entity result """
+        self.assertIn(e1, result.errors['__state__'])
+        self.assertIn(e2, result.errors['__state__'])
+        self.assertIn(e3, result.errors['__state__'])
+        self.assertIn(e4, result.errors['__state__'])
+
+    # --------------------------------------------------------------------------
+    # simple property errors
+    # --------------------------------------------------------------------------
+
+    def test_raise_on_adding_bad_errors(self):
+        """ Errors are type-checked before adding to result """
+        result = Result()
+        with self.assertRaises(x.InvalidErrorType):
+            result.add_errors(errors='Err', property_name='prop')
+        with self.assertRaises(x.InvalidErrorType):
+            result.add_errors(errors=['Err', 'Err'], property_name='prop')
+
+    def test_add_single_error(self):
+        """ Adding single error to Result """
+        result = Result()
+        result.add_errors(errors=Error('message'), property_name='property')
+        self.assertTrue('property' in result.errors)
+
+    def test_add_multiple_errors(self):
+        """ Adding multiple errors to result """
+        errors = [Error('error1'), Error('error2')]
+        result = Result()
+        result.add_errors('property', errors)
+        self.assertEqual(2, len(result.errors['property']))
+
+    def test_append_simple_property_errors(self):
+        """ Appending simple property errors """
+        e1 = Error('error 1')
+        e2 = Error('error 2')
+        e3 = Error('error 3')
+        e4 = Error('error 4')
+
+        result = Result()
+        result.add_errors('prop', [e1, e2])
+        result.add_errors('prop', [e3, e4])
+
+        self.assertIn(e1, result.errors['prop'])
+        self.assertIn(e2, result.errors['prop'])
+        self.assertIn(e3, result.errors['prop'])
+        self.assertIn(e4, result.errors['prop'])
+
+    # --------------------------------------------------------------------------
+    # nested entity property errors
+    # --------------------------------------------------------------------------
+
+    def test_add_single_direct_error_to_nested_entity_errors(self):
+        """ Adding single direct error to nested entity errors """
         error = Error('Direct entity error')
         result = Result()
-        result.add_entity_errors('entity', error)
+        result.add_entity_errors('entity', direct_errors=error)
         self.assertIn('entity', result.errors)
         self.assertIn(error, result.errors['entity']['direct'])
 
-
-    def test_add_multiple_direct_errors_to_nested_entity(self):
-        """ Adding multiple direct errors to nested entity result"""
+    def test_add_multiple_direct_errors_to_nested_entity_errors(self):
+        """ Adding multiple direct errors to nested entity errors """
         error1 = Error('Direct entity error 1')
         error2 = Error('Direct entity error 2')
         result = Result()
-        result.add_entity_errors('entity', [error1, error2])
+        result.add_entity_errors('entity', direct_errors=[error1, error2])
         self.assertIn('entity', result.errors)
         self.assertIn(error1, result.errors['entity']['direct'])
         self.assertIn(error2, result.errors['entity']['direct'])
 
-    def test_raise_on_adding_bad_direct_errors_to_nested_entity_result(self):
+    def test_raise_on_adding_bad_direct_errors_to_nested_entity_errors(self):
         """ Typecheck direct entity errors """
         result = Result()
         with self.assertRaises(x.InvalidErrorType):
-            result.add_entity_errors('entity', 'Bad')
+            result.add_entity_errors('entity', direct_errors='Bad')
         with self.assertRaises(x.InvalidErrorType):
-            result.add_entity_errors('entity', ['Bad'])
+            result.add_entity_errors('entity', direct_errors=['Bad'])
+
+    def test_append_direct_errors_to_nested_entity_errors(self):
+        """ Appending direct errors to nested entity erorrs """
+        e1 = Error('error 1')
+        e2 = Error('error 2')
+        e3 = Error('error 3')
+        e4 = Error('error 4')
+
+        result = Result()
+        result.add_entity_errors('entity_property', direct_errors=[e1, e2])
+        result.add_entity_errors('entity_property', direct_errors=[e3, e4])
+
+        self.assertIn(e1, result.errors['entity_property']['direct'])
+        self.assertIn(e2, result.errors['entity_property']['direct'])
+        self.assertIn(e3, result.errors['entity_property']['direct'])
+        self.assertIn(e4, result.errors['entity_property']['direct'])
+
+    # def test_add_schema_errors_to_nested_entity_property(self):
+    #     """ Adding schema results to nested entity property"""
+    #     self.fail('Implement me')
+    #
+    #
+    # def test_append_schema_errors_to_nested_entity_erors(self):
+    #     """ Appending schema erros to nested entity erorrs """
+    #     self.fail('Implement me')
+
+    # --------------------------------------------------------------------------
+    # collection property errors
+    # --------------------------------------------------------------------------
+
+    def test_add_single_direct_error_to_nested_collection_errors(self):
+        """ Adding single direct error to nested collection errors"""
+        e1 = Error('error 1')
+        result = Result()
+        result.add_collection_errors('collection_prop', direct_errors=e1)
+        self.assertIn(e1, result.errors['collection_prop']['direct'])
+
+    def test_add_multiple_direct_errors_to_nested_collection_errors(self):
+        """ Adding multiple direct error to nested collection errors"""
+        e1 = Error('error 1')
+        e2 = Error('error 2')
+        result = Result()
+        result.add_collection_errors('collection_prop', direct_errors=[e1, e2])
+        self.assertIn(e1, result.errors['collection_prop']['direct'])
+        self.assertIn(e2, result.errors['collection_prop']['direct'])
+
+    def test_raise_on_adding_bad_direct_errs_to_nested_collection_errors(self):
+        """ Typecheck direct collection errors """
+        result = Result()
+        with self.assertRaises(x.InvalidErrorType):
+            result.add_collection_errors('collection', direct_errors='Bad')
+        with self.assertRaises(x.InvalidErrorType):
+            result.add_entity_errors('collection', direct_errors=['Bad'])
+
+    def test_append_direct_errors_to_nested_collection_errors(self):
+        """ Appending direct errors to nested collection errors """
+        e1 = Error('error 1')
+        e2 = Error('error 2')
+        e3 = Error('error 3')
+        e4 = Error('error 4')
+
+        result = Result()
+        result.add_collection_errors('collection_prop', direct_errors=[e1, e2])
+        result.add_collection_errors('collection_prop', direct_errors=[e3, e4])
+
+        self.assertIn(e1, result.errors['collection_prop']['direct'])
+        self.assertIn(e2, result.errors['collection_prop']['direct'])
+        self.assertIn(e3, result.errors['collection_prop']['direct'])
+        self.assertIn(e4, result.errors['collection_prop']['direct'])
+
+    # def test_add_collection_errors_to_nested_collection_errors(self):
+    #     """ Adding collection errors """
+    #     self.fail('Implement me')
+    #
+    #
+    # def test_append_collection_errors_to_nested_collection_errors(self):
+    #     """ Appending direct errors to nested collection errors """
+    #     self.fail('Implement me')
+
+
+
+
+
 
 
     # todo: test separately for simple, state, entity and collection
+
     def test_append_error_to_property(self):
         """ Appending errors to property"""
         result1 = Result({'error': 'value'}) # simple
@@ -165,6 +259,10 @@ class ResultTest(TestCase):
         result3.add_state_errors(errors6)
         for e in errors5 + errors6:
             self.assertTrue(e in result3.errors['__state__'])
+
+    # --------------------------------------------------------------------------
+    # merging results
+    # --------------------------------------------------------------------------
 
     def test_raise_on_merging_incompatible_results(self):
         """ Raise on merging incompatible results """
@@ -331,11 +429,11 @@ class ResultTest(TestCase):
             err['nested_entity1']['schema']['deeper']['schema']
         )
 
+    # --------------------------------------------------------------------------
+    # translating and formatting resuts
+    # --------------------------------------------------------------------------
 
-
-
-
-    #todo: fixme
+    # todo: fixme
     def test_translate_messages(self):
         """ Translating nested result with arbitrary translator"""
         pass
