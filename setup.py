@@ -22,7 +22,7 @@ from setuptools import setup, find_packages
 # ----------------------------------------------------------------------------
 
 # project version
-version = '0.0.11'
+version = '0.1.0'
 
 # development status
 # dev_status = '1 - Planning'
@@ -52,7 +52,7 @@ setup(**dict(
     version=version,
     url=repo,
     download_url=repo + '/archive/v' + version + '.tar.gz',
-    description='Python3 filtering and validation library',
+    description='Filtering and validation library for arbitrary data structures',
     keywords=[
         'python3',
         'validation',
