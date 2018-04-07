@@ -45,7 +45,6 @@ class Result:
         self.locale = locale
 
     def __bool__(self):
-        # todo: check for collection errors to evaluate
         return not self.errors
 
     def __eq__(self, other):
@@ -312,21 +311,41 @@ class Result:
         errors = self._translate_errors(errors, translate)
         return errors
 
-    # todo: refactor to work with entity and collection errors
     def _translate_errors(self, errors, translate):
         """ Recursively apply translate callback to each error message"""
-        for property_name in errors:
-            property_errors = errors[property_name]
-            if type(property_errors) is list:
-                for index,error in enumerate(property_errors):
+        for prop in errors:
+            prop_errors = errors[prop]
+
+            # state and simple
+            if type(prop_errors) is list:
+                for index, error in enumerate(prop_errors):
                     message = translate(error.message)
                     message = self.format_error(message, error.kwargs)
-                    errors[property_name][index] = message
-            elif type(property_errors) is dict:
-                errors[property_name] = self._translate_errors(
-                    property_errors,
+                    errors[prop][index] = message
+
+            # entity and collection direct
+            if type(prop_errors) is dict and 'direct' in prop_errors:
+                for index, error in enumerate(prop_errors['direct']):
+                    message = translate(error.message)
+                    message = self.format_error(message, error.kwargs)
+                    errors[prop]['direct'][index] = message
+
+            # entity schema
+            if type(prop_errors) is dict and 'schema' in prop_errors:
+                errors[prop]['schema'] = self._translate_errors(
+                    prop_errors['schema'],
                     translate
                 )
+
+            # collection schema
+            if type(prop_errors) is dict and 'collection' in prop_errors:
+                translated = dict()
+                for index, result in prop_errors['collection'].items():
+                    translated[index] = self._translate_errors(
+                        result.errors,
+                        translate
+                    )
+                    errors[prop]['collection'] = translated
 
         return errors
 

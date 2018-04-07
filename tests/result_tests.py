@@ -529,49 +529,113 @@ class ResultTest(TestCase):
     # translating and formatting results
     # --------------------------------------------------------------------------
 
-    # todo: fixme
     def test_translate_messages(self):
         """ Translating nested result with arbitrary translator"""
-        pass
-        # self.fail('Implement me')
-        # p1 = [Error('prop1_error1')]
-        # p2 = [Error('prop2_error1', Error('prop2_error2'))]
-        # s1 = [Error('state_error1'), Error('state_error2')]
-        #
-        # p22 = [Error('prop2_error3'), Error('prop2_error4')]
-        # p3 = [Error('prop3_error1'), Error('prop3_error2')]
-        # s2 = [Error('state_error3'), Error('state_error4')]
-        #
-        # result1 = Result()
-        # result1.add_errors('property1', p1)
-        # result1.add_errors('property2', p2)
-        # result1.add_state_errors(s1)
-        #
-        # result2 = Result()
-        # result2.add_errors('property2', p22)
-        # result2.add_errors('property3', p3)
-        # result2.add_state_errors(s2)
-        # result1.add_entity_errors('result2', result2)
-        #
-        # def translator(input):
-        #     return 'ZZZ' + input
-        #
-        # result1._translate_errors(result1.errors, translator)
-        #
-        # # assert root translated
-        # self.assertEqual('ZZZprop1_error1', result1.errors['property1'][0])
-        # self.assertEqual('ZZZstate_error1', result1.errors['__state__'][0])
-        #
-        # # assert nested errors translated
-        # self.assertEqual(
-        #     'ZZZprop3_error1',
-        #     result1.errors['result2']['property3'][0]
-        # )
-        #
-        # self.assertEqual(
-        #     'ZZZstate_error3',
-        #     result1.errors['result2']['__state__'][0]
-        # )
+
+        t = 'ZZZ'
+
+        def translator(input):
+            return t + input
+
+        result = Result()
+
+        # state errors
+        state = [Error('state1'), Error('state2')]
+        result.add_state_errors(state)
+
+        # properties
+        result.add_errors('simple_prop', [
+            Error('Simple prop error 1'),
+            Error('Simple prop error 2'),
+        ])
+
+        # entities direct
+        result.add_entity_errors('entity_prop', direct_errors=[
+            Error('Entity direct error 1'),
+            Error('Entity direct error 2')
+        ])
+
+        # entity schema
+        schema_result = Result()
+        schema_result.add_errors('nested_prop', [
+            Error('Nested prop error 1'),
+            Error('Nested prop error 2'),
+        ])
+        result.add_entity_errors('entity_prop', schema_errors=schema_result)
+
+        # collection direct
+        result.add_collection_errors('collection_prop', direct_errors=[
+            Error('Collection direct error 1'),
+            Error('Collection direct error 2')
+        ])
+
+        # collections schema
+        collection_item = Result()
+        collection_item.add_errors('simple_nested', [
+            Error('Collection item error 1'),
+            Error('Collection item error 2'),
+        ])
+
+        result.add_collection_errors('collection_prop', collection_errors=[
+            Result(),
+            collection_item,
+            Result(),
+        ])
+
+        err = result._translate_errors(result.errors, translator)
+
+        # assert state translated
+        self.assertEquals(t + 'state1', err['__state__'][0])
+        self.assertEquals(t + 'state2', err['__state__'][1])
+
+        # assert simple props translated
+        self.assertEquals(t + 'Simple prop error 1', err['simple_prop'][0])
+        self.assertEquals(t + 'Simple prop error 2', err['simple_prop'][1])
+
+        # assert entity direct translated
+        self.assertEquals(
+            t + 'Entity direct error 1',
+            err['entity_prop']['direct'][0]
+        )
+
+        self.assertEquals(
+            t + 'Entity direct error 2',
+            err['entity_prop']['direct'][1]
+        )
+
+        # assert nested schemas translated
+        self.assertEquals(
+            t + 'Nested prop error 1',
+            err['entity_prop']['schema']['nested_prop'][0]
+        )
+        self.assertEquals(
+            t + 'Nested prop error 2',
+            err['entity_prop']['schema']['nested_prop'][1]
+        )
+
+        # assert collection direct translated
+        self.assertEquals(
+            t + 'Collection direct error 1',
+            err['collection_prop']['direct'][0]
+        )
+
+        self.assertEquals(
+            t + 'Collection direct error 2',
+            err['collection_prop']['direct'][1]
+        )
+
+        # assert collection items translated with schema
+        self.assertEquals(
+            t + 'Collection item error 1',
+            err['collection_prop']['collection'][1]['simple_nested'][0]
+
+        )
+
+        self.assertEquals(
+            t + 'Collection item error 2',
+            err['collection_prop']['collection'][1]['simple_nested'][1]
+
+        )
 
     def test_formatting_messages(self):
         """ Error messages formatted with parameters (if any) """
