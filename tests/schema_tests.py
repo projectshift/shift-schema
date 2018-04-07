@@ -266,37 +266,6 @@ class SchemaTest(TestCase):
         self.assertFalse(result)
         self.assertIn('spouse', result.get_messages())
 
-    # todo: move me down
-    def test_validate_and_filter(self):
-        """ Process: validation and filtering as single operation"""
-        person = helpers.Person(first_name='   W   ')
-        person.spouse = helpers.Person(first_name='   X   ')
-        schema = Schema(helpers.person_spec_aggregate)
-        result = schema.process(person)
-
-        self.assertEqual('W', person.first_name)
-        self.assertEqual('X', person.spouse.first_name)
-
-        self.assertTrue('first_name' in result.errors) # too short
-        self.assertTrue('first_name' in result.errors['spouse']['schema'])
-
-    # todo: move me down
-    def test_results_injected_with_translations(self):
-        """ Schema-generated results are injected with translation settings """
-        schema = Schema()
-        result = schema.validate(mock.Mock())
-        self.assertEqual('en', result.locale)
-        self.assertIsInstance(result.translator, Translator)
-
-        Schema.locale = 'ru'
-        Schema.translator.add_location('/tmp')
-
-        schema = Schema()
-        result = schema.validate(mock.Mock())
-        self.assertEqual('ru', result.locale)
-        self.assertIsInstance(result.translator, Translator)
-        self.assertTrue('/tmp' in result.translator.dirs)
-
     def test_can_filter_out_collections_directly(self):
         """ Filter out collection properties with filters attached directly """
         address1 = helpers.Address(
@@ -379,7 +348,6 @@ class SchemaTest(TestCase):
         self.assertFalse(result)
         self.assertIn('addresses', result.errors)
 
-    @attr('zzz')
     def test_validate_collection_items_with_schemas(self):
         """ Validating collection items with schema """
 
@@ -429,8 +397,47 @@ class SchemaTest(TestCase):
         schema = Schema(helpers.person_spec_collection_aggregate)
         result = schema.validate(person)
 
-        # todo: finish this
-        # print(result)
+        self.assertFalse(result)
+        collection = result.errors['addresses']['collection']
+
+        self.assertIsInstance(collection[1], Result)
+        self.assertFalse(collection[1])
+        self.assertIn('postcode', collection[1].errors)
+
+        self.assertIsInstance(collection[3], Result)
+        self.assertFalse(collection[3])
+        self.assertIn('address', collection[3].errors)
+
+
+
+    def test_validate_and_filter(self):
+        """ Process: validation and filtering as single operation"""
+        person = helpers.Person(first_name='   W   ')
+        person.spouse = helpers.Person(first_name='   X   ')
+        schema = Schema(helpers.person_spec_aggregate)
+        result = schema.process(person)
+
+        self.assertEqual('W', person.first_name)
+        self.assertEqual('X', person.spouse.first_name)
+
+        self.assertTrue('first_name' in result.errors) # too short
+        self.assertTrue('first_name' in result.errors['spouse']['schema'])
+
+    def test_results_injected_with_translations(self):
+        """ Schema-generated results are injected with translation settings """
+        schema = Schema()
+        result = schema.validate(mock.Mock())
+        self.assertEqual('en', result.locale)
+        self.assertIsInstance(result.translator, Translator)
+
+        Schema.locale = 'ru'
+        Schema.translator.add_location('/tmp')
+
+        schema = Schema()
+        result = schema.validate(mock.Mock())
+        self.assertEqual('ru', result.locale)
+        self.assertIsInstance(result.translator, Translator)
+        self.assertTrue('/tmp' in result.translator.dirs)
 
 
 

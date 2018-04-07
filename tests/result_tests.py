@@ -269,9 +269,31 @@ class ResultTest(TestCase):
         self.assertIn(e1, errors[0].errors['simple'])
         self.assertIn(e2, errors[2].errors['simple'])
 
-    # def test_append_collection_errors_to_nested_collection_errors(self):
-    #     """ Appending direct errors to nested collection errors """
-    #     self.fail('Implement me')
+    def test_append_collection_errors_to_nested_collection_errors(self):
+        """ Appending direct errors to nested collection errors """
+        result = Result()
+        result.add_collection_errors('collection_prop', collection_errors=[
+            Result(errors={'simple': [Error('Simple 0-1')]}),
+            Result(),
+            Result(),
+            Result(errors={'simple': [Error('Simple 3-1')]}),
+        ])
+
+        result.add_collection_errors('collection_prop', collection_errors=[
+            Result(errors={'simple': [Error('Simple 0-2')]}),
+            Result(),
+            Result(),
+            Result(errors={'simple': [Error('Simple 3-2')]}),
+            Result(errors={'simple': [Error('Simple 4')]}),
+        ])
+
+        # assert missing added
+        err = result.errors['collection_prop']['collection']
+        self.assertIn(4, err)
+
+        # assert existing merged
+        self.assertEquals(2, len(err[0]['simple']))
+        self.assertEquals(2, len(err[3]['simple']))
 
     def test_result_valid_when_nested_collection_valid(self):
         """ Do not create collection property on result if collection valid"""
@@ -280,6 +302,14 @@ class ResultTest(TestCase):
             'collection_prop',
             collection_errors=[Result(), Result()]
         )
+
+        result2 = Result()
+        result2.add_collection_errors(
+            'collection_prop',
+            collection_errors=[Result(), Result()]
+        )
+
+        result.merge(result2)
         self.assertTrue(result)
 
     # --------------------------------------------------------------------------
@@ -322,8 +352,6 @@ class ResultTest(TestCase):
     def test_merging_nested_results(self):
         """ Merging nested results"""
 
-        # todo: test merging collections
-
         """
         Result 1
         """
@@ -363,6 +391,20 @@ class ResultTest(TestCase):
 
         nested1_1.add_entity_errors('deeper', schema_errors=nested1_2)
         result1.add_entity_errors('nested_entity1', schema_errors=nested1_1)
+
+        # collection direct
+        result1.add_entity_errors('nested_collection1', direct_errors=[
+            Error('Res2 Collection prop1 direct err 1'),
+            Error('Res2 Collection prop1 direct err 2'),
+        ])
+
+        # collection nested schemas
+        result1.add_collection_errors('nested_collection1', collection_errors=[
+            Result({'simple1': Error('Simple Error')}),
+            Result(),
+            Result({'simple2': Error('Another simple Error')}),
+            Result()
+        ])
 
         """
         Result 2
@@ -414,6 +456,26 @@ class ResultTest(TestCase):
         nested2_1.add_entity_errors('deeper', schema_errors=nested2_2)
         result2.add_entity_errors('nested_entity1', schema_errors=nested2_1)
 
+        # collection direct
+        result2.add_entity_errors('nested_collection1', direct_errors=[
+            Error('Res2 Collection prop1 direct err 3'),
+            Error('Res2 Collection prop1 direct err 4'),
+        ])
+
+        # collection nested schemas
+        result2.add_collection_errors('nested_collection1', collection_errors=[
+            Result({'simple3': Error('And another simple Error')}),
+            Result(),
+            Result(),
+            Result(),
+            Result({'simple4': Error('Another simple Error fom result2')}),
+        ])
+
+        result2.add_collection_errors('nested_collection2', collection_errors=[
+            Result({'simple1': Error('Simple Error')}),
+            Result({'simple2': Error('Another simple Error')}),
+        ])
+
         # now merge
         result1.merge(result2)
         err = result1.errors
@@ -451,14 +513,27 @@ class ResultTest(TestCase):
             err['nested_entity1']['schema']['deeper']['schema']
         )
 
+        # assert nested collections direct merged
+        self.assertEquals(4, len(err['nested_collection1']['direct']))
+
+        # assert missing added
+        self.assertIn('nested_collection2', err)
+
+        # assert missing collection members added
+        self.assertIn(4, err['nested_collection1']['collection'])
+
+        # assert errors merged recursively for existing collection members
+        self.assertEquals(2, len(err['nested_collection1']['collection'][0]))
+
     # --------------------------------------------------------------------------
-    # translating and formatting resuts
+    # translating and formatting results
     # --------------------------------------------------------------------------
 
     # todo: fixme
     def test_translate_messages(self):
         """ Translating nested result with arbitrary translator"""
         pass
+        # self.fail('Implement me')
         # p1 = [Error('prop1_error1')]
         # p2 = [Error('prop2_error1', Error('prop2_error2'))]
         # s1 = [Error('state_error1'), Error('state_error2')]
@@ -497,7 +572,6 @@ class ResultTest(TestCase):
         #     'ZZZstate_error3',
         #     result1.errors['result2']['__state__'][0]
         # )
-
 
     def test_formatting_messages(self):
         """ Error messages formatted with parameters (if any) """

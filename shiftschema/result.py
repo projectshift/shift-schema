@@ -42,7 +42,7 @@ class Result:
             errors = dict()
         self.errors = errors
         self.translator = translator
-        self.locale=locale
+        self.locale = locale
 
     def __bool__(self):
         # todo: check for collection errors to evaluate
@@ -55,7 +55,7 @@ class Result:
         return self.__bool__() != other
 
     def __repr__(self):
-        return pformat(self.errors)
+        return '<Result errors=[' + pformat(self.errors) + ']>'
 
     def add_state_errors(self, errors):
         """
@@ -174,7 +174,7 @@ class Result:
 
         :param property_name: str, property name
         :param direct_errors: list, errors from validators attached directly
-        :param collection_errors: list, list of errors for collection members
+        :param collection_errors: list of results for collection members
         :return: shiftschema.result.Result
         """
         if direct_errors is None and collection_errors is None:
@@ -206,10 +206,17 @@ class Result:
             if 'collection' not in self.errors[property_name]:
                 self.errors[property_name]['collection'] = errors_dict
             else:
-                self.errors[property_name]['collection'] = self.merge_errors(
-                    self.errors[property_name]['collection'],
-                    errors_dict
-                )
+                local = self.errors[property_name]['collection']
+                remote = errors_dict
+                for index, result in remote.items():
+                    if index not in local:
+                        self.errors[property_name]['collection'][index] = result
+                    else:
+                        merged = self.merge_errors(
+                            local[index].errors,
+                            remote[index].errors
+                        )
+                        self.errors[property_name]['collection'][index] = merged
 
         return self
 
@@ -231,7 +238,9 @@ class Result:
                 continue
 
             local = errors_local[prop]
+            local = local.errors if isinstance(local, Result) else local
             remote = errors_remote[prop]
+            remote = remote.errors if isinstance(remote, Result) else remote
 
             # check compatibility
             if not isinstance(local, type(remote)):
@@ -256,22 +265,27 @@ class Result:
                 continue
 
             # merge direct errors on nested entities and collection
-            if 'direct' in remote and 'direct' not in local:
-                errors_local[prop]['direct'] = remote['direct']
             if 'direct' in remote and 'direct' in local:
                 errors_local[prop]['direct'].extend(remote['direct'])
 
             # merge nested schema errors
-            if 'schema' in remote and not 'schema' in local:
-                errors_local[prop]['schema'] = remote['schema']
             if 'schema' in remote and 'schema' in local:
                 errors_local[prop]['schema'] = self.merge_errors(
                     errors_local[prop]['schema'],
                     remote['schema']
                 )
 
-            # todo: merge nested collection
             # merge nested collections errors
+            if 'collection' in remote and 'collection' in local:
+                for index, result in remote['collection'].items():
+                    if index not in local['collection']:
+                        errors_local[prop]['collection'][index] = result
+                    else:
+                        merged = self.merge_errors(
+                            errors_local[prop]['collection'][index].errors,
+                            errors_remote[prop]['collection'][index].errors,
+                        )
+                        errors_local[prop]['collection'][index] = merged
 
         # and return
         return errors_local

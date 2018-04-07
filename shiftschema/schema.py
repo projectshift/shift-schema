@@ -354,20 +354,10 @@ class Schema:
                 collection_ctx
             )
 
-            print('COLLECTION ERRORS:', collection_errors)
-
-
-
-
-            # print(collection_errors)
-
-            # if len(collection_errors):
-            #     result.add_errors(collection_errors, property_name)
-
-
-            # results = prop.validate_with_schema(value, collection_ctx)
-            # print('COLLECTION RESULT:', results)
-
+            result.add_collection_errors(
+                property_name=property_name,
+                collection_errors=collection_errors
+            )
 
         return result
 
