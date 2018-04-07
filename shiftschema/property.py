@@ -137,7 +137,10 @@ class CollectionProperty(EntityProperty):
 
         result = []
         for index, item in enumerate(collection):
-            item_result = self._schema.validate(item, context)
+            item_result = self._schema.validate(
+                item,
+                context if context else item
+            )
             result.append(item_result)
 
         return result

@@ -351,7 +351,7 @@ class Schema:
 
             collection_errors = prop.validate_with_schema(
                 collection,
-                collection_ctx
+                context # not collection ctx
             )
 
             result.add_collection_errors(
