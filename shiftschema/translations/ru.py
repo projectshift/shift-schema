@@ -11,6 +11,9 @@ translations = {
     # choice
     '%not_a_valid_choice%': "Недопустимое значение",
 
+    # multichoice
+    '%invalid_multichoice%': "Содержит недопустимые элементы: [{items}]",
+
     # digits
     '%must_only_contain_digits%': "Значение должно состоять из цифр",
 

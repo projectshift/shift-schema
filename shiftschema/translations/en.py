@@ -11,6 +11,10 @@ translations = {
     # choice
     '%choice_not_valid%': "Provided value is not a valid choice",
 
+
+    # multichoice
+    '%invalid_multichoice%': "Value contains invalid items: [{items}]",
+
     # digits
     '%digits_must_only_contain_digits%': "Must only consist of digits.",
 

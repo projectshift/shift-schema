@@ -7,7 +7,7 @@ class Error:
     """
     Error
     Represents a single validation check result that evaluates to bool to
-    indicate whether the result is valid. In case it's not wil hold the
+    indicate whether the result is valid. In case it's not will hold the
     error message and optional kwargs for parametrized translation.
     """
     def __init__(self, message=None, kwargs=None):

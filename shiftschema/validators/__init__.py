@@ -1,5 +1,6 @@
 from shiftschema.validators.abstract_validator import AbstractValidator
 from shiftschema.validators.choice import Choice
+from shiftschema.validators.multichoice import MultiChoice
 from shiftschema.validators.digits import Digits
 from shiftschema.validators.length import Length
 from shiftschema.validators.email import Email
