@@ -2,7 +2,8 @@ from shiftschema.filters import AbstractFilter
 from shiftschema.validators import AbstractValidator
 from shiftschema.exceptions import InvalidFilter, InvalidValidator
 from shiftschema.exceptions import InvalidSchemaType
-from copy import deepcopy, copy
+from shiftschema.validators import Required
+
 
 class SimpleProperty:
     """
@@ -51,7 +52,7 @@ class SimpleProperty:
         :return: filtered value
         """
         if value is None:
-            return
+            return value
         for filter_obj in self.filters:
             value = filter_obj.filter(value, context=context)
         return value
@@ -66,6 +67,9 @@ class SimpleProperty:
         """
         errors = []
         for validator in self.validators:
+            if value is None and not isinstance(validator, Required):
+                continue
+
             error = validator.run(value, context)
             if error:
                 errors.append(error)
@@ -81,8 +85,7 @@ class EntityProperty(SimpleProperty):
     """
 
     def __init__(self):
-        self.filters = []
-        self.validators = []
+        super().__init__()
         self._schema = None
 
     @property

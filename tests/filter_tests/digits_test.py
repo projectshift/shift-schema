@@ -4,6 +4,7 @@ from nose.plugins.attrib import attr
 from shiftschema.exceptions import UnsupportedValueType
 from shiftschema.filters import Digits
 
+
 @attr('filter', 'digits')
 class DigitsTest(TestCase):
     """ String digits filter test"""

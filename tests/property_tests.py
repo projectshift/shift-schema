@@ -88,6 +88,23 @@ class SimplePropertyTests(TestCase):
         result = prop.validate('shorter than thirty')
         self.assertTrue(len(result) == 2)
 
+    def test_skip_validation_if_value_is_none(self):
+        """ Skip validation if value is None """
+        prop = SimpleProperty()
+        prop.add_validator(validators.Length(min=30))
+        prop.add_validator(validators.Email())
+        result = prop.validate(None)
+        self.assertEquals(0, len(result))
+
+    def test_required_validator_still_runs_if_value_is_none(self):
+        """ Required validator still runs even if value is None """
+        prop = SimpleProperty()
+        prop.add_validator(validators.Length(min=30))
+        prop.add_validator(validators.Email())
+        prop.add_validator(validators.Required())
+        result = prop.validate(None)
+        self.assertEquals(1, len(result))
+
 
 @attr('property', 'entity')
 class EntityPropertyTests(TestCase):
@@ -152,7 +169,7 @@ class EntityPropertyTests(TestCase):
         prop.schema = Schema()
         prop.schema.add_state_validator(helpers.ValidatorInvalid())
         prop.schema.add_property('simple')
-        prop.schema.simple.add_validator(helpers.ValidatorInvalid())
+        prop.schema.simple.add_validator(helpers.validators.Required())
         result = prop.validate_with_schema(dict())
 
         self.assertIsInstance(result, Result)

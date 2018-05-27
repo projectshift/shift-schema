@@ -194,6 +194,14 @@ class SchemaTest(TestCase):
         self.assertEqual('mr', person.salutation)
         self.assertEqual(1964, person.birth_year)
 
+    def test_skip_all_filters_if_value_is_none(self):
+        """ Skip filtering if value is none """
+        schema = Schema(helpers.person_spec)
+        person = helpers.Person()
+        schema.filter(person)
+        self.assertIsNone(person.first_name)
+        self.assertIsNone(person.last_name)
+
     def test_validate_state(self):
         """ Validating entity state """
         model = helpers.Person()
@@ -249,8 +257,9 @@ class SchemaTest(TestCase):
         schema.add_entity('spouse')
         schema.spouse.add_validator(helpers.ValidatorInvalid())
         schema.spouse.schema = Schema(helpers.person_spec)
-
+        schema.spouse.schema.salutation.add_validator(validators.Required())
         result = schema.validate(person)
+
         self.assertTrue(len(result.errors['spouse']['direct']))
         self.assertIn('salutation', result.errors['spouse']['schema'])
 

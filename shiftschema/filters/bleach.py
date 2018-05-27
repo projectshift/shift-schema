@@ -83,8 +83,6 @@ class Bleach(AbstractFilter):
         if self.protocols:
             self.bleach_params['protocols'] = self.protocols
 
-
-
     def filter(self, value, context=None):
         """
         Filter

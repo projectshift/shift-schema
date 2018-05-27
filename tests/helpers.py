@@ -149,8 +149,6 @@ person_spec_collection_aggregate = {
 }
 
 
-
-
 class Person:
     """
     Person

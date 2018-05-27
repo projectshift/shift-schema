@@ -21,7 +21,7 @@ class Strip(AbstractFilter):
         :return:                    None
         """
         modes = ['left', 'right', 'both']
-        if not mode in modes:
+        if mode not in modes:
             raise InvalidOption('Allowed strip modes are left, right or both')
 
         self.mode = mode
