@@ -152,8 +152,14 @@ if not valid:
 
 There is a number of implemented filters already and we are constantly adding more. You also can implement your own by extending from `AbstractFilter` class. Currently the follwing filters are provided:
 
+##### Bleach
+Sanitizes HTML input with [bleach](https://bleach.readthedocs.io) Usefull when accepting rich-html input from users.
+
 ##### Digits
 Removes everything from the string leaving just the digits and optionally converts result to integer.
+
+##### Linkify
+Uses [bleach](https://bleach.readthedocs.io) tp parse input text for something that looks like a URL or email and add links to these elements.
 
 ##### Lowercase
 Converts incoming string to lowercase. If incoming data is not a string it will be converted to one implicitly.
@@ -179,6 +185,14 @@ Validates that passed in value is a valid email. The check is regex only so we d
 ##### Length
 Validates an input for being proper length. You can check for minimum length, maximum length or both.
 
+##### MultiChoice
+Accepts an interable and ensures every item in it is allowed. Just like choice, but for multiple values.
+
+##### Not empty
+Accepts an interable and ensures it is not empty
+
+##### Required
+This is used to mark a property as required. Has modifiers to allow values like `False` or `0`.
 
 ## flask wtforms extension:
 
