@@ -12,16 +12,18 @@ class Required(AbstractValidator):
     value_required = '%value_required%'
     allow_false = False
 
-    def __init__(self, allow_false=False, message=None):
+    def __init__(self, allow_false=False, allow_zero=False, message=None):
         """
         Initialize validator
         Accepts an optional custom error message.
 
+        :param allow_false      bool, whether to allow False as value
+        :param allow_zero:      bool, whether to allow 0 as value
         :param message:         str, custom error message
-        :param message:         bool, whether to allow False as value
         :return:                None
         """
         self.allow_false = allow_false
+        self.allow_zero = allow_zero
         if message is not None:
             self.value_required = message
 
@@ -47,6 +49,10 @@ class Required(AbstractValidator):
 
         # ok if false, but false is allowed
         if value is False and self.allow_false:
+            return Error()
+
+        # ok if 0, but zero is allowed
+        if value == 0 and self.allow_zero:
             return Error()
 
         # error otherwise

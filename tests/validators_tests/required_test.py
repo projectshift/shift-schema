@@ -45,3 +45,9 @@ class RequiredTest(TestCase):
         validator = Required(allow_false=True)
         error = validator.validate(False)
         self.assertFalse(error)
+
+    def test_zero_values_can_be_allowed(self):
+        """ False can be a valid value for required check """
+        validator = Required(allow_zero=True)
+        error = validator.validate(0)
+        self.assertFalse(error)
