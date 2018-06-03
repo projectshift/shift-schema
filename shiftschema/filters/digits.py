@@ -1,5 +1,4 @@
 from shiftschema.filters import AbstractFilter
-from shiftschema.exceptions import UnsupportedValueType
 import re
 
 class Digits(AbstractFilter):
@@ -18,7 +17,6 @@ class Digits(AbstractFilter):
         """
         self.to_int = to_int
 
-
     def filter(self, value, context=None):
         """
         Filter
@@ -29,9 +27,7 @@ class Digits(AbstractFilter):
         :return:                filtered value
         """
 
-        if not type(value) is str:
-            raise UnsupportedValueType('Invalid type of value str expected')
-
+        value = str(value)
         pattern = r'\d+'
         found = ''.join(re.findall(pattern, value))
 

@@ -67,19 +67,11 @@ class UnableToMergeResultsType(ShiftValidateException, TypeError):
     """
     pass
 
+
 class InvalidOption(ShiftValidateException, ValueError):
     """
     Invalid exists
     Indicates an invalid option or option value passed to filter or validator
-    """
-    pass
-
-
-class UnsupportedValueType(ShiftValidateException, TypeError):
-    """
-    UnsupportedValueType
-    Raised on an attempt to process value of unsupported type. Used mostly
-    by filter and validators.
     """
     pass
 

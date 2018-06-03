@@ -1,5 +1,4 @@
 from shiftschema.filters import AbstractFilter
-from shiftschema.exceptions import UnsupportedValueType, InvalidOption
 
 
 class Lowercase(AbstractFilter):

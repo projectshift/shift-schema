@@ -2,7 +2,8 @@ from unittest import TestCase, mock
 from nose.plugins.attrib import attr
 
 from shiftschema.filters import Strip
-from shiftschema.exceptions import InvalidOption, UnsupportedValueType
+from shiftschema.exceptions import InvalidOption
+
 
 @attr('filter', 'strip')
 class StripTest(TestCase):
@@ -17,13 +18,6 @@ class StripTest(TestCase):
         """ Raise error on invalid mode value """
         with self.assertRaises(InvalidOption):
             Strip(mode='BAD!')
-
-    def test_raise_on_bad_value(self):
-        """ Raise error on filtering bad value """
-        strip = Strip()
-        with self.assertRaises(UnsupportedValueType):
-            strip.filter(123)
-
 
     def test_can_filter(self):
         """ Can do filtering """

@@ -1,7 +1,6 @@
 from unittest import TestCase, mock
 from nose.plugins.attrib import attr
 
-from shiftschema.exceptions import UnsupportedValueType
 from shiftschema.filters import Digits
 
 
@@ -13,14 +12,6 @@ class DigitsTest(TestCase):
         """ Can create digits filter """
         filter = Digits()
         self.assertIsInstance(filter, Digits)
-
-    def test_raise_on_bad_value(self):
-        """ Raise in filtering bad value """
-        value = 123
-        filter = Digits()
-
-        with self.assertRaises(UnsupportedValueType):
-            filter.filter(value)
 
     def test_can_filter_digits(self):
         """ Can filter out the digits """

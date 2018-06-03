@@ -1,7 +1,6 @@
 from unittest import TestCase, mock
 from nose.plugins.attrib import attr
 
-from shiftschema.exceptions import UnsupportedValueType
 from shiftschema.filters import Bleach
 
 

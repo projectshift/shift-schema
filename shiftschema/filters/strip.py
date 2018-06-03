@@ -1,5 +1,5 @@
 from shiftschema.filters import AbstractFilter
-from shiftschema.exceptions import UnsupportedValueType, InvalidOption
+from shiftschema.exceptions import InvalidOption
 
 
 class Strip(AbstractFilter):
@@ -38,9 +38,7 @@ class Strip(AbstractFilter):
         :param context:             object, filtering context
         :return:                    filtered value
         """
-        if not type(value) is str:
-            raise UnsupportedValueType('Invalid type of value str expected')
-
+        value = str(value)
         if self.mode == 'left':
             return value.lstrip(self.chars)
         elif self.mode == 'right':
