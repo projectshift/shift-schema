@@ -417,7 +417,21 @@ class SchemaTest(TestCase):
         self.assertFalse(collection[3])
         self.assertIn('address', collection[3].errors)
 
+    def test_skip_validating_collection_with_schema_if_collection_empty(self):
+        """ Skip validating collection with schema if it's empty or None """
+        person = helpers.Person(
+            first_name='Matthew',
+            last_name='Rankin',
+            salutation='mr',
+            email='matrankin@gmail.com',
+            birth_year='1964',
+        )
 
+        person.addresses = None  # override default
+        schema = Schema(helpers.person_spec_collection_aggregate)
+        schema.addresses.validators = []  # skip required validator
+        result = schema.validate(person)
+        self.assertTrue(result)
 
     def test_validate_and_filter(self):
         """ Process: validation and filtering as single operation"""

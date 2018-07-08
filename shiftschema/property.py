@@ -135,7 +135,7 @@ class CollectionProperty(EntityProperty):
 
     def validate_with_schema(self, collection=None, context=None):
         """ Validate each item in collection with our schema"""
-        if self._schema is None:
+        if self._schema is None or not collection:
             return
 
         result = []
