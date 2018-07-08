@@ -20,9 +20,8 @@ class NotEmpty(AbstractValidator):
         :param messages:         str, dict, custom error message or dict
         :return:                None
         """
-        # if message is not None:
-        #     self.cant_be_empty = message
-        pass
+        if message:
+            self.cant_be_empty = message
 
     def validate(self, value, context=None):
         """
