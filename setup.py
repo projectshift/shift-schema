@@ -51,7 +51,7 @@ setup(**dict(
     name='shiftschema',
     version=version,
     url=repo,
-    download_url=repo + '/archive/v' + version + '.tar.gz',
+    download_url=repo + '/archive/' + version + '.tar.gz',
     description='Filtering and validation library for arbitrary data structures',
     keywords=[
         'python3',
