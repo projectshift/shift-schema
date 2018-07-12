@@ -31,13 +31,14 @@ class MultiChoice(AbstractValidator):
 
         self.choices = valid_choices
 
-    def validate(self, value, context=None):
+    def validate(self, value, model=None, context=None):
         """
         Validate
         Perform value validation against validation settings and return
         error object.
 
         :param value:           list, value to check
+        :param model:           parent model being validated
         :param context:         object or None, validation context
         :return:                shiftschema.result.Error
         """

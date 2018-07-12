@@ -23,12 +23,13 @@ class NotEmpty(AbstractValidator):
         if message:
             self.cant_be_empty = message
 
-    def validate(self, value, context=None):
+    def validate(self, value, model=None, context=None):
         """
         Validate
         Perform value validation and return result
 
         :param value:           value to check
+        :param model:           parent model being validated
         :param context:         object or None, validation context
         :return:                shiftschema.results.Error
         """

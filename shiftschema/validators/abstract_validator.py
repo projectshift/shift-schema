@@ -11,7 +11,7 @@ class AbstractValidator(metaclass=ABCMeta):
     """
 
     @abstractmethod
-    def validate(self, value, context=None):
+    def validate(self, value, model=None, context=None):
         """
         Validate
         Abstract validation method: implement this in your concrete
@@ -20,22 +20,24 @@ class AbstractValidator(metaclass=ABCMeta):
         that evaluates to boolean.
 
         :param value:               a value to validate
-        :param context:             validation context
+        :param model:               parent model of the property
+        :param context:             parent model or custom context
         :return:                    shiftschema.result.Error
         """
-        return
+        raise NotImplemented
 
-    def run(self, value, context=None):
+    def run(self, value, model=None, context=None):
         """
         Run validation
         Wraps concrete implementation to ensure custom validators return
         proper type of result.
 
         :param value:               a value to validate
-        :param context:             validation context
+        :param model:               parent model of the property
+        :param context:             parent model or custom context
         :return:                    shiftschema.result.Error
         """
-        res = self.validate(value, context)
+        res = self.validate(value, model, context)
         if not isinstance(res, Error):
             err = 'Validator "{}" result must be of type "{}", got "{}"'
             raise InvalidErrorType(err.format(

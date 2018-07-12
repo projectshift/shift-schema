@@ -11,9 +11,19 @@ class SimpleProperty:
     A single value property on the schema and holds a number of filters and
     validators for this value
     """
-    def __init__(self):
+    def __init__(self, use_context=True):
+        """
+        Initialize property
+        Can optionally accept a flag indicating whether the property should
+        inherit context when being filtered and validated. This is useful
+        to control how custom context is being passed down when validating
+        graphs with nested schemas.
+
+        :param use_context: bool, use or ignore passed context
+        """
         self.filters = []
         self.validators = []
+        self.use_context = use_context
 
     def add_filter(self, filter):
         """
@@ -43,25 +53,31 @@ class SimpleProperty:
         self.validators.append(validator)
         return self
 
-    def filter(self, value=None, context=None):
+    def filter(self, value=None, model=None, context=None):
         """
         Sequentially applies all the filters to provided value
 
         :param value: a value to filter
+        :param model: parent entity
         :param context: filtering context, usually parent entity
         :return: filtered value
         """
         if value is None:
             return value
         for filter_obj in self.filters:
-            value = filter_obj.filter(value, context=context)
+            value = filter_obj.filter(
+                value=value,
+                model=model,
+                context=context if self.use_context else None
+            )
         return value
 
-    def validate(self, value=None, context=None):
+    def validate(self, value=None, model=None, context=None):
         """
         Sequentially apply each validator to value and collect errors.
 
         :param value: a value to validate
+        :param model: parent entity
         :param context: validation context, usually parent entity
         :return: list of errors (if any)
         """
@@ -70,7 +86,11 @@ class SimpleProperty:
             if value is None and not isinstance(validator, Required):
                 continue
 
-            error = validator.run(value, context)
+            error = validator.run(
+                value=value,
+                model=model,
+                context=context if self.use_context else None
+            )
             if error:
                 errors.append(error)
 
@@ -84,8 +104,8 @@ class EntityProperty(SimpleProperty):
     filters and validators attached as well as a nested schema.
     """
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, use_context=True):
+        super().__init__(use_context=use_context)
         self._schema = None
 
     @property
@@ -107,14 +127,20 @@ class EntityProperty(SimpleProperty):
         if model is None or self.schema is None:
             return
 
-        self._schema.filter(model, context)
+        self._schema.filter(
+            model=model,
+            context=context if self.use_context else None
+        )
 
     def validate_with_schema(self, model=None, context=None):
         """ Perform model validation with schema"""
         if self._schema is None or model is None:
             return
 
-        result = self._schema.validate(model, context)
+        result = self._schema.validate(
+            model=model,
+            context=context if self.use_context else None
+        )
         return result
 
 
@@ -131,7 +157,10 @@ class CollectionProperty(EntityProperty):
         if collection is None or self.schema is None:
             return
         for item in collection:
-            self._schema.filter(item, context)
+            self._schema.filter(
+                model=item,
+                context=context if self.use_context else None
+            )
 
     def validate_with_schema(self, collection=None, context=None):
         """ Validate each item in collection with our schema"""
@@ -141,8 +170,8 @@ class CollectionProperty(EntityProperty):
         result = []
         for index, item in enumerate(collection):
             item_result = self._schema.validate(
-                item,
-                context if context else item
+                model=item,
+                context=context if self.use_context else None
             )
             result.append(item_result)
 

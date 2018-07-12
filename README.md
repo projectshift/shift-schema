@@ -3,8 +3,8 @@
 # shift-schema
 
 
-Filtering and validation library for Python3. Can filter and validate data in 
-model objects and simple dictionaries with flexible schemas. 
+Filtering and validation library. Can filter and validate data in 
+objects and simple dictionaries with flexible schemas. 
 
 Main idea: decouple filtering and validation rules from web forms into
 flexible schemas, then reuse those schemas in forms as well as apis and cli. Model validation and filtering rules should be part of the model and your domain logic, not your views or forms logic.
@@ -37,26 +37,6 @@ class MySchema(Schema):
 
 schema = MySchema()
 ```
-
-Or alternatively you can pass spec dictionary to constructor:
-
-```python
-from shiftschema.schema import Schema
-from shiftschema import validators as validator
-
-schema = Schema({
-    'properties': {
-        'name' = dict(
-            required=True,
-            validators = [validator.Length(min=3, max=100)]
-        ),
-        'email' = dict(
-            validators = [validator.Email()]
-        )    
-    }
-})
-```
-
 
 
 

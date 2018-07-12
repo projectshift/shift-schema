@@ -17,15 +17,11 @@ class Schema:
     locale = 'en'
     translator = Translator()
 
-    def __init__(self, spec=None, locale=None, translator=None):
+    def __init__(self, locale=None, translator=None):
         self.state = []
         self.properties = {}
         self.entities = {}
         self.collections = {}
-
-        # create from spec
-        if spec:
-            self.factory(spec)
 
         if locale:
             self.locale = locale
@@ -41,72 +37,6 @@ class Schema:
         :return: None
         """
         pass
-
-    def factory(self, spec):
-        """
-        Factory method: configures itself from a spec dictionary
-        :param spec: dict
-        :return: None
-        """
-        if 'state' in spec:
-            for state_validator in spec['state']:
-                self.add_state_validator(state_validator)
-
-        if 'properties' in spec:
-            for property_name in spec['properties']:
-                self.add_property(property_name)
-                prop = self.properties[property_name]
-                prop_spec = spec['properties'][property_name]
-
-                prop_filters = prop_spec.get('filters')
-                if prop_filters:
-                    for filter in prop_filters:
-                        prop.add_filter(filter)
-
-                prop_validators = prop_spec.get('validators')
-                if prop_validators:
-                    for validator in prop_validators:
-                        prop.add_validator(validator)
-
-        if 'entities' in spec:
-            for property_name in spec['entities']:
-                self.add_entity(property_name)
-                prop = self.entities[property_name]
-                prop_spec = spec['entities'][property_name]
-
-                prop_filters = prop_spec.get('filters')
-                if prop_filters:
-                    for filter in prop_filters:
-                        prop.add_filter(filter)
-
-                prop_validators = prop_spec.get('validators')
-                if prop_validators:
-                    for validator in prop_validators:
-                        prop.add_validator(validator)
-
-                schema = prop_spec.get('schema')
-                if schema:
-                    prop.schema = schema
-
-        if 'collections' in spec:
-            for property_name in spec['collections']:
-                self.add_collection(property_name)
-                prop = self.collections[property_name]
-                prop_spec = spec['collections'][property_name]
-
-                prop_filters = prop_spec.get('filters')
-                if prop_filters:
-                    for filter in prop_filters:
-                        prop.add_filter(filter)
-
-                prop_validators = prop_spec.get('validators')
-                if prop_validators:
-                    for validator in prop_validators:
-                        prop.add_validator(validator)
-
-                schema = prop_spec.get('schema')
-                if schema:
-                    prop.schema = schema
 
     def has_property(self, property_name):
         """
@@ -151,36 +81,39 @@ class Schema:
         if validator not in self.state:
             self.state.append(validator)
 
-    def add_property(self, property_name):
+    def add_property(self, property_name, use_context=True):
         """
         Add simple property to schema
         :param property_name: str, property name
+        :param use_context: bool, whether custom context should be used
         :return: shiftschema.property.SimpleProperty
         """
         if self.has_property(property_name):
             err = 'Property "{}" already exists'
             raise PropertyExists(err.format(property_name))
 
-        prop = SimpleProperty()
+        prop = SimpleProperty(use_context=bool(use_context))
         self.properties[property_name] = prop
         return prop
 
-    def add_entity(self, property_name):
+    def add_entity(self, property_name, use_context=True):
         """
         Add entity property to schema
         :param property_name: str, property name
+        :param use_context: bool, whether custom context should be used
         :return: shiftschema.property.EntityProperty
         """
         if self.has_property(property_name):
             err = 'Property "{}" already exists'
             raise PropertyExists(err.format(property_name))
-        prop = EntityProperty()
+        prop = EntityProperty(use_context=bool(use_context))
         self.entities[property_name] = prop
         return prop
 
-    def add_collection(self, property_name):
+    def add_collection(self, property_name, use_context=True):
         """
         Add collection property to schema
+        :param property_name: str, property name
         :param property_name: str, property name
         :return: shiftschema.property.CollectionProperty
         """
@@ -188,7 +121,7 @@ class Schema:
             err = 'Property "{}" already exists'
             raise PropertyExists(err.format(property_name))
 
-        prop = CollectionProperty()
+        prop = CollectionProperty(use_context=bool(use_context))
         self.collections[property_name] = prop
         return prop
 
@@ -255,8 +188,11 @@ class Schema:
             if value is None:
                 continue
 
-            property_ctx = context if context else model
-            filtered_value = prop.filter(value, property_ctx)
+            filtered_value = prop.filter(
+                value=value,
+                model=model,
+                context=context
+            )
             if value != filtered_value:  # unless changed!
                 self.set(model, property_name, filtered_value)
 
@@ -264,24 +200,35 @@ class Schema:
         for property_name in self.entities:
             prop = self.entities[property_name]
             value = self.get(model, property_name)
-            entity_ctx = context if context else model
 
-            filtered_value = prop.filter(value, entity_ctx)
+            filtered_value = prop.filter(
+                value=value,
+                model=model,
+                context=context
+            )
             if value != filtered_value:  # unless changed!
                 self.set(model, property_name, filtered_value)
 
-            prop.filter_with_schema(value, entity_ctx)
+            prop.filter_with_schema(
+                model=value,
+                context=context
+            )
 
         # collections
         for property_name in self.collections:
             prop = self.collections[property_name]
             collection = self.get(model, property_name)
-            collection_ctx = context if context else model
-
-            filtered_value = prop.filter(collection, collection_ctx)
+            filtered_value = prop.filter(
+                value=collection,
+                model=model,
+                context=context
+            )
             self.set(model, property_name, filtered_value)
 
-            prop.filter_with_schema(collection, collection_ctx)
+            prop.filter_with_schema(
+                collection,
+                context if prop.use_context else None
+            )
 
     def validate(self, model=None, context=None):
         """
@@ -296,30 +243,40 @@ class Schema:
 
         # validate state
         for state_validator in self.state:
-            state_ctx = context  # none or parent model (for nested schemas)
-            error = state_validator.run(model, state_ctx)
+            error = state_validator.run(
+                value=model,
+                model=model,
+                context=context
+            )
             if error:
                 result.add_state_errors(error)
 
         # validate simple properties
         for property_name in self.properties:
+            prop = self.properties[property_name]
             value = self.get(model, property_name)
-            property_ctx = context if context else model
-            errors = self.properties[property_name].validate(
+            errors = prop.validate(
                 value=value,
-                context=property_ctx
+                model=model,
+                context=context
             )
 
             if errors:
-                result.add_errors(errors=errors, property_name=property_name)
+                result.add_errors(
+                    errors=errors,
+                    property_name=property_name
+                )
 
         # validate nested entity properties
         for property_name in self.entities:
             prop = self.entities[property_name]
             value = self.get(model, property_name)
-            entity_ctx = context if context else model
 
-            errors = prop.validate(value, entity_ctx)
+            errors = prop.validate(
+                value=value,
+                model=model,
+                context=context
+            )
             if len(errors):
                 result.add_entity_errors(
                     property_name=property_name,
@@ -329,7 +286,10 @@ class Schema:
             if value is None:
                 continue
 
-            schema_valid = prop.validate_with_schema(value, entity_ctx)
+            schema_valid = prop.validate_with_schema(
+                model=value,
+                context=context
+            )
             if schema_valid == False:
                 result.add_entity_errors(
                     property_name,
@@ -340,9 +300,12 @@ class Schema:
         for property_name in self.collections:
             prop = self.collections[property_name]
             collection = self.get(model, property_name)
-            collection_ctx = context if context else model
 
-            errors = prop.validate(collection, collection_ctx)
+            errors = prop.validate(
+                value=collection,
+                model=model,
+                context=context
+            )
             if len(errors):
                 result.add_collection_errors(
                     property_name=property_name,
@@ -350,8 +313,8 @@ class Schema:
                 )
 
             collection_errors = prop.validate_with_schema(
-                collection,
-                context # not collection ctx
+                collection=collection,
+                context=context
             )
 
             result.add_collection_errors(
