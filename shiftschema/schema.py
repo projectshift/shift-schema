@@ -240,34 +240,39 @@ class Schema:
 
         # validate state
         for state_validator in self.state:
-            state_ctx = context  # none or parent model (for nested schemas)
-            error = state_validator.run(model, model, state_ctx)
+            error = state_validator.run(
+                value=model,
+                model=model,
+                context=context
+            )
             if error:
                 result.add_state_errors(error)
 
         # validate simple properties
         for property_name in self.properties:
+            prop = self.properties[property_name]
             value = self.get(model, property_name)
-            property_ctx = context if context else model
-            errors = self.properties[property_name].validate(
+            errors = prop.validate(
                 value=value,
                 model=model,
-                context=property_ctx
+                context=context if prop.use_context else None
             )
 
             if errors:
-                result.add_errors(errors=errors, property_name=property_name)
+                result.add_errors(
+                    errors=errors,
+                    property_name=property_name
+                )
 
         # validate nested entity properties
         for property_name in self.entities:
             prop = self.entities[property_name]
             value = self.get(model, property_name)
-            entity_ctx = context if context else model
 
             errors = prop.validate(
                 value=value,
                 model=model,
-                context=entity_ctx
+                context=context if prop.use_context else None
             )
             if len(errors):
                 result.add_entity_errors(
@@ -280,7 +285,7 @@ class Schema:
 
             schema_valid = prop.validate_with_schema(
                 model=value,
-                context=entity_ctx
+                context=context if prop.use_context else None
             )
             if schema_valid == False:
                 result.add_entity_errors(
@@ -292,12 +297,11 @@ class Schema:
         for property_name in self.collections:
             prop = self.collections[property_name]
             collection = self.get(model, property_name)
-            collection_ctx = context if context else model
 
             errors = prop.validate(
                 value=collection,
                 model=model,
-                context=collection_ctx
+                context=context if prop.use_context else None
             )
             if len(errors):
                 result.add_collection_errors(
@@ -307,7 +311,7 @@ class Schema:
 
             collection_errors = prop.validate_with_schema(
                 collection=collection,
-                context=context # not collection ctx
+                context=context if prop.use_context else None
             )
 
             result.add_collection_errors(
