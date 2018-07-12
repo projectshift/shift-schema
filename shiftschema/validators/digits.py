@@ -21,12 +21,13 @@ class Digits(AbstractValidator):
         if message is not None:
             self.not_digital = message
 
-    def validate(self, value, context=None):
+    def validate(self, value, model=None, context=None):
         """
         Validate
         Perform value validation and return result
 
         :param value:           value to check, cast to string
+        :param model:           parent model being validated
         :param context:         object or None, validation context
         :return:                shiftschema.results.SimpleResult
         """

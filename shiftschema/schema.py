@@ -256,7 +256,11 @@ class Schema:
                 continue
 
             property_ctx = context if context else model
-            filtered_value = prop.filter(value, property_ctx)
+            filtered_value = prop.filter(
+                value=value,
+                model=model,
+                context=property_ctx
+            )
             if value != filtered_value:  # unless changed!
                 self.set(model, property_name, filtered_value)
 
@@ -266,7 +270,11 @@ class Schema:
             value = self.get(model, property_name)
             entity_ctx = context if context else model
 
-            filtered_value = prop.filter(value, entity_ctx)
+            filtered_value = prop.filter(
+                value=value,
+                model=model,
+                context=entity_ctx
+            )
             if value != filtered_value:  # unless changed!
                 self.set(model, property_name, filtered_value)
 
@@ -278,7 +286,11 @@ class Schema:
             collection = self.get(model, property_name)
             collection_ctx = context if context else model
 
-            filtered_value = prop.filter(collection, collection_ctx)
+            filtered_value = prop.filter(
+                value=collection,
+                model=model,
+                context=collection_ctx
+            )
             self.set(model, property_name, filtered_value)
 
             prop.filter_with_schema(collection, collection_ctx)
@@ -297,7 +309,7 @@ class Schema:
         # validate state
         for state_validator in self.state:
             state_ctx = context  # none or parent model (for nested schemas)
-            error = state_validator.run(model, state_ctx)
+            error = state_validator.run(model, model, state_ctx)
             if error:
                 result.add_state_errors(error)
 
@@ -307,6 +319,7 @@ class Schema:
             property_ctx = context if context else model
             errors = self.properties[property_name].validate(
                 value=value,
+                model=model,
                 context=property_ctx
             )
 
@@ -319,7 +332,11 @@ class Schema:
             value = self.get(model, property_name)
             entity_ctx = context if context else model
 
-            errors = prop.validate(value, entity_ctx)
+            errors = prop.validate(
+                value=value,
+                model=model,
+                context=entity_ctx
+            )
             if len(errors):
                 result.add_entity_errors(
                     property_name=property_name,
@@ -329,7 +346,10 @@ class Schema:
             if value is None:
                 continue
 
-            schema_valid = prop.validate_with_schema(value, entity_ctx)
+            schema_valid = prop.validate_with_schema(
+                model=value,
+                context=entity_ctx
+            )
             if schema_valid == False:
                 result.add_entity_errors(
                     property_name,
@@ -342,7 +362,11 @@ class Schema:
             collection = self.get(model, property_name)
             collection_ctx = context if context else model
 
-            errors = prop.validate(collection, collection_ctx)
+            errors = prop.validate(
+                value=collection,
+                model=model,
+                context=collection_ctx
+            )
             if len(errors):
                 result.add_collection_errors(
                     property_name=property_name,
@@ -350,8 +374,8 @@ class Schema:
                 )
 
             collection_errors = prop.validate_with_schema(
-                collection,
-                context # not collection ctx
+                collection=collection,
+                context=context # not collection ctx
             )
 
             result.add_collection_errors(

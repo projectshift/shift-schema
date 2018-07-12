@@ -11,32 +11,32 @@ from shiftschema.schema import Schema
 
 class ValidatorValid(validators.AbstractValidator):
     """ Test validator that is always valid"""
-    def validate(self, value=None, context=None):
+    def validate(self, value=None, model=None, context=None):
         return Error() # always valid
 
 
 class ValidatorInvalid(validators.AbstractValidator):
     """ Test validator that is always invalid"""
-    def validate(self, value=None, context=None):
+    def validate(self, value=None, model=None, context=None):
         return Error('always invalid')
 
 
 class EntityFilter(filters.AbstractFilter):
     """ A simple filter that can be used on entity properties """
-    def filter(self, value, context=None):
+    def filter(self, value, model=None, context=None):
         return [value]
 
 
 class CollectionFilter(filters.AbstractFilter):
     """ Test filter to apply to collection properties """
-    def filter(self, value, context=None):
+    def filter(self, value, model=None, context=None):
         filtered = filter(lambda x: x['value'] % 2 == 0, value)
         return list(filtered)
 
 
 class DropUSAddressesCollectionFilter(filters.AbstractFilter):
     """ Goes through a collection of addresses and drops US ones """
-    def filter(self, value, context=None):
+    def filter(self, value, model=None, context=None):
         return [a for a in value if a.country.strip() != 'US']
 
 

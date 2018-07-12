@@ -31,13 +31,14 @@ class Length(AbstractValidator):
             self.too_short = message
             self.not_in_range = message
 
-    def validate(self, value, context=None):
+    def validate(self, value, model=None, context=None):
         """
         Validate
         Perform value validation against validation settings and return
         simple result object
 
         :param value:           str, value to check
+        :param model:           parent model being validated
         :param context:         object or None, validation context
         :return:                shiftschema.results.SimpleResult
         """

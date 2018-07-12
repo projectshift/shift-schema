@@ -43,25 +43,31 @@ class SimpleProperty:
         self.validators.append(validator)
         return self
 
-    def filter(self, value=None, context=None):
+    def filter(self, value=None, model=None, context=None):
         """
         Sequentially applies all the filters to provided value
 
         :param value: a value to filter
+        :param model: parent entity
         :param context: filtering context, usually parent entity
         :return: filtered value
         """
         if value is None:
             return value
         for filter_obj in self.filters:
-            value = filter_obj.filter(value, context=context)
+            value = filter_obj.filter(
+                value=value,
+                model=model,
+                context=context
+            )
         return value
 
-    def validate(self, value=None, context=None):
+    def validate(self, value=None, model=None, context=None):
         """
         Sequentially apply each validator to value and collect errors.
 
         :param value: a value to validate
+        :param model: parent entity
         :param context: validation context, usually parent entity
         :return: list of errors (if any)
         """
@@ -70,7 +76,11 @@ class SimpleProperty:
             if value is None and not isinstance(validator, Required):
                 continue
 
-            error = validator.run(value, context)
+            error = validator.run(
+                value=value,
+                model=model,
+                context=context
+            )
             if error:
                 errors.append(error)
 
