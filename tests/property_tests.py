@@ -24,6 +24,12 @@ class SimplePropertyTests(TestCase):
         prop = SimpleProperty()
         self.assertIsInstance(prop, SimpleProperty)
 
+    def test_simple_property_can_ignore_context(self):
+        """ Simple properties can ignore context via use_context"""
+        use_context = False
+        prop = SimpleProperty(use_context=use_context)
+        self.assertEquals(use_context, prop.use_context)
+
     def test_adding_filter(self):
         """ Add filter to property """
         prop = SimpleProperty()
@@ -113,6 +119,12 @@ class EntityPropertyTests(TestCase):
         """ Creating entity property """
         prop = EntityProperty()
         self.assertIsInstance(prop, EntityProperty)
+
+    def test_entity_properties_can_ignore_context(self):
+        """ Entity properties can ignore context via use_context"""
+        use_context = False
+        prop = EntityProperty(use_context=use_context)
+        self.assertEquals(use_context, prop.use_context)
 
     def test_accessing_schema(self):
         """ Accessing nested schema with property descriptors """
@@ -207,6 +219,12 @@ class CollectionPropertyTests(TestCase):
         """ Creating collection property """
         prop = CollectionProperty()
         self.assertIsInstance(prop, CollectionProperty)
+
+    def test_collection_properties_can_ignore_context(self):
+        """ Collection properties can ignore context via use_context"""
+        use_context = False
+        prop = CollectionProperty(use_context=use_context)
+        self.assertEquals(use_context, prop.use_context)
 
     def test_filtering_a_collection(self):
         """ Filtering a collection """
