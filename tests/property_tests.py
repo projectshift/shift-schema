@@ -143,7 +143,7 @@ class EntityPropertyTests(TestCase):
             last_name='   Wonka    ',
         )
         prop = EntityProperty()
-        prop.schema = Schema(helpers.person_spec)
+        prop.schema = helpers.PersonSpec()
         prop.filter_with_schema(model)
         self.assertEqual('Willy', model.first_name)
         self.assertEqual('Wonka', model.last_name)
@@ -186,7 +186,7 @@ class EntityPropertyTests(TestCase):
         model = helpers.Person()
         model.nested = nested
 
-        nested_schema = Schema(helpers.person_spec)
+        nested_schema = helpers.PersonSpec()
         schema = Schema()
         schema.add_entity('nested')
         schema.nested.schema = nested_schema

@@ -255,11 +255,10 @@ class Schema:
             if value is None:
                 continue
 
-            property_ctx = context if context else model
             filtered_value = prop.filter(
                 value=value,
                 model=model,
-                context=property_ctx
+                context=context if prop.use_context else None
             )
             if value != filtered_value:  # unless changed!
                 self.set(model, property_name, filtered_value)
@@ -268,32 +267,35 @@ class Schema:
         for property_name in self.entities:
             prop = self.entities[property_name]
             value = self.get(model, property_name)
-            entity_ctx = context if context else model
 
             filtered_value = prop.filter(
                 value=value,
                 model=model,
-                context=entity_ctx
+                context=context if prop.use_context else None
             )
             if value != filtered_value:  # unless changed!
                 self.set(model, property_name, filtered_value)
 
-            prop.filter_with_schema(value, entity_ctx)
+            prop.filter_with_schema(
+                value,
+                context if prop.use_context else None
+            )
 
         # collections
         for property_name in self.collections:
             prop = self.collections[property_name]
             collection = self.get(model, property_name)
-            collection_ctx = context if context else model
-
             filtered_value = prop.filter(
                 value=collection,
                 model=model,
-                context=collection_ctx
+                context=context if prop.use_context else None
             )
             self.set(model, property_name, filtered_value)
 
-            prop.filter_with_schema(collection, collection_ctx)
+            prop.filter_with_schema(
+                collection,
+                context if prop.use_context else None
+            )
 
     def validate(self, model=None, context=None):
         """

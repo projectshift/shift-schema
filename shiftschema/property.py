@@ -11,9 +11,19 @@ class SimpleProperty:
     A single value property on the schema and holds a number of filters and
     validators for this value
     """
-    def __init__(self):
+    def __init__(self, use_context=True):
+        """
+        Initialize property
+        Can optionally accept a flag indicating whether the property should
+        inherit context when being filtered and validated. This is useful
+        to control how custom context is being passed down when validating
+        graphs with nested schemas.
+
+        :param use_context: bool, use or ignore passed context
+        """
         self.filters = []
         self.validators = []
+        self.use_context = use_context
 
     def add_filter(self, filter):
         """
@@ -94,8 +104,8 @@ class EntityProperty(SimpleProperty):
     filters and validators attached as well as a nested schema.
     """
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, use_context=True):
+        super().__init__(use_context=use_context)
         self._schema = None
 
     @property

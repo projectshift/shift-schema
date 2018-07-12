@@ -11,6 +11,7 @@ from shiftschema.translator import Translator
 from shiftschema import validators
 from shiftschema import filters
 from tests import helpers
+from pprint import pprint as pp
 
 
 @attr('schema')
@@ -156,7 +157,7 @@ class SchemaTest(TestCase):
 
     def test_create_from_spec(self):
         """ Creating schema from spec"""
-        schema = Schema(spec=helpers.person_spec_aggregate)
+        schema = helpers.PersonSpecAggregate()
         self.assertEqual(1, len(schema.state))
 
         # import pdb;pdb.set_trace()
@@ -181,7 +182,7 @@ class SchemaTest(TestCase):
 
     def test_filter_entity(self):
         """ Filtering entity with schema """
-        schema = Schema(helpers.person_spec)
+        schema = helpers.PersonSpec()
         person = helpers.Person(
             first_name='  Willy  ',
             last_name='  Wonka  ',
@@ -196,7 +197,7 @@ class SchemaTest(TestCase):
 
     def test_skip_all_filters_if_value_is_none(self):
         """ Skip filtering if value is none """
-        schema = Schema(helpers.person_spec)
+        schema = helpers.PersonSpec()
         person = helpers.Person()
         schema.filter(person)
         self.assertIsNone(person.first_name)
@@ -213,7 +214,7 @@ class SchemaTest(TestCase):
 
     def test_validate_simple_properties(self):
         """ Validating simple properties """
-        schema = Schema(helpers.person_spec)
+        schema = helpers.PersonSpec()
         person = helpers.Person(
             first_name='Some really really long name',
             last_name='And a really really long last name',
@@ -241,7 +242,7 @@ class SchemaTest(TestCase):
 
         schema = Schema()
         schema.add_entity('spouse')
-        schema.spouse.schema = Schema(helpers.person_spec)
+        schema.spouse.schema = helpers.PersonSpec()
         result = schema.validate(model)
 
         self.assertFalse(result)
@@ -253,10 +254,10 @@ class SchemaTest(TestCase):
         person = helpers.Person()
         person.spouse = helpers.Person()
 
-        schema = Schema(helpers.person_spec)
+        schema = helpers.PersonSpec()
         schema.add_entity('spouse')
         schema.spouse.add_validator(helpers.ValidatorInvalid())
-        schema.spouse.schema = Schema(helpers.person_spec)
+        schema.spouse.schema = helpers.PersonSpec()
         schema.spouse.schema.salutation.add_validator(validators.Required())
         result = schema.validate(person)
 
@@ -309,7 +310,7 @@ class SchemaTest(TestCase):
         person.addresses.append(address2)
         person.addresses.append(address3)
 
-        schema = Schema(helpers.person_spec_collection_aggregate)
+        schema = helpers.PersonSpecAggregate()
         schema.filter(person)
         self.assertEquals(2, len(person.addresses))
         for address in person.addresses:
@@ -335,7 +336,7 @@ class SchemaTest(TestCase):
 
         person.addresses.append(address1)
 
-        schema = Schema(helpers.person_spec_collection_aggregate)
+        schema = helpers.PersonSpecCollectionAggregate()
         schema.filter(person)
         self.assertEquals('2 Hollin Croft', person.addresses[0].address)
         self.assertEquals('Barnsley', person.addresses[0].city)
@@ -352,7 +353,7 @@ class SchemaTest(TestCase):
             birth_year='1964',
         )
 
-        schema = Schema(helpers.person_spec_collection_aggregate)
+        schema = helpers.PersonSpecCollectionAggregate()
         result = schema.validate(person)
         self.assertFalse(result)
         self.assertIn('addresses', result.errors)
@@ -397,13 +398,13 @@ class SchemaTest(TestCase):
             email='matrankin@gmail.com',
             birth_year='1964',
         )
-
+        #
         person.addresses.append(address1)
         person.addresses.append(address2)
         person.addresses.append(address3)
         person.addresses.append(address4)
 
-        schema = Schema(helpers.person_spec_collection_aggregate)
+        schema = helpers.PersonSpecCollectionAggregate()
         result = schema.validate(person)
 
         self.assertFalse(result)
@@ -428,7 +429,7 @@ class SchemaTest(TestCase):
         )
 
         person.addresses = None  # override default
-        schema = Schema(helpers.person_spec_collection_aggregate)
+        schema = helpers.PersonSpecCollectionAggregate()
         schema.addresses.validators = []  # skip required validator
         result = schema.validate(person)
         self.assertTrue(result)
@@ -437,7 +438,7 @@ class SchemaTest(TestCase):
         """ Process: validation and filtering as single operation"""
         person = helpers.Person(first_name='   W   ')
         person.spouse = helpers.Person(first_name='   X   ')
-        schema = Schema(helpers.person_spec_aggregate)
+        schema = helpers.PersonSpecAggregate()
         result = schema.process(person)
 
         self.assertEqual('W', person.first_name)
