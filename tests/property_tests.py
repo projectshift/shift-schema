@@ -1,4 +1,3 @@
-
 from unittest import TestCase, mock
 from nose.plugins.attrib import attr
 
@@ -77,6 +76,22 @@ class SimplePropertyTests(TestCase):
         prop.add_filter(filters.Digits())
         value = '  Good luck in 2024 to you and your robots!'
         self.assertEqual('2024', prop.filter(value))
+
+    def test_filtering_simple_prop_with_context(self):
+        """ Filtering simple property with context (default) """
+        self.fail('Implement me!')
+
+    def test_filtering_simple_prop_without_context(self):
+        """ Filtering simple property without context """
+        self.fail('Implement me!')
+
+    def test_validating_simple_prop_with_context(self):
+        """ Validating simple property with context (default) """
+        self.fail('Implement me!')
+
+    def test_validating_simple_prop_without_context(self):
+        """ Validating simple property without context """
+        self.fail('Implement me!')
 
     def test_validate_value_and_pass(self):
         """ Validate simple property and pass """
@@ -189,6 +204,22 @@ class EntityPropertyTests(TestCase):
         self.assertIn('__state__', result.errors)
         self.assertIn('simple', result.errors)
 
+    def test_filtering_entity_prop_with_schema_using_context(self):
+        """ Filtering entity property with schema using context (default) """
+        self.fail('Implement me!')
+
+    def test_filtering_entity_prop_with_schema_without_context(self):
+        """ Filtering entity property with schema without context """
+        self.fail('Implement me!')
+
+    def test_validating_entity_prop_with_schema_using_context(self):
+        """ Validating entity property with schema using context (default) """
+        self.fail('Implement me!')
+
+    def test_validating_entity_prop_with_schema_without_context(self):
+        """ Validating entity property with schema without context """
+        self.fail('Implement me!')
+
     def test_filter_and_validate(self):
         """ Process: filter and validate in single operation """
         nested = helpers.Person(
@@ -285,6 +316,22 @@ class CollectionPropertyTests(TestCase):
         self.assertTrue(result[1])
         self.assertFalse(result[2])
         self.assertTrue(result[3])
+
+    def test_filtering_collection_prop_with_schema_using_context(self):
+        """ Filtering collection property with schema using context (default)"""
+        self.fail('Implement me!')
+
+    def test_filtering_collection_prop_with_schema_without_context(self):
+        """ Filtering collection property with schema without context """
+        self.fail('Implement me!')
+
+    def test_validating_collection_prop_with_schema_using_context(self):
+        """ Validating collection property with schema using context """
+        self.fail('Implement me!')
+
+    def test_validating_collection_prop_with_schema_without_context(self):
+        """ Validating collection property with schema without context """
+        self.fail('Implement me!')
 
 
 
