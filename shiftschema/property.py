@@ -68,7 +68,7 @@ class SimpleProperty:
             value = filter_obj.filter(
                 value=value,
                 model=model,
-                context=context
+                context=context if self.use_context else None
             )
         return value
 
@@ -89,7 +89,7 @@ class SimpleProperty:
             error = validator.run(
                 value=value,
                 model=model,
-                context=context
+                context=context if self.use_context else None
             )
             if error:
                 errors.append(error)
@@ -127,14 +127,20 @@ class EntityProperty(SimpleProperty):
         if model is None or self.schema is None:
             return
 
-        self._schema.filter(model, context)
+        self._schema.filter(
+            model=model,
+            context=context if self.use_context else None
+        )
 
     def validate_with_schema(self, model=None, context=None):
         """ Perform model validation with schema"""
         if self._schema is None or model is None:
             return
 
-        result = self._schema.validate(model, context)
+        result = self._schema.validate(
+            model=model,
+            context=context if self.use_context else None
+        )
         return result
 
 
@@ -151,7 +157,10 @@ class CollectionProperty(EntityProperty):
         if collection is None or self.schema is None:
             return
         for item in collection:
-            self._schema.filter(item, context)
+            self._schema.filter(
+                model=item,
+                context=context if self.use_context else None
+            )
 
     def validate_with_schema(self, collection=None, context=None):
         """ Validate each item in collection with our schema"""
@@ -161,8 +170,8 @@ class CollectionProperty(EntityProperty):
         result = []
         for index, item in enumerate(collection):
             item_result = self._schema.validate(
-                item,
-                context if context else item
+                model=item,
+                context=context if self.use_context else None
             )
             result.append(item_result)
 

@@ -191,19 +191,24 @@ class SchemaTest(TestCase):
 
     def test_filtering_simple_properties_with_context(self):
         """ Filtering simple properties with context (default)"""
-        self.fail('Implement me!')
+        custom_context = 'I AM CUSTOM CONTEXT'
 
-    def test_filtering_simple_properties_without_context(self):
-        """ Filtering simple properties without context """
-        self.fail('Implement me!')
+        class TestFilter(filters.AbstractFilter):
+            def filter(self, value, model=None, context=None):
+                if context == custom_context:
+                    return 'CUSTOM CONTEXT'
+                else:
+                    return 'NO CUSTOM CONTEXT'
 
-    def test_validating_simple_properties_with_context(self):
-        """ Validating simple properties with context (default)"""
-        self.fail('Implement me!')
+        class TestSchema(Schema):
+            def schema(self):
+                self.add_property('prop')
+                self.prop.add_filter(TestFilter())
 
-    def test_validating_simple_properties_without_context(self):
-        """ Validating simple properties without context """
-        self.fail('Implement me!')
+        model = dict(prop='some value')
+        schema = TestSchema()
+        schema.filter(model, context=custom_context)
+        self.assertEquals('CUSTOM CONTEXT', model['prop'])
 
     def test_validate_state(self):
         """ Validating entity state """
@@ -236,22 +241,6 @@ class SchemaTest(TestCase):
         schema.property.add_validator(Required())
         result = schema.validate(dict())
         self.assertFalse(result)
-
-    def test_filtering_entity_properties_with_context(self):
-        """ Filtering entity properties with context (default)"""
-        self.fail('Implement me!')
-
-    def test_filtering_entity_properties_without_context(self):
-        """ Filtering entity properties without context """
-        self.fail('Implement me!')
-
-    def test_validating_entity_properties_with_context(self):
-        """ Validating entity properties with context (default)"""
-        self.fail('Implement me!')
-
-    def test_validating_entity_properties_without_context(self):
-        """ Filtering entity properties without context """
-        self.fail('Implement me!')
 
     def test_validate_entity_property(self):
         """ Validated linked entity properties with nested schemas """
@@ -293,22 +282,6 @@ class SchemaTest(TestCase):
         result = schema.validate(Person())
         self.assertFalse(result)
         self.assertIn('spouse', result.get_messages())
-
-    def test_filtering_collection_properties_with_context(self):
-        """ Filtering collection properties with context (default)"""
-        self.fail('Implement me!')
-
-    def test_filtering_collection_properties_without_context(self):
-        """ Filtering collection properties without context """
-        self.fail('Implement me!')
-
-    def test_validating_collection_properties_with_context(self):
-        """ Validating collection properties with context (default)"""
-        self.fail('Implement me!')
-
-    def test_validating_collection_properties_without_context(self):
-        """ Validating collection properties without context """
-        self.fail('Implement me!')
 
     def test_can_filter_out_collections_directly(self):
         """ Filter out collection properties with filters attached directly """

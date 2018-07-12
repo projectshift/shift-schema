@@ -81,36 +81,39 @@ class Schema:
         if validator not in self.state:
             self.state.append(validator)
 
-    def add_property(self, property_name):
+    def add_property(self, property_name, use_context=True):
         """
         Add simple property to schema
         :param property_name: str, property name
+        :param use_context: bool, whether custom context should be used
         :return: shiftschema.property.SimpleProperty
         """
         if self.has_property(property_name):
             err = 'Property "{}" already exists'
             raise PropertyExists(err.format(property_name))
 
-        prop = SimpleProperty()
+        prop = SimpleProperty(use_context=bool(use_context))
         self.properties[property_name] = prop
         return prop
 
-    def add_entity(self, property_name):
+    def add_entity(self, property_name, use_context=True):
         """
         Add entity property to schema
         :param property_name: str, property name
+        :param use_context: bool, whether custom context should be used
         :return: shiftschema.property.EntityProperty
         """
         if self.has_property(property_name):
             err = 'Property "{}" already exists'
             raise PropertyExists(err.format(property_name))
-        prop = EntityProperty()
+        prop = EntityProperty(use_context=bool(use_context))
         self.entities[property_name] = prop
         return prop
 
-    def add_collection(self, property_name):
+    def add_collection(self, property_name, use_context=True):
         """
         Add collection property to schema
+        :param property_name: str, property name
         :param property_name: str, property name
         :return: shiftschema.property.CollectionProperty
         """
@@ -118,7 +121,7 @@ class Schema:
             err = 'Property "{}" already exists'
             raise PropertyExists(err.format(property_name))
 
-        prop = CollectionProperty()
+        prop = CollectionProperty(use_context=bool(use_context))
         self.collections[property_name] = prop
         return prop
 
@@ -188,7 +191,7 @@ class Schema:
             filtered_value = prop.filter(
                 value=value,
                 model=model,
-                context=context if prop.use_context else None
+                context=context
             )
             if value != filtered_value:  # unless changed!
                 self.set(model, property_name, filtered_value)
@@ -201,14 +204,14 @@ class Schema:
             filtered_value = prop.filter(
                 value=value,
                 model=model,
-                context=context if prop.use_context else None
+                context=context
             )
             if value != filtered_value:  # unless changed!
                 self.set(model, property_name, filtered_value)
 
             prop.filter_with_schema(
-                value,
-                context if prop.use_context else None
+                model=value,
+                context=context
             )
 
         # collections
@@ -218,7 +221,7 @@ class Schema:
             filtered_value = prop.filter(
                 value=collection,
                 model=model,
-                context=context if prop.use_context else None
+                context=context
             )
             self.set(model, property_name, filtered_value)
 
@@ -255,7 +258,7 @@ class Schema:
             errors = prop.validate(
                 value=value,
                 model=model,
-                context=context if prop.use_context else None
+                context=context
             )
 
             if errors:
@@ -272,7 +275,7 @@ class Schema:
             errors = prop.validate(
                 value=value,
                 model=model,
-                context=context if prop.use_context else None
+                context=context
             )
             if len(errors):
                 result.add_entity_errors(
@@ -285,7 +288,7 @@ class Schema:
 
             schema_valid = prop.validate_with_schema(
                 model=value,
-                context=context if prop.use_context else None
+                context=context
             )
             if schema_valid == False:
                 result.add_entity_errors(
@@ -301,7 +304,7 @@ class Schema:
             errors = prop.validate(
                 value=collection,
                 model=model,
-                context=context if prop.use_context else None
+                context=context
             )
             if len(errors):
                 result.add_collection_errors(
@@ -311,7 +314,7 @@ class Schema:
 
             collection_errors = prop.validate_with_schema(
                 collection=collection,
-                context=context if prop.use_context else None
+                context=context
             )
 
             result.add_collection_errors(
