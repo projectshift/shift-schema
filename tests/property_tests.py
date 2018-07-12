@@ -3,6 +3,7 @@ from nose.plugins.attrib import attr
 
 from shiftschema.schema import Schema
 from shiftschema.result import Result
+from shiftschema.result import Error
 from shiftschema.property import SimpleProperty
 from shiftschema.property import EntityProperty
 from shiftschema.property import CollectionProperty
@@ -77,21 +78,70 @@ class SimplePropertyTests(TestCase):
         value = '  Good luck in 2024 to you and your robots!'
         self.assertEqual('2024', prop.filter(value))
 
+
     def test_filtering_simple_prop_with_context(self):
         """ Filtering simple property with context (default) """
-        self.fail('Implement me!')
+        custom_context = 'CUSTOM CONTEXT'
+
+        class TestFilter(filters.AbstractFilter):
+            def filter(self, value, model=None, context=None):
+                if context == custom_context:
+                    return 'CONTEXT'
+                else:
+                    return 'NO CONTEXT'
+        prop = SimpleProperty()
+        prop.add_filter(TestFilter())
+        res = prop.filter('some value', context=custom_context)
+        self.assertEquals('CONTEXT', res)
 
     def test_filtering_simple_prop_without_context(self):
         """ Filtering simple property without context """
-        self.fail('Implement me!')
+        custom_context = 'CUSTOM CONTEXT'
+
+        class TestFilter(filters.AbstractFilter):
+            def filter(self, value, model=None, context=None):
+                if context == custom_context:
+                    return 'CONTEXT'
+                else:
+                    return 'NO CONTEXT'
+        prop = SimpleProperty(use_context=False)
+        prop.add_filter(TestFilter())
+        res = prop.filter('some value', context=custom_context)
+        self.assertEquals('NO CONTEXT', res)
 
     def test_validating_simple_prop_with_context(self):
         """ Validating simple property with context (default) """
-        self.fail('Implement me!')
+        custom_context = 'CUSTOM CONTEXT'
+
+        class TestValidator(validators.AbstractValidator):
+            def validate(self, value, model=None, context=None):
+                if context == custom_context:
+                    return Error('CONTEXT')
+                else:
+                    return Error('NO CONTEXT')
+
+        prop = SimpleProperty()
+        prop.add_validator(TestValidator())
+        res = prop.validate('some value', context=custom_context)
+        err = res[0].message
+        self.assertEquals('CONTEXT', err)
 
     def test_validating_simple_prop_without_context(self):
         """ Validating simple property without context """
-        self.fail('Implement me!')
+        custom_context = 'CUSTOM CONTEXT'
+
+        class TestValidator(validators.AbstractValidator):
+            def validate(self, value, model=None, context=None):
+                if context == custom_context:
+                    return Error('CONTEXT')
+                else:
+                    return Error('NO CONTEXT')
+
+        prop = SimpleProperty(use_context=False)
+        prop.add_validator(TestValidator())
+        res = prop.validate('some value', context=custom_context)
+        err = res[0].message
+        self.assertEquals('NO CONTEXT', err)
 
     def test_validate_value_and_pass(self):
         """ Validate simple property and pass """
@@ -206,19 +256,93 @@ class EntityPropertyTests(TestCase):
 
     def test_filtering_entity_prop_with_schema_using_context(self):
         """ Filtering entity property with schema using context (default) """
-        self.fail('Implement me!')
+        custom_context = 'CUSTOM CONTEXT'
+
+        class TestFilter(filters.AbstractFilter):
+            def filter(self, value, model=None, context=None):
+                if context == custom_context:
+                    return 'CONTEXT'
+                else:
+                    return 'NO CONTEXT'
+
+        nested_schema = Schema()
+        nested_schema.add_property('prop')
+        nested_schema.prop.add_filter(TestFilter())
+
+        prop = EntityProperty()
+        prop.schema = nested_schema
+
+        model = dict(prop='some value')
+        prop.filter_with_schema(model, context=custom_context)
+        self.assertEquals('CONTEXT', model['prop'])
 
     def test_filtering_entity_prop_with_schema_without_context(self):
         """ Filtering entity property with schema without context """
-        self.fail('Implement me!')
+        custom_context = 'CUSTOM CONTEXT'
+
+        class TestFilter(filters.AbstractFilter):
+            def filter(self, value, model=None, context=None):
+                if context == custom_context:
+                    return 'CONTEXT'
+                else:
+                    return 'NO CONTEXT'
+
+        nested_schema = Schema()
+        nested_schema.add_property('prop')
+        nested_schema.prop.add_filter(TestFilter())
+
+        prop = EntityProperty(use_context=False)
+        prop.schema = nested_schema
+
+        model = dict(prop='some value')
+        prop.filter_with_schema(model, context=custom_context)
+        self.assertEquals('NO CONTEXT', model['prop'])
 
     def test_validating_entity_prop_with_schema_using_context(self):
         """ Validating entity property with schema using context (default) """
-        self.fail('Implement me!')
+        custom_context = 'CUSTOM CONTEXT'
+
+        class TestValidator(validators.AbstractValidator):
+            def validate(self, value, model=None, context=None):
+                if context == custom_context:
+                    return Error('CONTEXT')
+                else:
+                    return Error('NO CONTEXT')
+
+        nested_schema = Schema()
+        nested_schema.add_property('prop')
+        nested_schema.prop.add_validator(TestValidator())
+
+        prop = EntityProperty()
+        prop.schema = nested_schema
+
+        model = dict(prop='some value')
+        res = prop.validate_with_schema(model, context=custom_context)
+        err = res.get_messages()
+        self.assertEquals('CONTEXT', err['prop'][0])
 
     def test_validating_entity_prop_with_schema_without_context(self):
         """ Validating entity property with schema without context """
-        self.fail('Implement me!')
+        custom_context = 'CUSTOM CONTEXT'
+
+        class TestValidator(validators.AbstractValidator):
+            def validate(self, value, model=None, context=None):
+                if context == custom_context:
+                    return Error('CONTEXT')
+                else:
+                    return Error('NO CONTEXT')
+
+        nested_schema = Schema()
+        nested_schema.add_property('prop')
+        nested_schema.prop.add_validator(TestValidator())
+
+        prop = EntityProperty(use_context=False)
+        prop.schema = nested_schema
+
+        model = dict(prop='some value')
+        res = prop.validate_with_schema(model, context=custom_context)
+        err = res.get_messages()
+        self.assertEquals('NO CONTEXT', err['prop'][0])
 
     def test_filter_and_validate(self):
         """ Process: filter and validate in single operation """
@@ -319,19 +443,113 @@ class CollectionPropertyTests(TestCase):
 
     def test_filtering_collection_prop_with_schema_using_context(self):
         """ Filtering collection property with schema using context (default)"""
-        self.fail('Implement me!')
+        custom_context = 'CUSTOM CONTEXT'
+
+        class TestFilter(filters.AbstractFilter):
+            def filter(self, value, model=None, context=None):
+                if context == custom_context:
+                    return 'CONTEXT'
+                else:
+                    return 'NO CONTEXT'
+
+        nested_schema = Schema()
+        nested_schema.add_property('prop')
+        nested_schema.prop.add_filter(TestFilter())
+
+        prop = CollectionProperty()
+        prop.schema = nested_schema
+
+        col = [
+            dict(prop='some value'),
+            dict(prop='some other value')
+        ]
+
+        prop.filter_with_schema(collection=col, context=custom_context)
+        for item in col:
+            self.assertEquals('CONTEXT', item['prop'])
 
     def test_filtering_collection_prop_with_schema_without_context(self):
         """ Filtering collection property with schema without context """
-        self.fail('Implement me!')
+        custom_context = 'CUSTOM CONTEXT'
+
+        class TestFilter(filters.AbstractFilter):
+            def filter(self, value, model=None, context=None):
+                if context == custom_context:
+                    return 'CONTEXT'
+                else:
+                    return 'NO CONTEXT'
+
+        nested_schema = Schema()
+        nested_schema.add_property('prop')
+        nested_schema.prop.add_filter(TestFilter())
+
+        prop = CollectionProperty(use_context=False)
+        prop.schema = nested_schema
+
+        col = [
+            dict(prop='some value'),
+            dict(prop='some other value')
+        ]
+
+        prop.filter_with_schema(collection=col, context=custom_context)
+        for item in col:
+            self.assertEquals('NO CONTEXT', item['prop'])
 
     def test_validating_collection_prop_with_schema_using_context(self):
         """ Validating collection property with schema using context """
-        self.fail('Implement me!')
+        custom_context = 'CUSTOM CONTEXT'
+
+        class TestValidator(validators.AbstractValidator):
+            def validate(self, value, model=None, context=None):
+                if context == custom_context:
+                    return Error('CONTEXT')
+                else:
+                    return Error('NO CONTEXT')
+
+        nested_schema = Schema()
+        nested_schema.add_property('prop')
+        nested_schema.prop.add_validator(TestValidator())
+
+        prop = CollectionProperty()
+        prop.schema = nested_schema
+
+        col = [
+            dict(prop='some value'),
+            dict(prop='some other value')
+        ]
+
+        res = prop.validate_with_schema(collection=col, context=custom_context)
+        for result in res:
+            err = result.get_messages()
+            self.assertEquals('CONTEXT', err['prop'][0])
 
     def test_validating_collection_prop_with_schema_without_context(self):
         """ Validating collection property with schema without context """
-        self.fail('Implement me!')
+        custom_context = 'CUSTOM CONTEXT'
+
+        class TestValidator(validators.AbstractValidator):
+            def validate(self, value, model=None, context=None):
+                if context == custom_context:
+                    return Error('CONTEXT')
+                else:
+                    return Error('NO CONTEXT')
+
+        nested_schema = Schema()
+        nested_schema.add_property('prop')
+        nested_schema.prop.add_validator(TestValidator())
+
+        prop = CollectionProperty(use_context=False)
+        prop.schema = nested_schema
+
+        col = [
+            dict(prop='some value'),
+            dict(prop='some other value')
+        ]
+
+        res = prop.validate_with_schema(collection=col, context=custom_context)
+        for result in res:
+            err = result.get_messages()
+            self.assertEquals('NO CONTEXT', err['prop'][0])
 
 
 
