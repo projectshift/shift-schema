@@ -155,20 +155,6 @@ class SchemaTest(TestCase):
         schema.set(model, 'someproperty', 'SOME VALUE')
         self.assertEqual('SOME VALUE', model.someproperty)
 
-    def test_create_from_spec(self):
-        """ Creating schema from spec"""
-        schema = helpers.PersonSpecAggregate()
-        self.assertEqual(1, len(schema.state))
-
-        # import pdb;pdb.set_trace()
-        self.assertIsInstance(schema.first_name, SimpleProperty)
-        self.assertEqual(1, len(schema.first_name.filters))
-        self.assertEqual(1, len(schema.first_name.validators))
-
-        self.assertIsInstance(schema.last_name, SimpleProperty)
-        self.assertEqual(1, len(schema.last_name.filters))
-        self.assertEqual(1, len(schema.last_name.validators))
-
     def test_create_by_subclassing(self):
         """ Creating schema in subclass """
         class MySchema(Schema):

@@ -17,15 +17,11 @@ class Schema:
     locale = 'en'
     translator = Translator()
 
-    def __init__(self, spec=None, locale=None, translator=None):
+    def __init__(self, locale=None, translator=None):
         self.state = []
         self.properties = {}
         self.entities = {}
         self.collections = {}
-
-        # create from spec
-        if spec:
-            self.factory(spec)
 
         if locale:
             self.locale = locale
@@ -41,72 +37,6 @@ class Schema:
         :return: None
         """
         pass
-
-    def factory(self, spec):
-        """
-        Factory method: configures itself from a spec dictionary
-        :param spec: dict
-        :return: None
-        """
-        if 'state' in spec:
-            for state_validator in spec['state']:
-                self.add_state_validator(state_validator)
-
-        if 'properties' in spec:
-            for property_name in spec['properties']:
-                self.add_property(property_name)
-                prop = self.properties[property_name]
-                prop_spec = spec['properties'][property_name]
-
-                prop_filters = prop_spec.get('filters')
-                if prop_filters:
-                    for filter in prop_filters:
-                        prop.add_filter(filter)
-
-                prop_validators = prop_spec.get('validators')
-                if prop_validators:
-                    for validator in prop_validators:
-                        prop.add_validator(validator)
-
-        if 'entities' in spec:
-            for property_name in spec['entities']:
-                self.add_entity(property_name)
-                prop = self.entities[property_name]
-                prop_spec = spec['entities'][property_name]
-
-                prop_filters = prop_spec.get('filters')
-                if prop_filters:
-                    for filter in prop_filters:
-                        prop.add_filter(filter)
-
-                prop_validators = prop_spec.get('validators')
-                if prop_validators:
-                    for validator in prop_validators:
-                        prop.add_validator(validator)
-
-                schema = prop_spec.get('schema')
-                if schema:
-                    prop.schema = schema
-
-        if 'collections' in spec:
-            for property_name in spec['collections']:
-                self.add_collection(property_name)
-                prop = self.collections[property_name]
-                prop_spec = spec['collections'][property_name]
-
-                prop_filters = prop_spec.get('filters')
-                if prop_filters:
-                    for filter in prop_filters:
-                        prop.add_filter(filter)
-
-                prop_validators = prop_spec.get('validators')
-                if prop_validators:
-                    for validator in prop_validators:
-                        prop.add_validator(validator)
-
-                schema = prop_spec.get('schema')
-                if schema:
-                    prop.schema = schema
 
     def has_property(self, property_name):
         """
