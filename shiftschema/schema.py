@@ -182,6 +182,25 @@ class Schema:
             return
 
         # properties
+        self.filter_properties(model, context=context)
+
+        # entities
+        self.filter_entities(model, context=context)
+
+        # collections
+        self.filter_collections(model, context=context)
+
+    def filter_properties(self, model, context=None):
+        """
+        Filter simple properties
+        Runs filters on simple properties changing them in place.
+        :param model:  object or dict
+        :param context: object, dict or None
+        :return: None
+        """
+        if model is None:
+            return
+
         for property_name in self.properties:
             prop = self.properties[property_name]
             value = self.get(model, property_name)
@@ -196,7 +215,17 @@ class Schema:
             if value != filtered_value:  # unless changed!
                 self.set(model, property_name, filtered_value)
 
-        # entities
+    def filter_entities(self, model, context=None):
+        """
+        Filter entities
+        Runs filters on entity properties changing them in place.
+        :param model:  object or dict
+        :param context: object, dict or None
+        :return: None
+        """
+        if model is None:
+            return
+
         for property_name in self.entities:
             prop = self.entities[property_name]
             value = self.get(model, property_name)
@@ -214,7 +243,17 @@ class Schema:
                 context=context
             )
 
-        # collections
+    def filter_collections(self, model, context=None):
+        """
+        Filter collections
+        Runs filters on collection properties changing them in place.
+        :param model:  object or dict
+        :param context: object, dict or None
+        :return: None
+        """
+        if model is None:
+            return
+
         for property_name in self.collections:
             prop = self.collections[property_name]
             collection = self.get(model, property_name)
@@ -242,6 +281,33 @@ class Schema:
         result = Result(translator=self.translator, locale=self.locale)
 
         # validate state
+        state_result = self.validate_state(model, context=context)
+        result.merge(state_result)
+
+        # validate simple properties
+        props_result = self.validate_properties(model, context=context)
+        result.merge(props_result)
+
+        # validate nested entity properties
+        entities_result = self.validate_entities(model, context=context)
+        result.merge(entities_result)
+
+        # validate collection properties
+        collections_result = self.validate_collections(model, context=context)
+        result.merge(collections_result)
+
+        # and return
+        return result
+
+    def validate_state(self, model, context=None):
+        """
+        Validate model state
+        Run state validators and return and result object.
+        :param model:  object or dict
+        :param context: object, dict or None
+        :return: shiftschema.result.Result
+        """
+        result = Result()
         for state_validator in self.state:
             error = state_validator.run(
                 value=model,
@@ -251,7 +317,17 @@ class Schema:
             if error:
                 result.add_state_errors(error)
 
-        # validate simple properties
+        return result
+
+    def validate_properties(self, model, context=None):
+        """
+        Validate simple properties
+        Performs validation on simple properties to return a result object.
+        :param model:  object or dict
+        :param context: object, dict or None
+        :return: shiftschema.result.Result
+        """
+        result = Result()
         for property_name in self.properties:
             prop = self.properties[property_name]
             value = self.get(model, property_name)
@@ -267,7 +343,17 @@ class Schema:
                     property_name=property_name
                 )
 
-        # validate nested entity properties
+        return result
+
+    def validate_entities(self, model, context=None):
+        """
+        Validate entity properties
+        Performs validation on entity properties to return a result object.
+        :param model:  object or dict
+        :param context: object, dict or None
+        :return: shiftschema.result.Result
+        """
+        result = Result()
         for property_name in self.entities:
             prop = self.entities[property_name]
             value = self.get(model, property_name)
@@ -296,7 +382,17 @@ class Schema:
                     schema_errors=schema_valid.errors
                 )
 
-        # validate collection properties
+        return result
+
+    def validate_collections(self, model, context=None):
+        """
+        Validate collection properties
+        Performs validation on collection properties to return a result object.
+        :param model:  object or dict
+        :param context: object, dict or None
+        :return: shiftschema.result.Result
+        """
+        result = Result()
         for property_name in self.collections:
             prop = self.collections[property_name]
             collection = self.get(model, property_name)
