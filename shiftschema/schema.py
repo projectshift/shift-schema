@@ -141,7 +141,10 @@ class Schema:
             getter = getattr(model, 'get_' + property_name)
             return getter()
         else:
-            return getattr(model, property_name)
+            try:
+                return getattr(model, property_name)
+            except AttributeError:
+                return None
 
     def set(self, model, property_name, value):
         """
@@ -157,7 +160,10 @@ class Schema:
             setter = getattr(model, 'set_' + property_name)
             setter(value)
         else:
-            setattr(model, property_name, value)
+            try:
+                setattr(model, property_name, value)
+            except AttributeError:
+                pass
 
     def process(self, model=None, context=None):
         """
