@@ -156,11 +156,15 @@ class CollectionProperty(EntityProperty):
         """ Perform collection items filtering with schema """
         if collection is None or self.schema is None:
             return
-        for item in collection:
-            self._schema.filter(
-                model=item,
-                context=context if self.use_context else None
-            )
+
+        try:
+            for item in collection:
+                self._schema.filter(
+                    model=item,
+                    context=context if self.use_context else None
+                )
+        except TypeError:
+            pass
 
     def validate_with_schema(self, collection=None, context=None):
         """ Validate each item in collection with our schema"""
@@ -168,12 +172,15 @@ class CollectionProperty(EntityProperty):
             return
 
         result = []
-        for index, item in enumerate(collection):
-            item_result = self._schema.validate(
-                model=item,
-                context=context if self.use_context else None
-            )
-            result.append(item_result)
+        try:
+            for index, item in enumerate(collection):
+                item_result = self._schema.validate(
+                    model=item,
+                    context=context if self.use_context else None
+                )
+                result.append(item_result)
+        except TypeError:
+            pass
 
         return result
 
