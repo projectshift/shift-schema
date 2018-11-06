@@ -28,5 +28,8 @@ translations = {
     # not empty
     '%not_iterable%': 'Не итерируемое значение',
     '%cant_be_empty%': 'Не может быть пустым, необходим хотя бы один элемент',
+
+    # url
+    '%url_invalid%': 'Неверный адрес URL'
 }
 

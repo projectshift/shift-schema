@@ -28,5 +28,8 @@ translations = {
 
     # not empty
     '%not_iterable%': 'This is not an iterable',
-    '%cant_be_empty%': 'Can\t be empty, at least one item required',
+    '%cant_be_empty%': 'Can\'t be empty, at least one item required',
+
+    # url
+    '%url_invalid%': 'This URL is invalid'
 }

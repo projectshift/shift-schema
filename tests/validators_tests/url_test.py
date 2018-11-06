@@ -2,10 +2,15 @@ from unittest import TestCase, mock
 from nose.plugins.attrib import attr
 
 from shiftschema.validators import Url
+import re
 
 # these are valid urls
 valid = [
+    # "http://localhost/blah_blah",
+    # "http://localhost/blah_blah",
+    # "http://foo.com@user:pass",
     "http://foo.com/blah_blah",
+    "//foo.com/blah_blah",
     "http://foo.com/blah_blah/",
     "http://foo.com/blah_blah_(wikipedia)",
     "http://foo.com/blah_blah_(wikipedia)_(again)",
@@ -42,6 +47,7 @@ valid = [
     "http://a.b-c.de",
     "http://223.255.255.254",
     "https://foo_bar.example.com/",
+    "https://папироска.рф"
 ]
 
 # these are invalid urls
@@ -96,6 +102,20 @@ class UrlTest(TestCase):
         """ Can instantiate URL validator """
         validator = Url()
         self.assertIsInstance(validator, Url)
+
+    @attr('zzz')
+    def test_valid_urls_pass(self):
+        """ Valid urls pass validation """
+        validator = Url()
+        for url in valid:
+            validator.validate(url)
+            break
+
+
+
+
+
+
 
     # def test_can_fail(self):
     #     """ Validating digits and failing """
