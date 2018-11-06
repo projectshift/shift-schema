@@ -51,7 +51,6 @@ class Email(AbstractValidator):
         http://tfletcher.com/lib/rfc822.py
         Licensed under a Creative Commons Attribution-ShareAlike 2.5 License
         http://creativecommons.org/licenses/by-sa/2.5/
-
         :return:
         """
 

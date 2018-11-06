@@ -6,6 +6,7 @@ from shiftschema.validators.length import Length
 from shiftschema.validators.email import Email
 from shiftschema.validators.required import Required
 from shiftschema.validators.not_empty import NotEmpty
+from shiftschema.validators.url import Url
 
 
 

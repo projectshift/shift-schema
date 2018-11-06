@@ -5,6 +5,7 @@ from shiftschema.filters.lowercase import Lowercase
 from shiftschema.filters.uppercase import Uppercase
 from shiftschema.filters.bleach import Bleach
 from shiftschema.filters.linkify import Linkify
+from shiftschema.filters.add_http import AddHttp
 
 
 # todo implement these filters:
