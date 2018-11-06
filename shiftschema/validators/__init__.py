@@ -18,7 +18,8 @@ from shiftschema.validators.url import Url
 # equals.py
 # file_exists.py
 # file_size.py
-# host.py
+# hostname.py
+# ip.py
 # iban.py
 # image size.py
 # is_image.py
@@ -26,4 +27,4 @@ from shiftschema.validators.url import Url
 # isbn.py
 # range.py
 # regex.py
-# url.py
+

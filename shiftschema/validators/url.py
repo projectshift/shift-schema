@@ -17,19 +17,27 @@ class Url(AbstractValidator):
     # regex compile flags
     flags = re.UNICODE | re.IGNORECASE
 
-    def __init__(self, tlds=None, message=None):
+    # allow localhost?
+    localhost = False
+
+    def __init__(self, protocols=None, localhost=False, message=None):
         """
         Initialize validator
         Accepts an optional custom error message.
 
+        :param protocols:       list, allowed protocols
+        :param localhost:       bool, wether to allow localhost
         :param message:         str, custom error message
         :return:                None
         """
         if message is not None:
             self.not_email = message
 
-        if tlds:
-            self.tlds = tlds
+        if protocols:
+            self.protocols = protocols
+
+        if localhost:
+            self.localhost = True
 
     def validate(self, value, model=None, context=None):
         """
@@ -42,19 +50,22 @@ class Url(AbstractValidator):
         :return:                shiftschema.results.SimpleResult
         """
         value = str(value)
-        regex = self.regex(protocols=self.protocols)
-        print('REGEX', regex)
+        regex = self.regex(
+            protocols=self.protocols,
+            localhost=self.localhost
+        )
+
         regex = re.compile(regex, flags=self.flags)
-
         match = regex.match(value)
-        print('MATCH?', match)
 
-
+        # return error
+        if not match:
+            return Error(self.url_invalid)
 
         # success otherwise
         return Error()
 
-    def regex(self, protocols):
+    def regex(self, protocols, localhost=True):
         """
         URL Validation regex
         Based on regular expression by Diego Perini (@dperini) and provided
@@ -87,7 +98,9 @@ class Url(AbstractValidator):
         p += r"(?:"
         p += r"(?:"
         p += r"[a-z0-9\u00a1-\uffff][a-z0-9\u00a1-\uffff_-]{0,62})?"
-        p += r"[a-z0-9\u00a1-\uffff]\."
+        p += r"[a-z0-9\u00a1-\uffff]"
+        p += r"\." if not localhost else r"[\.]?|localhost"
+
 
         p += r")+"
 

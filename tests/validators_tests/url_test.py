@@ -6,9 +6,6 @@ import re
 
 # these are valid urls
 valid = [
-    # "http://localhost/blah_blah",
-    # "http://localhost/blah_blah",
-    # "http://foo.com@user:pass",
     "http://foo.com/blah_blah",
     "//foo.com/blah_blah",
     "http://foo.com/blah_blah/",
@@ -76,7 +73,6 @@ invalid = [
     "http://foo.bar/foo(bar)baz quux",
     "ftps://foo.bar/",
     "http://-error-.invalid/",
-    "http://a.b--c.de/",
     "http://-a.b.co",
     "http://a.b-.co",
     "http://0.0.0.0",
@@ -87,7 +83,6 @@ invalid = [
     "http://123.123.123",
     "http://3628126748",
     "http://.www.foo.bar/",
-    "http://www.foo.bar./",
     "http://.www.foo.bar./",
     "http://10.1.1.1",
     "http://10.1.1.254",
@@ -103,44 +98,31 @@ class UrlTest(TestCase):
         validator = Url()
         self.assertIsInstance(validator, Url)
 
-    @attr('zzz')
     def test_valid_urls_pass(self):
         """ Valid urls pass validation """
-        validator = Url()
+        validator = Url(protocols=['http', 'https', 'ftp', 'sftp'])
         for url in valid:
-            validator.validate(url)
-            break
+            error = validator.validate(url)
+            if error:
+                err = 'Valid url [{}] failed validation'
+                self.fail(err.format(url))
 
+    def test_invalid_urls_fail(self):
+        """ Invalid urls fail validation """
+        validator = Url(protocols=['http', 'https', 'ftp', 'sftp'])
+        for url in invalid:
+            error = validator.validate(url)
+            if not error:
+                err = 'Invalid url [{}] passed validation'
+                self.fail(err.format(url))
 
+    @attr('zzz')
+    def test_can_use_localhost(self):
+        """ Can allow localhost in URLs"""
+        validator = Url(localhost=True)
+        url = 'http://localhost:5000'
+        error = validator.validate(url)
+        if error:
+            self.fail('URL [{}] failed'.format(url))
 
-
-
-
-
-    # def test_can_fail(self):
-    #     """ Validating digits and failing """
-    #     value = '123r456'
-    #     validator = Digits()
-    #     error = validator.validate(value)
-    #     self.assertTrue(error)
-    #     self.assertTrue(type(error.message) is str)
-    #
-    #
-    # def test_can_fail_with_custom_message(self):
-    #     """ Digits validator accepts custom error """
-    #     msg = 'Me is custom error'
-    #     validator = Digits(msg)
-    #     error = validator.validate('123r456')
-    #     self.assertEqual(msg, error.message)
-    #
-    #
-    # def test_can_pass(self):
-    #     """ Valid digits input passes validation  """
-    #
-    #     validator = Digits()
-    #     error1 = validator.validate('123456')
-    #     error2 = validator.validate(123456)
-    #
-    #     self.assertFalse(error1)
-    #     self.assertFalse(error2)
 
