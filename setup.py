@@ -22,7 +22,7 @@ from setuptools import setup, find_packages
 # ----------------------------------------------------------------------------
 
 # project version
-version = '0.2.3'
+version = '0.2.4'
 
 # development status
 # dev_status = '1 - Planning'
