@@ -22,7 +22,7 @@ from setuptools import setup, find_packages
 # ----------------------------------------------------------------------------
 
 # project version
-version = '0.2.4'
+version = '0.2.5'
 
 # development status
 # dev_status = '1 - Planning'
@@ -93,7 +93,7 @@ setup(**dict(
 
     # project dependencies
     install_requires=[
-        'bleach==2.1.3'
+        'bleach>=3.1.0,<4.0.0'
     ],
 
 
