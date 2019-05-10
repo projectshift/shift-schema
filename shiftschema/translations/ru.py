@@ -30,6 +30,9 @@ translations = {
     '%cant_be_empty%': 'Не может быть пустым, необходим хотя бы один элемент',
 
     # url
-    '%url_invalid%': 'Неверный адрес URL'
+    '%url_invalid%': 'Неверный адрес URL',
+
+    # ip
+    '%invalid_ip%': 'Некорректный адрес IPv4 или IPv6',
 }
 

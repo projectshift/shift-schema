@@ -31,5 +31,8 @@ translations = {
     '%cant_be_empty%': 'Can\'t be empty, at least one item required',
 
     # url
-    '%url_invalid%': 'This URL is invalid'
+    '%url_invalid%': 'This URL is invalid',
+
+    # ip
+    '%invalid_ip%': 'This is not a valid IPv4 or IPv6 address',
 }
