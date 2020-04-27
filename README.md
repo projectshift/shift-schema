@@ -209,7 +209,7 @@ class UserSchema(Schema):
         self.password.add_validator(validators.Length(min=3, max=200))		
 ```
 
-You can now use chema to validate and filter form data in your views. The usage is similar to regular forms and workflow:
+You can now use schema to validate and filter form data in your views. The usage is similar to regular forms and workflow:
 
 ```python
 @app.route('/register/', methods=['GET', 'POST'])
