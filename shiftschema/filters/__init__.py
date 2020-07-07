@@ -1,5 +1,6 @@
 from shiftschema.filters.abstract_filter import AbstractFilter
 from shiftschema.filters.digits import Digits
+from shiftschema.filters.slugify import Slugify
 from shiftschema.filters.strip import Strip
 from shiftschema.filters.lowercase import Lowercase
 from shiftschema.filters.uppercase import Uppercase

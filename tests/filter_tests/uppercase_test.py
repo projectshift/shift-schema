@@ -3,12 +3,13 @@ from nose.plugins.attrib import attr
 
 from shiftschema.filters import Uppercase
 
+
 @attr('filter', 'uppercase')
 class UppercaseTest(TestCase):
     """ Uppercase filter test"""
 
     def test_create(self):
-        """ Can create digits filter """
+        """ Can create uppercase filter """
         filter = Uppercase()
         self.assertIsInstance(filter, Uppercase)
 
