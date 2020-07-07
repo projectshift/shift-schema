@@ -55,7 +55,7 @@ class Slugify(AbstractFilter):
         stopwords=(),
         regex_pattern=None,
         lowercase=True,
-        replacements=(),
+        replacements=()
     ):
         """
         Initialise filter
