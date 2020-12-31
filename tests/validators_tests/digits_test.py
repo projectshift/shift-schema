@@ -13,6 +13,14 @@ class DigitsTest(TestCase):
         validator = Digits()
         self.assertIsInstance(validator, Digits)
 
+    def test_validate_a_copy_of_value(self):
+        """ Create a copy of value for validation """
+        value = 12345
+        value_type = type(value)
+        validator = Digits()
+        validator.validate(value)
+        self.assertEqual(value_type, type(value))
+
     def test_can_fail(self):
         """ Validating digits and failing """
         value = '123r456'
@@ -21,14 +29,12 @@ class DigitsTest(TestCase):
         self.assertTrue(error)
         self.assertTrue(type(error.message) is str)
 
-
     def test_can_fail_with_custom_message(self):
         """ Digits validator accepts custom error """
         msg = 'Me is custom error'
         validator = Digits(msg)
         error = validator.validate('123r456')
         self.assertEqual(msg, error.message)
-
 
     def test_can_pass(self):
         """ Valid digits input passes validation  """

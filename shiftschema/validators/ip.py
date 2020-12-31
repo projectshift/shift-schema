@@ -33,6 +33,7 @@ class Ip(AbstractValidator):
         :return:                shiftschema.results.SimpleResult
         """
 
+        value = str(value)
         try:
             ip = ipaddress.ip_address(value)
         except ValueError:

@@ -43,7 +43,8 @@ class Length(AbstractValidator):
         :return:                shiftschema.results.SimpleResult
         """
 
-        length = len(str(value))
+        value = str(value)
+        length = len(value)
         params = dict(min=self.min, max=self.max)
 
         # too short?

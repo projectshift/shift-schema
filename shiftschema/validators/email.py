@@ -34,6 +34,7 @@ class Email(AbstractValidator):
         :return:                shiftschema.results.SimpleResult
         """
 
+        value = str(value)
         regex = self.regex()
         match = regex.match(value)
         if not match:
