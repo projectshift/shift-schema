@@ -10,20 +10,32 @@ class Required(AbstractValidator):
     """
 
     value_required = '%value_required%'
-    allow_false = False
 
-    def __init__(self, allow_false=False, allow_zero=False, message=None):
+    allow_false = False
+    allow_zero = False
+    allow_empty_string = False
+
+    def __init__(
+        self,
+        allow_false=False,
+        allow_zero=False,
+        allow_empty_string=False,
+        message=None
+    ):
         """
         Initialize validator
         Accepts an optional custom error message.
 
-        :param allow_false      bool, whether to allow False as value
-        :param allow_zero:      bool, whether to allow 0 as value
-        :param message:         str, custom error message
-        :return:                None
+        :param allow_false          bool, whether to allow False as value
+        :param allow_zero:          bool, whether to allow 0 as value
+        :param allow_empty_string:  bool, whether to allow '' as value
+        :param message:             str, custom error message
+        :return:                    None
         """
         self.allow_false = allow_false
         self.allow_zero = allow_zero
+        self.allow_empty_string = allow_empty_string
+
         if message is not None:
             self.value_required = message
 
@@ -39,13 +51,11 @@ class Required(AbstractValidator):
         """
 
         # ok if non-empty string
-        if type(value) is str:
-            value = value.strip()
-            if value != '':
-                return Error()
+        if type(value) is str and value != '':
+            return Error()
 
         # ok if has value
-        if value:
+        if bool(value):
             return Error()
 
         # ok if false, but false is allowed
@@ -54,6 +64,10 @@ class Required(AbstractValidator):
 
         # ok if 0, but zero is allowed
         if value == 0 and self.allow_zero:
+            return Error()
+
+        # ok if '', but empty string is allowed
+        if value == '' and self.allow_empty_string:
             return Error()
 
         # error otherwise

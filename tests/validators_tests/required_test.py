@@ -34,11 +34,16 @@ class RequiredTest(TestCase):
         self.assertTrue(error)
         self.assertTrue(error.message)
 
-        # empty strings
+        # empty string
         validator = Required()
-        error = validator.validate('     ')
+        error = validator.validate('')
         self.assertTrue(error)
         self.assertTrue(error.message)
+
+        # empty spaces pass
+        validator = Required()
+        error = validator.validate('     ')
+        self.assertFalse(error)
 
     def test_false_values_can_be_allowed(self):
         """ False can be a valid value for required check """
@@ -50,4 +55,10 @@ class RequiredTest(TestCase):
         """ False can be a valid value for required check """
         validator = Required(allow_zero=True)
         error = validator.validate(0)
+        self.assertFalse(error)
+
+    def test_empty_strings_can_be_allowed(self):
+        """ Empty string can be a valid value for required check """
+        validator = Required(allow_empty_string=True)
+        error = validator.validate('')
         self.assertFalse(error)
