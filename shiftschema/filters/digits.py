@@ -1,6 +1,7 @@
 from shiftschema.filters import AbstractFilter
 import re
 
+
 class Digits(AbstractFilter):
     """
     Digits filter
