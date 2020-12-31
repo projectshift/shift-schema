@@ -26,6 +26,11 @@ class AddHttp(AbstractFilter):
         :param context:         object, filtering context
         :return:                filtered value
         """
+
+        # string filter: skip non-strings
+        if type(value) is not str:
+            return value
+
         http = ['http://', 'https://']
         if all(not str(value).startswith(s) for s in http):
             value = 'http://{}'.format(value)

@@ -14,6 +14,13 @@ class StripTest(TestCase):
         filter = Strip()
         self.assertIsInstance(filter, Strip)
 
+    def test_pass_through_non_strings(self):
+        """ Strip: Pass through non-string values (don't do anything) """
+        filter = Strip()
+        self.assertEquals(None, filter.filter(None))
+        self.assertEquals(False, filter.filter(False))
+        self.assertEquals(123, filter.filter(123))
+
     def test_raise_on_invalid_mode(self):
         """ Raise error on invalid mode value """
         with self.assertRaises(InvalidOption):
@@ -26,7 +33,6 @@ class StripTest(TestCase):
         strip = Strip()
         self.assertEqual(expected, strip.filter(value))
 
-
     def test_filter_left(self):
         """ Can filter from left side """
         value = '   filter me   '
@@ -34,14 +40,12 @@ class StripTest(TestCase):
         strip = Strip('left')
         self.assertEqual(expected, strip.filter(value))
 
-
     def test_filter_right(self):
         """ Can filter from right side """
         value = '   filter me   '
         expected = '   filter me'
         strip = Strip('right')
         self.assertEqual(expected, strip.filter(value))
-
 
     def test_filter_specific_chars(self):
         """ Can strip specific characters """

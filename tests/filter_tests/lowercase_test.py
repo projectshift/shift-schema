@@ -13,11 +13,12 @@ class LowercaseTest(TestCase):
         filter = Lowercase()
         self.assertIsInstance(filter, Lowercase)
 
-    def test_implicitly_convert_to_string(self):
-        """ Implicitly convert value to string """
-        value = 123456
+    def test_pass_through_non_strings(self):
+        """ Lowercase: Pass through non-string values (don't do anything) """
         filter = Lowercase()
-        self.assertEqual('123456', filter.filter(value))
+        self.assertEquals(None, filter.filter(None))
+        self.assertEquals(False, filter.filter(False))
+        self.assertEquals(123, filter.filter(123))
 
     def test_filtering(self):
         """ Filtering value to lowercase """

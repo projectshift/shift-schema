@@ -26,6 +26,13 @@ class LinkifyTest(TestCase):
         filter = Linkify()
         self.assertIsInstance(filter, Linkify)
 
+    def test_pass_through_non_strings(self):
+        """ Linkify: Pass through non-string values (don't do anything) """
+        filter = Linkify()
+        self.assertEquals(None, filter.filter(None))
+        self.assertEquals(False, filter.filter(False))
+        self.assertEquals(123, filter.filter(123))
+
     def test_compose_params(self):
         """ Compose linkifier params upon filter instantiation """
         filter = Linkify(**self.params)

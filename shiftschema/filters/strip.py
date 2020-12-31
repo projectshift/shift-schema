@@ -39,7 +39,11 @@ class Strip(AbstractFilter):
         :param context:             object, filtering context
         :return:                    filtered value
         """
-        value = str(value)
+
+        # string filter: skip non-strings
+        if type(value) is not str:
+            return value
+
         if self.mode == 'left':
             return value.lstrip(self.chars)
         elif self.mode == 'right':

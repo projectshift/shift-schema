@@ -83,8 +83,13 @@ class Slugify(AbstractFilter):
         :param context:             object, filtering context
         :return:                    filtered value
         """
+
+        # string filter: skip non-strings
+        if type(value) is not str:
+            return value
+
         result = slugify(
-            str(value),
+            value,
             entities=self.entities,
             decimal=self.decimal,
             hexadecimal=self.hexadecimal,

@@ -63,7 +63,11 @@ class Linkify(AbstractFilter):
         :param context:             object, filtering context
         :return:                    filtered value
         """
-        value = str(value)
+
+        # string filter: skip non-strings
+        if type(value) is not str:
+            return value
+
         linker = Linker(**self.linkify_params)
         return linker.linkify(value)
 

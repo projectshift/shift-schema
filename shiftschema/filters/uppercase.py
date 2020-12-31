@@ -18,7 +18,11 @@ class Uppercase(AbstractFilter):
         :param context:             object, filtering context
         :return:                    filtered value
         """
-        value = str(value)
+
+        # string filter: skip non-strings
+        if type(value) is not str:
+            return value
+
         return value.upper()
 
 

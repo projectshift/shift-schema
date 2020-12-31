@@ -13,6 +13,13 @@ class AddHttpTest(TestCase):
         filter = AddHttp()
         self.assertIsInstance(filter, AddHttp)
 
+    def test_pass_through_non_strings(self):
+        """ AddHttp: Pass through non-string values (don't do anything) """
+        filter = AddHttp()
+        self.assertEquals(None, filter.filter(None))
+        self.assertEquals(False, filter.filter(False))
+        self.assertEquals(123, filter.filter(123))
+
     def test_add_http_to_string(self):
         """ Adding http to string if not present"""
         value = 'google.com'

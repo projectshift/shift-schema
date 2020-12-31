@@ -24,6 +24,13 @@ class BleachTest(TestCase):
         filter = Bleach()
         self.assertIsInstance(filter, Bleach)
 
+    def test_pass_through_non_strings(self):
+        """ Bleach: Pass through non-string values (don't do anything) """
+        filter = Bleach()
+        self.assertEquals(None, filter.filter(None))
+        self.assertEquals(False, filter.filter(False))
+        self.assertEquals(123, filter.filter(123))
+
     def test_compose_params(self):
         """ Compose bleach params upon filter instantiation """
         filter = Bleach(**self.params)
