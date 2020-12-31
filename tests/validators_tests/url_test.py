@@ -116,7 +116,6 @@ class UrlTest(TestCase):
                 err = 'Invalid url [{}] passed validation'
                 self.fail(err.format(url))
 
-    @attr('zzz')
     def test_can_use_localhost(self):
         """ Can allow localhost in URLs"""
         validator = Url(localhost=True)
