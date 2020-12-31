@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 import os
 from setuptools import setup, find_packages
+from shiftschema.version import version
 
 # ----------------------------------------------------------------------------
 # Building
@@ -22,7 +23,7 @@ from setuptools import setup, find_packages
 # ----------------------------------------------------------------------------
 
 # project version
-version = '0.2.8'
+version = version
 
 # development status
 # dev_status = '1 - Planning'
