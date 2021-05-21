@@ -94,8 +94,8 @@ setup(**dict(
 
     # project dependencies
     install_requires=[
-        'bleach>=3.1.5,<4.0.0',
-        'python-slugify>=4.0.1,<5.0.0'
+        'bleach>=3.3.0,<4.0.0',
+        'python-slugify>=5.0.2,<6.0.0'
     ],
 
 
