@@ -1,12 +1,9 @@
-from unittest import TestCase, mock
-from nose.plugins.attrib import attr
-
+from unittest import TestCase
 from shiftschema.validators import AbstractValidator
 from shiftschema.exceptions import InvalidErrorType
 
 
-@attr('validator', 'abstract')
-class AbstractTest(TestCase):
+class AbstractValidatorTest(TestCase):
     """ Abstract validator tests"""
 
     def test_can_extend(self):

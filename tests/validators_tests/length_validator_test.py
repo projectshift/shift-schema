@@ -1,10 +1,8 @@
-from unittest import TestCase, mock
-from nose.plugins.attrib import attr
+from unittest import TestCase
 from shiftschema.validators import Length
 
 
-@attr('validator', 'length')
-class LengthTest(TestCase):
+class LengthValidatorTest(TestCase):
     """ String length validator test"""
 
     def test_create(self):

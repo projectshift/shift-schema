@@ -1,9 +1,8 @@
 from unittest import TestCase
-
 from shiftschema.validators import Digits
 
 
-class DigitsTest(TestCase):
+class DigitsValidatorTest(TestCase):
 
     def test_create(self):
         """ Can instantiate choice validator """

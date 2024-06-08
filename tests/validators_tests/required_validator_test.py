@@ -1,11 +1,8 @@
-from unittest import TestCase, mock
-from nose.plugins.attrib import attr
-
+from unittest import TestCase
 from shiftschema.validators import Required
 
 
-@attr('validator', 'required')
-class RequiredTest(TestCase):
+class RequiredValidatorTest(TestCase):
     """ Required validator test"""
 
     def test_create(self):

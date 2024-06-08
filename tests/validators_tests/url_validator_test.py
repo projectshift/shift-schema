@@ -1,5 +1,4 @@
-from unittest import TestCase, mock
-from nose.plugins.attrib import attr
+from unittest import TestCase
 
 from shiftschema.validators import Url
 import re
@@ -89,9 +88,7 @@ invalid = [
 ]
 
 
-
-@attr('validator', 'url')
-class UrlTest(TestCase):
+class UrlValidatorTest(TestCase):
 
     def test_create(self):
         """ Can instantiate URL validator """

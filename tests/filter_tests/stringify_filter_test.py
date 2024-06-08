@@ -1,12 +1,8 @@
-from unittest import TestCase, mock
-from nose.plugins.attrib import attr
-
+from unittest import TestCase
 from shiftschema.filters import Stringify
-from shiftschema.exceptions import InvalidOption
 
 
-@attr('filter', 'stringify')
-class StringifyTest(TestCase):
+class StringifyFilterTest(TestCase):
     """ String strip filter test"""
 
     def test_create(self):

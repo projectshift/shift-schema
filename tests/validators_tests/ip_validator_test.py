@@ -1,18 +1,13 @@
-from unittest import TestCase, mock
-from nose.plugins.attrib import attr
-
+from unittest import TestCase
 from shiftschema.validators import Ip
-from shiftschema.exceptions import InvalidOption
 
 
-@attr('validator', 'ip')
-class IpTest(TestCase):
+class IpValidatorTest(TestCase):
 
     def test_create(self):
         """ Can instantiate IP validator """
         validator = Ip()
         self.assertIsInstance(validator, Ip)
-
 
     def test_valid_ip_v4_passes_validation(self):
         """ Valid IPv4 address passes validation"""

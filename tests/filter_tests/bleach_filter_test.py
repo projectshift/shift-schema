@@ -1,11 +1,9 @@
-from unittest import TestCase, mock
-from nose.plugins.attrib import attr
+from unittest import TestCase
 
 from shiftschema.filters import Bleach
 
 
-@attr('filter', 'bleach')
-class BleachTest(TestCase):
+class BleachFilterTest(TestCase):
     """ String bleach sanitizing filter test"""
 
     def setUp(self):

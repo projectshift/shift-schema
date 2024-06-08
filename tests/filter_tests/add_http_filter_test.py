@@ -1,11 +1,9 @@
-from unittest import TestCase, mock
-from nose.plugins.attrib import attr
+from unittest import TestCase
 
 from shiftschema.filters import AddHttp
 
 
-@attr('filter', 'add-http')
-class AddHttpTest(TestCase):
+class AddHttpFilterTest(TestCase):
     """ Add HTTP filter test"""
 
     def test_create(self):

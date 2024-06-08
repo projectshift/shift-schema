@@ -1,10 +1,7 @@
 from unittest import TestCase
-from nose.plugins.attrib import attr
-
 from shiftschema.filters import Lowercase
 
 
-@attr('filter', 'lowercase')
 class LowercaseFilterTest(TestCase):
     """ Lowercase filter test"""
 

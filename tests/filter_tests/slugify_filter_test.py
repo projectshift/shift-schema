@@ -1,11 +1,9 @@
-from unittest import TestCase, mock
-from nose.plugins.attrib import attr
+from unittest import TestCase
 
 from shiftschema.filters import Slugify
 
 
-@attr('filter', 'slugify')
-class UppercaseTest(TestCase):
+class SlugifyFilterTest(TestCase):
     """ Slugify filter test"""
 
     def test_create(self):

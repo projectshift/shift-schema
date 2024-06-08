@@ -1,11 +1,8 @@
-from unittest import TestCase, mock
-from nose.plugins.attrib import attr
-
+from unittest import TestCase
 from shiftschema.filters import Uppercase
 
 
-@attr('filter', 'uppercase')
-class UppercaseTest(TestCase):
+class UppercaseFilterTest(TestCase):
     """ Uppercase filter test"""
 
     def test_create(self):

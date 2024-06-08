@@ -1,11 +1,8 @@
 from unittest import TestCase
-from nose.plugins.attrib import attr
-
 from shiftschema.validators import NotEmpty
 
 
-@attr('validator', 'not_empty')
-class NotEmptyTest(TestCase):
+class NotEmptyValidatorTest(TestCase):
     """ Not empty validator test"""
 
     def test_create(self):

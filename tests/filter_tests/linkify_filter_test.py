@@ -1,10 +1,8 @@
-from unittest import TestCase, mock
-from nose.plugins.attrib import attr
+from unittest import TestCase
 
 from shiftschema.filters import Linkify
 
 
-@attr('filter', 'linkify')
 class LinkifyFilterTest(TestCase):
     """ String linkifier filter test"""
 

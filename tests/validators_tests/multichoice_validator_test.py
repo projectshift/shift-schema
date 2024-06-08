@@ -1,12 +1,9 @@
-from unittest import TestCase, mock
-from nose.plugins.attrib import attr
-
+from unittest import TestCase
 from shiftschema.validators import MultiChoice
 from shiftschema.exceptions import InvalidOption
 
 
-@attr('validator', 'multichoice')
-class ChoiceTest(TestCase):
+class ChoiceValidatorTest(TestCase):
     """ Choice validator test"""
 
     def test_create(self):

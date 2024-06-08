@@ -1,12 +1,8 @@
-from unittest import TestCase, mock
-from nose.plugins.attrib import attr
-
+from unittest import TestCase
 from shiftschema.validators import Email
-from shiftschema.exceptions import InvalidOption
 
 
-@attr('validator', 'email')
-class EmailTest(TestCase):
+class EmailValidatorTest(TestCase):
     """ Email validator test"""
 
     def test_create(self):
