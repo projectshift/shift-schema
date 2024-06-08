@@ -5,7 +5,7 @@ from shiftschema.filters import Lowercase
 
 
 @attr('filter', 'lowercase')
-class LowercaseTest(TestCase):
+class LowercaseFilterTest(TestCase):
     """ Lowercase filter test"""
 
     def test_create(self):

@@ -1,11 +1,8 @@
-from unittest import TestCase, mock
-from nose.plugins.attrib import attr
+from unittest import TestCase
 
 from shiftschema.validators import Digits
-from shiftschema.exceptions import InvalidOption
 
 
-@attr('validator', 'digits')
 class DigitsTest(TestCase):
 
     def test_create(self):

@@ -5,7 +5,7 @@ from shiftschema.filters import Linkify
 
 
 @attr('filter', 'linkify')
-class LinkifyTest(TestCase):
+class LinkifyFilterTest(TestCase):
     """ String linkifier filter test"""
 
     def setUp(self):

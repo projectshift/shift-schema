@@ -1,11 +1,9 @@
-from unittest import TestCase, mock
-from nose.plugins.attrib import attr
+from unittest import TestCase
 
 from shiftschema.filters import Digits
 
 
-@attr('filter', 'digits')
-class DigitsTest(TestCase):
+class DigitsFilterTest(TestCase):
     """ String digits filter test"""
 
     def test_create(self):
