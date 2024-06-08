@@ -1,6 +1,11 @@
 from shiftschema.validators.abstract_validator import AbstractValidator
 from shiftschema.result import Error
-from collections import Iterable
+
+# support Python 3.10+
+try:
+    from collections import Iterable
+except ImportError:
+    from collections.abc import Iterable
 
 
 class NotEmpty(AbstractValidator):
